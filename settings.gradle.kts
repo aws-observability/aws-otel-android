@@ -1,0 +1,12 @@
+rootProject.name = "aws-opentelemetry-android"
+
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+
+include(":otelagent")
