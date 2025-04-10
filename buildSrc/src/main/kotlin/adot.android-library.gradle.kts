@@ -36,6 +36,15 @@ android {
         languageVersion = minKotlinVersion.version
         freeCompilerArgs = listOf("-Xjvm-default=all")
     }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("src/main/java", "src/main/kotlin")
+        }
+        getByName("test") {
+            java.srcDirs("src/test/java", "src/test/kotlin")
+        }
+    }
 }
 
 tasks.withType<Test> {

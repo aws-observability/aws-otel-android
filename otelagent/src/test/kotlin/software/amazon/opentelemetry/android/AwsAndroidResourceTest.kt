@@ -35,22 +35,13 @@ import org.mockito.junit.jupiter.MockitoExtension
 internal class AwsAndroidResourceTest {
     private val appName = "awsTestApp"
     private val rumSdkVersion = BuildConfig.OTEL_ANDROID_VERSION
-    private val osDescription =
-        StringBuilder()
-            .append("Android Version ")
-            .append(Build.VERSION.RELEASE)
-            .append(" (Build ")
-            .append(Build.ID)
-            .append(" API level ")
-            .append(Build.VERSION.SDK_INT)
-            .append(")")
-            .toString()
+    private val osDescription = "Android Version ${Build.VERSION.RELEASE} (Build ${Build.ID} API level ${Build.VERSION.SDK_INT})"
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private val app: Application? = null
 
     @Test
-    fun `should Create Correct Resource Typ eWith Region And Rum App Monitor Id`() {
+    fun `should Create Correct Resource Type With Region And Rum App Monitor Id`() {
         val appInfo = ApplicationInfo()
         appInfo.labelRes = 12345
 

@@ -5,14 +5,6 @@ plugins {
 
 android {
     namespace = "software.amazon.opentelemetry.android"
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/java", "src/main/kotlin")
-        }
-        getByName("test") {
-            java.srcDirs("src/test/java", "src/test/kotlin")
-        }
-    }
 }
 
 dependencies {
