@@ -14,3 +14,10 @@ dependencies {
     implementation(libs.opentelemetry.semconv)
     implementation(libs.opentelemetry.semconv.incubating)
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    testLogging {
+        events("skipped", "failed")
+    }
+}
