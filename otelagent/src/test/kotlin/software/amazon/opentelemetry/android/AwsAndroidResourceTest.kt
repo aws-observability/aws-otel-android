@@ -17,7 +17,6 @@ package software.amazon.opentelemetry.android
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.Build
-import io.opentelemetry.android.BuildConfig
 import io.opentelemetry.android.common.RumConstants
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.ServiceAttributes
@@ -34,7 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 internal class AwsAndroidResourceTest {
     private val appName = "awsTestApp"
-    private val rumSdkVersion = BuildConfig.OTEL_ANDROID_VERSION
+    private val rumSdkVersion = BuildConfig.RUM_SDK_VERSION
     private val osDescription = "Android Version ${Build.VERSION.RELEASE} (Build ${Build.ID} API level ${Build.VERSION.SDK_INT})"
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -82,6 +81,7 @@ internal class AwsAndroidResourceTest {
             AwsAndroidResource.createDefault(
                 app,
                 AwsRumAppMonitorConfig("test-region", "test-app-monitor-id"),
+                null,
             )
 
         Assertions.assertEquals(expected, result)
