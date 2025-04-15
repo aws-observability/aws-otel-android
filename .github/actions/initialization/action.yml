@@ -14,6 +14,7 @@ runs:
         distribution: 'temurin'
 
     - name: Setup Android SDK
+      shell: bash
       run: |
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip commandlinetools-linux-9477386_latest.zip
@@ -26,6 +27,7 @@ runs:
 
     # Check if wrapper exists
     - name: Check Gradle Wrapper
+      shell: bash
       id: wrapper-check
       run: |
         if [ ! -f "./gradlew" ]; then
@@ -39,17 +41,21 @@ runs:
 
     # Make gradlew executable
     - name: Make gradlew executable
+      shell: bash
       run: chmod +x ./gradlew
 
     # Initialize wrapper if needed
     - name: Initialize Gradle Wrapper
+      shell: bash
       run: |
         if [ ! -f "./gradle/wrapper/gradle-wrapper.jar" ]; then
           ./gradlew wrapper
         fi
 
     - name: Create local.properties
+      shell: bash
       run: echo "sdk.dir=/root/.android" > local.properties
 
     - name: Make gradlew executable
+      shell: bash
       run: chmod +x ./gradlew
