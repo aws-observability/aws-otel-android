@@ -10,4 +10,3 @@ pluginManagement {
 }
 
 include(":otelagent")
-include(":aws-auth")
