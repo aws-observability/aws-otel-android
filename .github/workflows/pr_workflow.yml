@@ -1,0 +1,33 @@
+name: Code test, build, lint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linter:
+    name: Linting check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize
+        uses: ./.github/actions/initialization
+
+      - name: Run Linter
+        uses: ./.github/actions/linting
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize
+        uses: ./.github/actions/initialization
+
+      - name: Actual build
+        uses: ./.github/actions/test
