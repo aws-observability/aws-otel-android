@@ -1,0 +1,9 @@
+name: 'Linter'
+description: 'Run Spotless Check'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Spotless check
+      shell: 'sh'
+      run: ./gradlew spotlessCheck
