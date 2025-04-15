@@ -33,4 +33,9 @@ allprojects {
 
 subprojects {
     apply(plugin = "adot.spotless")
+    afterEvaluate {
+        tasks.named("preBuild") {
+            dependsOn("spotlessApply")
+        }
+    }
 }

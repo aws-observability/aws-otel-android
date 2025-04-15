@@ -26,19 +26,28 @@ import static io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERS
 
 import android.app.Application;
 import android.os.Build;
-import io.opentelemetry.android.BuildConfig;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import java.util.function.Supplier;
 
+/**
+ * A utility class that can build an OpenTelemetry resource containing metadata that describes the
+ * Android device with context on AWS AppMonitor.
+ */
 class AwsAndroidResource {
-    static Resource createDefault(Application application, AwsRumAppMonitorConfig config) {
-        String appName = readAppName(application);
+    static Resource createDefault(
+            Application application, AwsRumAppMonitorConfig config, String customAppName) {
+        String appName;
+        if (customAppName == null || customAppName.isEmpty()) {
+            appName = readAppName(application);
+        } else {
+            appName = customAppName;
+        }
         ResourceBuilder resourceBuilder =
                 Resource.getDefault().toBuilder().put(SERVICE_NAME, appName);
 
         return resourceBuilder
-                .put(RUM_SDK_VERSION, BuildConfig.OTEL_ANDROID_VERSION)
+                .put(RUM_SDK_VERSION, BuildConfig.RUM_SDK_VERSION)
                 .put(DEVICE_MODEL_NAME, Build.MODEL)
                 .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
                 .put(DEVICE_MANUFACTURER, Build.MANUFACTURER)

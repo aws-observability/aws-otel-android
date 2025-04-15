@@ -12,6 +12,7 @@ kotlin = "2.1.20"
 androidPlugin = "8.9.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
+aws-sdk-v2 = "2.31.19"
 
 [libraries]
 opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
@@ -25,6 +26,7 @@ findbugs-jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
 opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.10.0-alpha" }
 opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
+opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
 opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
 opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
@@ -32,14 +34,15 @@ opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentele
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api" }
 opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator" }
 opentelemetry-sdk-extension-incubator = { module = "io.opentelemetry:opentelemetry-sdk-extension-incubator" }
-opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-semconv" }
 opentelemetry-context = { module = "io.opentelemetry:opentelemetry-context" }
 opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging" }
 opentelemetry-diskBuffering = { module = "io.opentelemetry.contrib:opentelemetry-disk-buffering", version.ref = "opentelemetry-contrib" }
-opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-semconv" }
 volley = "com.android.volley:volley:1.2.1"
 auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
 auto-service-processor = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
+aws-sdk-auth = { module = "software.amazon.awssdk:auth", version.ref = "aws-sdk-v2" }
 
 #Test tools
 opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version = "1.49.0" }
