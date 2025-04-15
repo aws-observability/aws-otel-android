@@ -50,14 +50,6 @@ runs:
       shell: 'sh'
       run: sudo chmod +x ./gradlew
 
-    # Initialize wrapper if needed
-    - name: Initialize Gradle Wrapper
-      shell: 'sh'
-      run: |
-        if [ ! -f "./gradle/wrapper/gradle-wrapper.jar" ]; then
-          ./gradlew wrapper
-        fi
-
     - name: Create local.properties
       shell: 'sh'
       run: |
@@ -65,8 +57,3 @@ runs:
         chmod 644 local.properties
         echo "Created local.properties with SDK path: $HOME/android-sdk"
         cat local.properties
-        
-
-    - name: Make gradlew executable
-      shell: 'sh'
-      run: sudo chmod +x ./gradlew
