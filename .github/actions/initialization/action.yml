@@ -18,8 +18,8 @@ runs:
       run: |
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip commandlinetools-linux-9477386_latest.zip
-        mkdir -p /root/.android/cmdline-tools/
-        mv cmdline-tools /root/.android/cmdline-tools/latest
+        sudo mkdir -p /root/.android/cmdline-tools/
+        sudo mv cmdline-tools /root/.android/cmdline-tools/latest
         export ANDROID_HOME=/root/.android
         export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
         yes | sdkmanager --licenses
@@ -42,7 +42,7 @@ runs:
     # Make gradlew executable
     - name: Make gradlew executable
       shell: bash
-      run: chmod +x ./gradlew
+      run: sudo chmod +x ./gradlew
 
     # Initialize wrapper if needed
     - name: Initialize Gradle Wrapper
@@ -58,4 +58,4 @@ runs:
 
     - name: Make gradlew executable
       shell: bash
-      run: chmod +x ./gradlew
+      run: sudo chmod +x ./gradlew
