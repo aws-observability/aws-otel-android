@@ -34,7 +34,7 @@ class OpenTelemetryAgent(
 
     override fun getRumSessionId(): String = delegate.rumSessionId
 
-    class Builder internal constructor(
+    class Builder constructor(
         private val application: Application,
     ) {
         private val additionalInstrumentations: List<AndroidInstrumentation> = listOf()
