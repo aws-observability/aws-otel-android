@@ -1,5 +1,4 @@
-name: 'Test'
-description: 'Run unit tests'
+name: 'Build and Test'
 
 runs:
   using: "composite"
