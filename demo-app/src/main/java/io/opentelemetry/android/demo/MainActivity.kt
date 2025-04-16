@@ -86,6 +86,6 @@ class MainActivity : ComponentActivity() {
                 Log.d(TAG, "Main Activity started ")
             }
         }
-        viewModel.sessionIdState.value = OtelDemoApplication.rum?.rumSessionId!!
+        viewModel.sessionIdState.value = OtelDemoApplication.openTelemetryAgent?.rumSessionId!!
     }
 }
