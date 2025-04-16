@@ -134,6 +134,7 @@ class OpenTelemetryAgentTest {
             OpenTelemetryAgent
                 .Builder(application)
                 .setApplicationName("testAppName")
+                .build()
         }
     }
 }

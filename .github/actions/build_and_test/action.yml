@@ -1,0 +1,8 @@
+name: 'Build and Test'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Tests
+      shell: 'sh'
+      run: ./gradlew build -x spotlessCheck -x spotlessApply
