@@ -6,4 +6,4 @@ runs:
   steps:
     - name: Run Tests
       shell: 'sh'
-      run: ./gradlew test
+      run: ./gradlew build -x spotlessCheck -x spotlessApply

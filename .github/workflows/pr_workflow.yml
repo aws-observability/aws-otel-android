@@ -1,9 +1,11 @@
-name: Code test, build, lint
+name: PR Approval
 
 on:
   pull_request:
     branches:
       - main
+      - release/*
+      - pre_release/*
 
 jobs:
   linter:
@@ -29,5 +31,5 @@ jobs:
       - name: Initialize
         uses: ./.github/actions/initialization
 
-      - name: Actual build
-        uses: ./.github/actions/test
+      - name: Build and test
+        uses: ./.github/actions/build_and_test
