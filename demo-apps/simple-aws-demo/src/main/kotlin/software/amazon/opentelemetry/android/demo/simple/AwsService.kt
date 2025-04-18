@@ -55,7 +55,7 @@ class AwsService(
         return response.buckets ?: emptyList()
     }
 
-    private suspend fun createCognitoCredentialsProvider(): CredentialsProvider {
+    suspend fun createCognitoCredentialsProvider(): CredentialsProvider {
         val cognitoClient = CognitoIdentityClient {
             this.region = awsRegion
         }

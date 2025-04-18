@@ -15,28 +15,44 @@
 package software.amazon.opentelemetry.android.demo.simple
 
 import android.app.Application
-import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
-import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
-import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter
-import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter
+import kotlinx.coroutines.runBlocking
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporter
 
 class SimpleAwsDemoApplication : Application() {
 
+    // Replace these with your actual AWS credentials and configuration
+    private val cognitoPoolId = "us-east-1:<id>" // Replace with your Cognito Identity Pool ID
+    private val awsRegion = "us-east-1" // Replace with your AWS region
+
+    lateinit var awsService: AwsService
+
     override fun onCreate() {
         super.onCreate()
-        
+
+        awsService = AwsService(cognitoPoolId, awsRegion)
+
+        val credentialsProvider = runBlocking { awsService.createCognitoCredentialsProvider() }
+
         // Initialize AWS OpenTelemetry Agent
         val appMonitorConfig = AwsRumAppMonitorConfig(
             region = "YOUR_REGION_FROM_CDK_OUTPUT",
             appMonitorId = "YOUR_APP_MONITOR_ID_FROM_CDK_OUTPUT"
         )
         
-        // Default configuration - sends data to AWS RUM
+        // Default configuration - sends data to X-Ray only (for now)
         val otelAgent = OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(appMonitorConfig)
             .setApplicationVersion("1.0.0")
+            .addSpanExporterCustomizer {
+                AwsSigV4SpanExporter.builder()
+                    .setRegion(awsRegion)
+                    .setEndpoint("https://xray.us-east-1.amazonaws.com/v1/traces")
+                    .setServiceName("xray")
+                    .setCredentialsProvider(credentialsProvider)
+                    .build()
+            }
             .build()
         
         // For local development with OpenTelemetry Collector

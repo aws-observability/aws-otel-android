@@ -10,4 +10,5 @@ pluginManagement {
 }
 
 include(":otelagent")
+include(":aws-runtime:kotlin-sdk-auth")
 include(":demo-apps:simple-aws-demo")
