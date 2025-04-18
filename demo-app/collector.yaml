@@ -7,8 +7,12 @@ receivers:
         endpoint: 0.0.0.0:4318
 extensions:
 exporters:
-  otlphttp:
-    traces_endpoint: "http://jaeger:4318/v1/traces"
+  file/logs:
+    path: /etc/out/logs.txt
+    flush_interval: 1
+  file/traces:
+    path: /etc/out/traces.txt
+    flush_interval: 1
   debug:
     verbosity: normal
   debug/detailed:
@@ -17,7 +21,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [debug/detailed, otlphttp]
+      exporters: [debug/detailed, file/traces]
     logs:
       receivers: [otlp]
-      exporters: [debug/detailed]
+      exporters: [debug/detailed, file/logs]
