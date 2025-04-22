@@ -1,0 +1,75 @@
+package software.amazon.opentelemetry.android.demo.simple
+
+import android.app.Application
+import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
+import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter
+import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
+import software.amazon.opentelemetry.android.OpenTelemetryAgent
+
+class SimpleAwsDemoApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        
+        // Initialize AWS OpenTelemetry Agent
+        val appMonitorConfig = AwsRumAppMonitorConfig(
+            region = "YOUR_REGION_FROM_CDK_OUTPUT",
+            appMonitorId = "YOUR_APP_MONITOR_ID_FROM_CDK_OUTPUT"
+        )
+        
+        // Default configuration - sends data to AWS RUM
+        val otelAgent = OpenTelemetryAgent.Builder(this)
+            .setAppMonitorConfig(appMonitorConfig)
+            .setApplicationVersion("1.0.0")
+            .build()
+        
+        // For local development with OpenTelemetry Collector
+        // Uncomment the following code and comment out the default configuration above
+        /*
+        // 10.0.2.2 is the special IP that Android emulator uses to communicate with the host
+        // Replace with your actual IP if needed
+        val localEndpoint = "http://10.0.2.2:4318"
+        
+        val otelAgent = OpenTelemetryAgent.Builder(this)
+            .setAppMonitorConfig(appMonitorConfig)
+            .setApplicationVersion("1.0.0")
+            // Configure span exporter to use local collector
+            .addSpanExporterCustomizer { _ ->
+                OtlpHttpSpanExporter.builder()
+                    .setEndpoint("$localEndpoint/v1/traces")
+                    .build()
+            }
+            // Configure log record exporter to use local collector
+            .addLogRecordExporterCustomizer { _ ->
+                OtlpHttpLogRecordExporter.builder()
+                    .setEndpoint("$localEndpoint/v1/logs")
+                    .build()
+            }
+            .build()
+        */
+        
+        // Alternative: Using gRPC exporters instead of HTTP
+        /*
+        val localGrpcEndpoint = "http://10.0.2.2:4317"
+        
+        val otelAgent = OpenTelemetryAgent.Builder(this)
+            .setAppMonitorConfig(appMonitorConfig)
+            .setApplicationVersion("1.0.0")
+            // Configure span exporter to use local collector via gRPC
+            .addSpanExporterCustomizer { _ ->
+                OtlpGrpcSpanExporter.builder()
+                    .setEndpoint(localGrpcEndpoint)
+                    .build()
+            }
+            // Configure log record exporter to use local collector via gRPC
+            .addLogRecordExporterCustomizer { _ ->
+                OtlpGrpcLogRecordExporter.builder()
+                    .setEndpoint(localGrpcEndpoint)
+                    .build()
+            }
+            .build()
+        */
+    }
+}
