@@ -2,6 +2,8 @@
 
 This is a simple demo application that demonstrates how to use the AWS OpenTelemetry Android SDK to instrument AWS API calls.
 
+![](Screenshot_20250422_172232.png)
+
 ## Features
 
 - Integration with AWS OpenTelemetry Android SDK
@@ -101,3 +103,8 @@ For local development and testing, you can use the included OpenTelemetry Collec
 - AWS CDK v2
 - AWS account with appropriate permissions to deploy the CDK stack
 - Docker and Docker Compose (for local collector setup)
+- Android Studio (latest version recommended)
+
+## How to run
+
+See: [demo-apps README](../README.md)
