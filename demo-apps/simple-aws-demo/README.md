@@ -4,8 +4,6 @@ This is a simple demo application that demonstrates how to use the AWS OpenTelem
 
 <img src="Screenshot_20250422_172232.png" width="250">
 
-![](Screenshot_20250422_172232.png | width=250)
-
 ## Features
 
 - Integration with AWS OpenTelemetry Android SDK
