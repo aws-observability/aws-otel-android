@@ -2,6 +2,8 @@
 
 This is a simple demo application that demonstrates how to use the AWS OpenTelemetry Android SDK to instrument AWS API calls.
 
+<img src="Screenshot_20250422_172232.png" width="250">
+
 ![](Screenshot_20250422_172232.png | width=250)
 
 ## Features
