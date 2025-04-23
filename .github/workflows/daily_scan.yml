@@ -1,0 +1,59 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: Apache-2.0
+# Performs a daily scan of:
+# * The latest released ADOT Java image, using Trivy
+# * Project dependencies, using DependencyCheck
+#
+#  Publishes results to CloudWatch Metrics.
+name: Daily scan
+
+on:
+  schedule:
+    - cron: '0 18 * * *' # scheduled to run at 18:00 UTC every day
+  workflow_dispatch: # be able to run the workflow on demand
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  scan_and_report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo for dependency scan
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+#
+      - name: Initialize
+        uses: ./.github/actions/initialization
+
+      - name: Configure AWS credentials for dependency scan
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.SECRET_MANAGER_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Get NVD API key for dependency scan
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        id: nvd_api_key
+        with:
+          secret-ids: ${{ secrets.NVD_API_KEY_SECRET_ARN }}
+          parse-json-secrets: true
+
+      # See http://jeremylong.github.io/DependencyCheck/dependency-check-cli/ for installation explanation
+      - name: Install and run dependency scan
+        id: dep_scan
+        if: always()
+        uses: ./.github/actions/execute_and_retry
+        with:
+          command: './gradlew dependencyCheckAnalyze'
+          max_retry: 5
+          sleep_time: 60
+
+      - name: Print dependency scan results on failure
+        if: ${{ steps.dep_scan.outcome != 'success' }}
+        run: less dependency-check-report.html

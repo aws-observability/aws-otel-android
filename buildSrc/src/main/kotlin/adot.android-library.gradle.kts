@@ -4,6 +4,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("org.owasp.dependencycheck")
 }
 
 val javaVersion = rootProject.extra["java_version"] as JavaVersion
@@ -63,4 +64,9 @@ dependencies {
     testRuntimeOnly(libs.findLibrary("junit-platform-launcher").get())
     testImplementation(libs.findLibrary("opentelemetry-sdk-testing").get())
     testImplementation(libs.findLibrary("androidx-junit").get())
+}
+
+dependencyCheck {
+    nvd.apiKey=System.getenv("NVD_API_KEY_NVD_API_KEY") ?: ""
+    failBuildOnCVSS=0.0f
 }
