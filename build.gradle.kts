@@ -32,10 +32,14 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "adot.spotless")
-    afterEvaluate {
-        tasks.named("preBuild") {
-            dependsOn("spotlessApply")
+    // Skip applying spotless to demo-apps projects
+    if (!project.path.startsWith(":demo-apps")) {
+        apply(plugin = "adot.spotless")
+
+        afterEvaluate {
+            tasks.named("preBuild") {
+                dependsOn("spotlessApply")
+            }
         }
     }
 }

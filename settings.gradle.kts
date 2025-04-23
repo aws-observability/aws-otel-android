@@ -10,3 +10,4 @@ pluginManagement {
 }
 
 include(":otelagent")
+include(":demo-apps:simple-aws-demo")
