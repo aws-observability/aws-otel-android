@@ -19,7 +19,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.amazonaws.regions.Regions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,8 +30,8 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
 
     // Replace these with your actual AWS credentials and configuration
-    private val cognitoPoolId = "us-east-1:0de39a7c-a1f5-44cd-98b0-e63256325f24" // Replace with your Cognito Identity Pool ID
-    private val awsRegion = Regions.US_EAST_1 // Replace with your AWS region
+    private val cognitoPoolId = "us-east-1:<ID>" // Replace with your Cognito Identity Pool ID
+    private val awsRegion = "us-east-1" // Replace with your AWS region
 
     private lateinit var awsService: AwsService
 
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        awsService = AwsService(applicationContext, cognitoPoolId, awsRegion)
+        awsService = AwsService(cognitoPoolId, awsRegion)
         
         setupButtons()
     }
@@ -59,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private fun listS3Buckets() {
         lifecycleScope.launch {
             try {
+                binding.resultTextView.text = "Loading S3 buckets..."
                 val result = withContext(Dispatchers.IO) {
                     val buckets = awsService.listS3Buckets()
                     
@@ -82,8 +82,9 @@ class MainActivity : AppCompatActivity() {
     private fun getCognitoIdentity() {
         lifecycleScope.launch {
             try {
+                binding.resultTextView.text = "Fetching Cognito identity..."
                 val result = withContext(Dispatchers.IO) {
-                    val identityId = awsService.getCognitoIdentity()
+                    val identityId = awsService.getCognitoIdentityId()
                     "Cognito Identity ID: $identityId"
                 }
                 
