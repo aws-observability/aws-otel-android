@@ -14,45 +14,75 @@
  */
 package software.amazon.opentelemetry.android.demo.simple
 
-import android.content.Context
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.regions.Region
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.Bucket
-import com.amazonaws.services.s3.model.ListBucketsRequest
+import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
+import aws.sdk.kotlin.services.cognitoidentity.CognitoIdentityClient
+import aws.sdk.kotlin.services.cognitoidentity.model.GetCredentialsForIdentityRequest
+import aws.sdk.kotlin.services.cognitoidentity.model.GetIdRequest
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.Bucket
+import aws.sdk.kotlin.services.s3.model.ListBucketsRequest
+import aws.smithy.kotlin.runtime.auth.awscredentials.CredentialsProvider
 
 /**
  * Service class to handle AWS API calls
  */
 class AwsService(
-    private val context: Context,
     private val cognitoPoolId: String,
-    private val awsRegion: Regions
+    private val awsRegion: String
 ) {
 
-    private val credentialsProvider = CognitoCachingCredentialsProvider(
-        context,
-        cognitoPoolId,
-        awsRegion
-    )
+    private val cognitoClient = CognitoIdentityClient {
+        this.region = awsRegion
+    }
 
     /**
      * List S3 buckets
      */
-    fun listS3Buckets(): List<Bucket> {
-        val s3Client = AmazonS3Client(credentialsProvider, Region.getRegion(awsRegion))
-        return s3Client.listBuckets(
-            ListBucketsRequest().apply {
+    suspend fun listS3Buckets(): List<Bucket> {
 
-            }
-        )
+        val credentials = createCognitoCredentialsProvider()
+
+        // Create S3 client
+        val s3Client = S3Client {
+            region = awsRegion
+            credentialsProvider = credentials
+        }
+        
+        // List buckets
+        val response = s3Client.listBuckets(ListBucketsRequest {})
+        
+        // Return the buckets
+        return response.buckets ?: emptyList()
     }
 
-    /**
-     * Get Cognito identity
-     */
-    fun getCognitoIdentity(): String {
-        return credentialsProvider.identityId
+    private suspend fun createCognitoCredentialsProvider(): CredentialsProvider {
+        val cognitoClient = CognitoIdentityClient {
+            this.region = awsRegion
+        }
+
+        // Get Identity ID
+        val identityId = getCognitoIdentityId()
+
+        // Get Credentials
+        val credentials = cognitoClient.getCredentialsForIdentity(GetCredentialsForIdentityRequest {
+            this.identityId = identityId
+        })
+
+        if (credentials.credentials == null) {
+            throw IllegalStateException("Failed to obtain credentials")
+        }
+
+        return StaticCredentialsProvider {
+            accessKeyId = credentials.credentials!!.accessKeyId
+            secretAccessKey = credentials.credentials!!.secretKey
+            sessionToken = credentials.credentials!!.sessionToken
+        }
     }
+
+    suspend fun getCognitoIdentityId(): String {
+        return cognitoClient.getId(GetIdRequest {
+            this.identityPoolId = cognitoPoolId
+        }).identityId!!
+    }
+
 }

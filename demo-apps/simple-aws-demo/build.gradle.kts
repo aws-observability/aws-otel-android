@@ -34,6 +34,8 @@ android {
     
     kotlinOptions {
         jvmTarget = javaVersion.toString()
+        // Required for AWS SDK for Kotlin
+        freeCompilerArgs += listOf("-Xjvm-default=all")
     }
     
     buildFeatures {
@@ -44,10 +46,10 @@ android {
 dependencies {
     implementation(project(":otelagent"))
     
-    // AWS SDK dependencies
-    implementation("com.amazonaws:aws-android-sdk-core:2.72.0")
-    implementation("com.amazonaws:aws-android-sdk-s3:2.72.0")
-    implementation("com.amazonaws:aws-android-sdk-cognitoauth:2.72.0")
+    // AWS SDK for Kotlin dependencies
+    implementation("aws.sdk.kotlin:s3:1.4.69")
+    implementation("aws.sdk.kotlin:cognitoidentity:1.4.69")
+    implementation("aws.sdk.kotlin:aws-core:1.4.69")
     
     // OpenTelemetry dependencies
     implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.31.0")
