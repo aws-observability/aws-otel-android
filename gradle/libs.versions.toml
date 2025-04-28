@@ -13,6 +13,7 @@ androidPlugin = "8.9.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
 aws-sdk-v2 = "2.31.19"
+owasp = "12.1.0"
 
 [libraries]
 opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
@@ -61,6 +62,7 @@ robolectric = "org.robolectric:robolectric:4.14.1"
 assertj-core = "org.assertj:assertj-core:3.27.3"
 awaitility = "org.awaitility:awaitility:4.3.0"
 mockwebserver = "com.google.mockwebserver:mockwebserver:20130706"
+owasp = {module = "org.owasp:dependency-check-gradle", version.ref = "owasp"}
 
 #Compilation tools
 desugarJdkLibs = "com.android.tools:desugar_jdk_libs:2.1.5"
