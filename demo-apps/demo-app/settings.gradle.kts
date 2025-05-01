@@ -10,7 +10,7 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         create("rootLibs") {
-            from(files("../gradle/libs.versions.toml"))
+            from(files("../../gradle/libs.versions.toml"))
         }
     }
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-includeBuild("..") {
+includeBuild("../../") {
     dependencySubstitution {
         substitute(module("software.amazon.opentelemetry.android:otelagent"))
             .using(project(":otelagent"))
