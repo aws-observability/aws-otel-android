@@ -28,7 +28,7 @@ class AwsRequestSignerTest : AuthTestBase() {
                     input = "test".toByteArray(),
                     credentialsProvider = credentialsProvider,
                     serviceName = "rum",
-                    endpoint = "dataplane.rum.us-east-1.amazonaws.com",
+                    endpoint = "https://dataplane.rum.us-east-1.amazonaws.com",
                     region = "us-east-1",
                 )
             }
