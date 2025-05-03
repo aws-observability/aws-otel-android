@@ -16,3 +16,4 @@ include(":demo-apps:simple-aws-demo")
 include(":demo-apps:agent-demo")
 
 include(":agent")
+include(":ui-loading")
