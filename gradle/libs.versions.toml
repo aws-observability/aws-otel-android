@@ -12,7 +12,7 @@ kotlin = "2.1.20"
 androidPlugin = "8.9.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
-aws-sdk-v2 = "2.31.19"
+aws-sdk-v2 = "2.31.36"
 owasp = "12.1.0"
 
 [libraries]
