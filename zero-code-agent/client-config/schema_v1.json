@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AWS Opentelemetry Android Configuration",
+  "properties": {
+    "$schema": {
+      "description": "JSON schema",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version of this schema",
+      "const": "1"
+    },
+    "rum": {
+      "description": "Configuration for RUM",
+      "type": "object",
+      "properties": {
+        "region": {
+          "description": "AWS region",
+          "type": "string"
+        },
+        "appMonitorId": {
+          "description": "App monitor ID",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
