@@ -29,10 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val TAG = "MainActivity"
 
-    // Replace these with your actual AWS credentials and configuration
-    private val cognitoPoolId = "us-east-1:<ID>" // Replace with your Cognito Identity Pool ID
-    private val awsRegion = "us-east-1" // Replace with your AWS region
-
     private lateinit var awsService: AwsService
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +36,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        awsService = AwsService(cognitoPoolId, awsRegion)
+        val app = (applicationContext as SimpleAwsDemoApplication)
+        awsService = app.awsService
         
         setupButtons()
     }

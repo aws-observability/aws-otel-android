@@ -45,6 +45,7 @@ android {
 
 dependencies {
     implementation(project(":otelagent"))
+    implementation(project(":aws-runtime:kotlin-sdk-auth"))
     
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.4.69")
