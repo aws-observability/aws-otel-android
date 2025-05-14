@@ -22,7 +22,7 @@
           "type": "string"
         },
         "appMonitorId": {
-          "description": "App monitor ID",
+          "description": "App Monitor ID",
           "type": "string"
         }
       }
