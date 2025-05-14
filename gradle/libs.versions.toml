@@ -49,6 +49,7 @@ aws-smithy-kotlin-aws-credentials = { module = "aws.smithy.kotlin:aws-credential
 aws-smithy-kotlin-aws-signing-default = { module = "aws.smithy.kotlin:aws-signing-default", version = "1.4.15" }
 aws-smithy-kotlin-http-auth-api = { module = "aws.smithy.kotlin:http-auth-api", version = "1.4.15" }
 aws-smithy-kotlin-http-auth-aws = { module = "aws.smithy.kotlin:http-auth-aws", version = "1.4.15" }
+serialization = {module= "org.jetbrains.kotlinx:kotlinx-serialization-json", version="1.8.0"}
 
 #Test tools
 opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version = "1.49.0" }

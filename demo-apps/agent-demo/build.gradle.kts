@@ -6,11 +6,11 @@ plugins {
 val javaVersion = rootProject.extra["java_version"] as JavaVersion
 
 android {
-    namespace = "software.amazon.opentelemetry.android.demo.simple"
+    namespace = "software.amazon.opentelemetry.android.demo.agent"
     compileSdk = (property("android.compileSdk") as String).toInt()
 
     defaultConfig {
-        applicationId = "software.amazon.opentelemetry.android.demo.simple"
+        applicationId = "software.amazon.opentelemetry.android.demo.agent"
         minSdk = (property("android.minSdk") as String).toInt()
         versionCode = 1
         versionName = "1.0"
@@ -34,7 +34,6 @@ android {
     
     kotlinOptions {
         jvmTarget = javaVersion.toString()
-        // Required for AWS SDK for Kotlin
         freeCompilerArgs += listOf("-Xjvm-default=all")
     }
     
@@ -44,9 +43,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":aws-runtime:kotlin-sdk-auth"))
-    
+    implementation(project(":agent"))
+
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.4.69")
     implementation("aws.sdk.kotlin:cognitoidentity:1.4.69")
@@ -61,7 +59,6 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

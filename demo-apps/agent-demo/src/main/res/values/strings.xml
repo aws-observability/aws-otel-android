@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Agent Demo Application</string>
+    <string name="aws_s3_list_button">List S3 Buckets</string>
+    <string name="aws_cognito_button">Get Cognito Identity</string>
+    <string name="aws_result_placeholder">AWS API results will appear here</string>
+</resources>
