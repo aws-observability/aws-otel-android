@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "software.amazon.opentelemetry.android.zerocode"
+    namespace = "software.amazon.opentelemetry.android.agent"
 }
 
 dependencies {

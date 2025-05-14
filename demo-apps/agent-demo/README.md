@@ -1,13 +1,13 @@
-# Zero Code Instrumentation Demo
+# Demo Application which uses the agent
 
-This is a simple Android application that demonstrates zero-code instrumentation with AWS OpenTelemetry for Android.
+This is a simple Android application that demonstrates zero-code instrumentation using the agent with AWS OpenTelemetry for Android.
 
-<img src="Screenshot_1.png" width="250">
-<img src="Screenshot_2.png" width="250">
+<img src="InstrumentationDemoScreen_1.png" width="250">
+<img src="InstrumentationDemoScreen_2.png" width="250">
 
 ## Overview
 
-This application contains two activities: a main activity with a button that navigates to a second activity. The app is configured to work with the zero-code-agent module for automatic instrumentation.
+This application contains two activities: a main activity with a button that navigates to a second activity. The app is configured to work with the agent module for automatic instrumentation.
 
 ## Features
 
@@ -27,7 +27,7 @@ This application contains two activities: a main activity with a button that nav
 
 - `MainActivity.kt`: The main activity with navigation to the second activity
 - `SecondActivity.kt`: A second activity with AWS functionality
-- `ZeroCodeInstrumentationDemoApplication.kt`: Application class for initialization
+- `AgentDemoApplication.kt`: Application class for initialization
 - `AwsService.kt`: Service class for AWS operations
 
 ## Dependencies

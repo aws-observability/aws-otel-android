@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation
+package software.amazon.opentelemetry.android.demo.agent
 
 import android.os.Bundle
 import android.util.Log
@@ -22,7 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation.databinding.ActivitySecondBinding
+import software.amazon.opentelemetry.android.demo.agent.databinding.ActivitySecondBinding
 
 class SecondActivity : AppCompatActivity() {
 

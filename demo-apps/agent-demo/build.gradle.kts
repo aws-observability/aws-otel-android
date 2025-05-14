@@ -6,11 +6,11 @@ plugins {
 val javaVersion = rootProject.extra["java_version"] as JavaVersion
 
 android {
-    namespace = "software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation"
+    namespace = "software.amazon.opentelemetry.android.demo.agent"
     compileSdk = (property("android.compileSdk") as String).toInt()
 
     defaultConfig {
-        applicationId = "software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation"
+        applicationId = "software.amazon.opentelemetry.android.demo.agent"
         minSdk = (property("android.minSdk") as String).toInt()
         versionCode = 1
         versionName = "1.0"

@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation
+package software.amazon.opentelemetry.android.demo.agent
 
 import android.content.Intent
 import android.os.Bundle
@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation.databinding.ActivityMainBinding
+import software.amazon.opentelemetry.android.demo.agent.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

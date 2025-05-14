@@ -4,15 +4,16 @@
   "title": "AwsAgentConfig",
   "description": "AWS Opentelemetry Android Configuration",
   "type": "object",
-  "required": ["rum","application"],
+  "required": ["rum", "application"],
   "additionalProperties": false,
   "properties": {
     "version": {
       "description": "Version of this schema",
-      "const": "1.0.0"
+      "const": "1.0.0",
+      "type": "string"
     },
     "rum": {
-      "required": ["region","appMonitorId"],
+      "required": ["region", "appMonitorId"],
       "additionalProperties": false,
       "description": "Configuration for RUM",
       "type": "object",

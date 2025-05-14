@@ -12,17 +12,17 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.demo.zeroCodeInstrumentation
+package software.amazon.opentelemetry.android.demo.agent
 
 import android.app.Application
 import android.util.Log
 
-class ZeroCodeInstrumentationDemoApplication : Application() {
+class AgentDemoApplication : Application() {
     
-    private val TAG = "ZeroCodeInstrDemoApp"
+    private val TAG = "AgentDemoApp"
     
     override fun onCreate() {
         super.onCreate()
-        Log.i(TAG, "Zero Code Instrumentation Demo Application started")
+        Log.i(TAG, "Agent Demo Application started")
     }
 }
