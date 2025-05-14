@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <provider
-                android:name="software.amazon.opentelemetry.android.zerocode.AwsRumAutoInstrumentationInitializer"
+                android:name="software.amazon.opentelemetry.android.agent.AwsRumAutoInstrumentationInitializer"
                 android:authorities="${applicationId}.aws-rum-auto-instrumentation-initializer"
                 android:enabled="true"
                 android:exported="false">

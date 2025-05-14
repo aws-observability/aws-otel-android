@@ -43,8 +43,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":zero-code-agent"))
-    
+    implementation(project(":agent"))
+
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.4.69")
     implementation("aws.sdk.kotlin:cognitoidentity:1.4.69")

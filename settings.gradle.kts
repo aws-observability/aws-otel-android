@@ -9,9 +9,9 @@ pluginManagement {
     }
 }
 
-include(":otelagent")
+include(":core")
 include(":aws-runtime:kotlin-sdk-auth")
 include(":demo-apps:simple-aws-demo")
 include(":demo-apps:zero-code-instrumentation-demo")
 
-include(":zero-code-agent")
+include(":agent")

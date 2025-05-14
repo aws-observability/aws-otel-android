@@ -1,6 +1,7 @@
 plugins {
     id("adot.android-library")
     id("adot.android-publish")
+    kotlin("plugin.serialization") version "2.1.21"
 }
 
 android {
@@ -8,8 +9,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":otelagent"))
-    implementation(libs.gson)
+    implementation(project(":core"))
+    implementation(libs.serialization)
 }
 
 tasks.withType<Test> {

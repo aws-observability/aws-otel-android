@@ -12,33 +12,42 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.zerocode
+package software.amazon.opentelemetry.android.agent
 
 import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
+import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
 
 internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
     override fun onCreate(): Boolean {
         // This will be called before Application.onCreate()
+        if (context != null) {
+            val config = AwsRumAppMonitorConfigReader.readConfig(context!!)
 
-        val config = AwsRumAppMonitorConfigReader.readConfig(context!!)
+            val application = context!!.applicationContext as Application
 
-        val application = context!!.applicationContext as Application
-
-        if (config != null) {
-            // Default configuration - sends data to AWS RUM
-            val otelAgent =
-                OpenTelemetryAgent
-                    .Builder(application)
-                    .setAppMonitorConfig(config.rum)
-                    .setApplicationVersion("1.0.0")
-                    .build()
+            if (config != null) {
+                // Default configuration - sends data to AWS RUM
+                val awsRumAppMonitorConfig =
+                    AwsRumAppMonitorConfig(
+                        config.rum.region,
+                        config.rum.appMonitorId,
+                    )
+                val otelAgent =
+                    OpenTelemetryAgent
+                        .Builder(application)
+                        .setAppMonitorConfig(awsRumAppMonitorConfig)
+                        .setApplicationVersion(config.application.applicationVersion)
+                        .build()
+            }
+        } else {
+            Log.e(AwsRumAppMonitorConfigReader.TAG, "Context not available")
         }
-
         return true
     }
 

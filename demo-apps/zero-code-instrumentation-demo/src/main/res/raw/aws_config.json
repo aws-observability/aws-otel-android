@@ -2,5 +2,8 @@
   "rum": {
     "region": "YOUR-AWS-REGION",
     "appMonitorId": "YOUR-RUM-APP-MONITOR-ID"
+  },
+  "application": {
+    "applicationVersion": "YOUR-APPLICATION-VERSION"
   }
 }

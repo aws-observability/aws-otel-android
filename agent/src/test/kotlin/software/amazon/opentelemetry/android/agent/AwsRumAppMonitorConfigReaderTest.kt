@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.zerocode
+package software.amazon.opentelemetry.android.agent
 
 import android.content.Context
 import android.content.res.Resources
@@ -43,6 +43,9 @@ class AwsRumAppMonitorConfigReaderTest {
             "rum": {
                 "appMonitorId": "testing",
                 "region": "test-region"
+            },
+            "application": {
+                "applicationVersion":"1.0.0"
             }
         }
         """.trimIndent()
@@ -54,6 +57,7 @@ class AwsRumAppMonitorConfigReaderTest {
         `when`(mockContext.packageName).thenReturn("test.package")
         mockkStatic(Log::class)
         every { Log.d(any(), any()) } returns 0
+        every { Log.e(any(), any()) } returns 0
     }
 
     @Test
@@ -89,5 +93,38 @@ class AwsRumAppMonitorConfigReaderTest {
 
         // Then
         assertNull(result)
+    }
+
+    @Test
+    fun `test error logging when invalid configuration provided`() {
+        // Given
+        val invalidJson =
+            """
+            {
+                 "rum": {
+                    "appMonitorId": "testing",
+                    "region": "test-region"
+                }
+            }
+            """.trimIndent()
+
+        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
+            .thenReturn(0)
+        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
+            .thenReturn(456)
+        `when`(mockResources.openRawResource(456))
+            .thenReturn(ByteArrayInputStream(invalidJson.toByteArray(StandardCharsets.UTF_8)))
+
+        // When
+        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+
+        // Then
+        assertNull(result)
+        io.mockk.verify {
+            Log.e(
+                AwsRumAppMonitorConfigReader.TAG,
+                "Missing fields in config: [application]",
+            )
+        }
     }
 }

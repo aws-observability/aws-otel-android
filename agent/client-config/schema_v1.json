@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "software.amazon.opentelemetry.android.config",
+  "title": "AwsAgentConfig",
+  "description": "AWS Opentelemetry Android Configuration",
+  "type": "object",
+  "required": ["rum","application"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "description": "Version of this schema",
+      "const": "1.0.0"
+    },
+    "rum": {
+      "required": ["region","appMonitorId"],
+      "additionalProperties": false,
+      "description": "Configuration for RUM",
+      "type": "object",
+      "properties": {
+        "region": {
+          "description": "AWS region",
+          "type": "string"
+        },
+        "appMonitorId": {
+          "description": "App monitor ID",
+          "type": "string"
+        }
+      }
+    },
+    "application": {
+      "required": ["applicationVersion"],
+      "description": "Application specific settings",
+      "type": "object",
+      "properties": {
+        "applicationVersion": {
+          "description": "Application Version",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
