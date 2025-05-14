@@ -1,4 +1,4 @@
-# Demo Application which uses the agent
+# AWS OpenTelemetry Android - Agent Instrumentation Demo
 
 This is a simple Android application that demonstrates zero-code instrumentation using the agent with AWS OpenTelemetry for Android.
 
