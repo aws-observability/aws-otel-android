@@ -33,8 +33,6 @@ class SimpleAwsDemoApplication : Application() {
 
         awsService = AwsService(cognitoPoolId, awsRegion)
 
-        val credentialsProvider = runBlocking { awsService.createCognitoCredentialsProvider() }
-
         // Initialize AWS OpenTelemetry Agent
         val appMonitorConfig = AwsRumAppMonitorConfig(
             region = "YOUR_REGION_FROM_CDK_OUTPUT",
@@ -50,7 +48,7 @@ class SimpleAwsDemoApplication : Application() {
                     .setRegion(awsRegion)
                     .setEndpoint("https://xray.us-east-1.amazonaws.com/v1/traces")
                     .setServiceName("xray")
-                    .setCredentialsProvider(credentialsProvider)
+                    .setCredentialsProvider(awsService.cognitoCredentialsProvider)
                     .build()
             }
             .build()

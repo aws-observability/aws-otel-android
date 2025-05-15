@@ -22,6 +22,7 @@ import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.Bucket
 import aws.sdk.kotlin.services.s3.model.ListBucketsRequest
 import aws.smithy.kotlin.runtime.auth.awscredentials.CredentialsProvider
+import software.amazon.opentelemetry.android.auth.CognitoCachedCredentialsProvider
 
 /**
  * Service class to handle AWS API calls
@@ -35,17 +36,19 @@ class AwsService(
         this.region = awsRegion
     }
 
+    val cognitoCredentialsProvider = CognitoCachedCredentialsProvider(
+        cognitoPoolId = cognitoPoolId,
+        cognitoClient = cognitoClient,
+    )
+
     /**
      * List S3 buckets
      */
     suspend fun listS3Buckets(): List<Bucket> {
-
-        val credentials = createCognitoCredentialsProvider()
-
         // Create S3 client
         val s3Client = S3Client {
             region = awsRegion
-            credentialsProvider = credentials
+            credentialsProvider = cognitoCredentialsProvider
         }
         
         // List buckets
@@ -53,30 +56,6 @@ class AwsService(
         
         // Return the buckets
         return response.buckets ?: emptyList()
-    }
-
-    suspend fun createCognitoCredentialsProvider(): CredentialsProvider {
-        val cognitoClient = CognitoIdentityClient {
-            this.region = awsRegion
-        }
-
-        // Get Identity ID
-        val identityId = getCognitoIdentityId()
-
-        // Get Credentials
-        val credentials = cognitoClient.getCredentialsForIdentity(GetCredentialsForIdentityRequest {
-            this.identityId = identityId
-        })
-
-        if (credentials.credentials == null) {
-            throw IllegalStateException("Failed to obtain credentials")
-        }
-
-        return StaticCredentialsProvider {
-            accessKeyId = credentials.credentials!!.accessKeyId
-            secretAccessKey = credentials.credentials!!.secretKey
-            sessionToken = credentials.credentials!!.sessionToken
-        }
     }
 
     suspend fun getCognitoIdentityId(): String {
