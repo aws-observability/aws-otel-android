@@ -1,7 +1,11 @@
 {
   "rum": {
     "region": "YOUR-AWS-REGION",
-    "appMonitorId": "YOUR-RUM-APP-MONITOR-ID"
+    "appMonitorId": "YOUR-RUM-APP-MONITOR-ID",
+    "overrideEndpoint": {
+      "logs": "http://10.0.2.2:4318/v1/logs",
+      "spans": "http://10.0.2.2:4318/v1/spans"
+    }
   },
   "application": {
     "applicationVersion": "YOUR-APPLICATION-VERSION"

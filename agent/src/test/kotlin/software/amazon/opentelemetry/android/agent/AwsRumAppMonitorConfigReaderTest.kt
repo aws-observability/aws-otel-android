@@ -40,14 +40,18 @@ class AwsRumAppMonitorConfigReaderTest {
     private val validJson =
         """
         {
-            "rum": {
-                "appMonitorId": "testing",
-                "region": "test-region"
-            },
-            "application": {
-                "applicationVersion":"1.0.0"
+                "rum": {
+                    "appMonitorId": "testing",
+                    "region": "test-region",
+                    "overrideEndpoint":{
+                        "logs":"http://test.com",
+                        "spans":"http://test123.com"
+                    }
+                },
+                "application": {
+                    "applicationVersion":"1.0.0"
+                }
             }
-        }
         """.trimIndent()
 
     @Before
@@ -126,5 +130,74 @@ class AwsRumAppMonitorConfigReaderTest {
                 "Missing fields in config: [application]",
             )
         }
+    }
+
+    @Test
+    fun `test should return specified logs endpoint`() {
+        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
+            .thenReturn(0)
+        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
+            .thenReturn(456)
+        `when`(mockResources.openRawResource(456))
+            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
+
+        // When
+        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+
+        // Then
+        assertNotNull(result)
+        assertNotNull(result?.rum)
+        assertEquals("http://test.com", AwsRumAppMonitorConfigReader.getLogsEndpoint(result!!))
+    }
+
+    @Test
+    fun `test should return specified spans endpoint`() {
+        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
+            .thenReturn(0)
+        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
+            .thenReturn(456)
+        `when`(mockResources.openRawResource(456))
+            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
+
+        // When
+        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+
+        // Then
+        assertNotNull(result)
+        assertNotNull(result?.rum)
+        assertEquals("http://test123.com", AwsRumAppMonitorConfigReader.getSpansEndpoint(result!!))
+    }
+
+    @Test
+    fun `test should return default rum endpoint when override not specified`() {
+        val validJson =
+            """
+            {
+                    "rum": {
+                        "appMonitorId": "testing",
+                        "region": "test-region"
+                    },
+                    "application": {
+                        "applicationVersion":"1.0.0"
+                    }
+                }
+            """.trimIndent()
+        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
+            .thenReturn(0)
+        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
+            .thenReturn(456)
+        `when`(mockResources.openRawResource(456))
+            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
+
+        // When
+        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+
+        // Then
+        assertNotNull(result)
+        assertNotNull(result?.rum)
+        assertEquals(
+            AwsRumAppMonitorConfigReader.buildRumEndpoint(result!!.rum.region),
+            AwsRumAppMonitorConfigReader.getSpansEndpoint(result),
+        )
     }
 }
