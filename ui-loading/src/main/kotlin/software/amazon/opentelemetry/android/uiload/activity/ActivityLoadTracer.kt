@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.activity
+package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Activity
 import io.opentelemetry.android.common.RumConstants
@@ -25,7 +25,7 @@ class ActivityLoadTracer(
     private val tracer: Tracer,
 ) {
     companion object {
-        private val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activity.name")
+        val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activity.name")
     }
 
     private val tracersByActivity: MutableMap<Activity, PerActivityLoadingTracer> =
@@ -49,7 +49,6 @@ class ActivityLoadTracer(
             RumConstants.SCREEN_NAME_KEY,
             ScreenNameExtractor.DEFAULT.extract(activity),
         )
-        println("span for $activity: $span")
         getTracer(activity).span = span
         return span
     }

@@ -12,18 +12,18 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.activity
+package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Application
-import android.os.Build
 import io.opentelemetry.android.instrumentation.AndroidInstrumentation
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.trace.Tracer
-import software.amazon.opentelemetry.android.activity.utils.FirstDrawListener
+import software.amazon.opentelemetry.android.uiload.utils.CommonUtils.getVersionSDKInt
+import software.amazon.opentelemetry.android.uiload.utils.FirstDrawListener
 
 class ActivityLoadInstrumentation : AndroidInstrumentation {
     companion object {
-        const val INSTRUMENTATION_SCOPE: String = "io.opentelemetry.ui-loading"
+        const val INSTRUMENTATION_SCOPE: String = "software.amazon.opentelemetry.ui-loading"
     }
 
     override fun install(ctx: InstallationContext) {
@@ -33,7 +33,7 @@ class ActivityLoadInstrumentation : AndroidInstrumentation {
     private fun buildActivityLoadTracer(ctx: InstallationContext): Application.ActivityLifecycleCallbacks {
         val delegateTracer: Tracer = ctx.openTelemetry.getTracer(INSTRUMENTATION_SCOPE)
         val tracers = ActivityLoadTracer(delegateTracer)
-        return if (Build.VERSION.SDK_INT < 29) {
+        return if (getVersionSDKInt() < 29) {
             Pre29ActivityLoadCallback(
                 tracers,
                 FirstDrawListener(),

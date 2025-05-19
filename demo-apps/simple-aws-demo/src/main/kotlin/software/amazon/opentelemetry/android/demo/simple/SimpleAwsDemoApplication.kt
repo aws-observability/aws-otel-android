@@ -38,7 +38,7 @@ class SimpleAwsDemoApplication : Application() {
             region = "YOUR_REGION_FROM_CDK_OUTPUT",
             appMonitorId = "YOUR_APP_MONITOR_ID_FROM_CDK_OUTPUT"
         )
-        
+
         // Default configuration - sends data to X-Ray only (for now)
         val otelAgent = OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(appMonitorConfig)
@@ -52,14 +52,14 @@ class SimpleAwsDemoApplication : Application() {
                     .build()
             }
             .build()
-        
+
         // For local development with OpenTelemetry Collector
         // Uncomment the following code and comment out the default configuration above
         /*
         // 10.0.2.2 is the special IP that Android emulator uses to communicate with the host
         // Replace with your actual IP if needed
         val localEndpoint = "http://10.0.2.2:4318"
-        
+
         val otelAgent = OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(appMonitorConfig)
             .setApplicationVersion("1.0.0")

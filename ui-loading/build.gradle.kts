@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "software.amazon.opentelemetry.android.activity"
+    namespace = "software.amazon.opentelemetry.android.uiload"
 
     defaultConfig {
         buildConfigField("String", "RUM_SDK_VERSION", "\"$version\"")

@@ -12,31 +12,26 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.activity
+package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import software.amazon.opentelemetry.android.activity.utils.FirstDrawListener
+import software.amazon.opentelemetry.android.uiload.utils.FirstDrawListener
 
-class ActivityLoadCallback(
+class Pre29ActivityLoadCallback(
     private val tracers: ActivityLoadTracer,
     private val firstDrawListener: FirstDrawListener,
 ) : Application.ActivityLifecycleCallbacks {
-    override fun onActivityPreCreated(
+    override fun onActivityCreated(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
-        tracers.startSpan(activity, "TTFD")
+        tracers.startSpan(activity, "TimeToFirstDraw")
         firstDrawListener.registerFirstDraw(
             activity,
         ) { tracers.endSpan(activity) }
     }
-
-    override fun onActivityCreated(
-        activity: Activity,
-        savedInstanceState: Bundle?,
-    ) {}
 
     override fun onActivityStarted(activity: Activity) {}
 
@@ -44,16 +39,13 @@ class ActivityLoadCallback(
 
     override fun onActivityPaused(activity: Activity) {}
 
-    override fun onActivityPostPaused(activity: Activity) {
-        firstDrawListener.unregisterFirstDraw(activity)
-    }
-
     override fun onActivityStopped(activity: Activity) {}
 
     override fun onActivitySaveInstanceState(
         activity: Activity,
         outState: Bundle,
-    ) {}
+    ) {
+    }
 
     override fun onActivityDestroyed(activity: Activity) {}
 }

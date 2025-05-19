@@ -23,7 +23,7 @@ import io.opentelemetry.android.instrumentation.AndroidInstrumentation
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
-import software.amazon.opentelemetry.android.activity.ActivityLoadInstrumentation
+import software.amazon.opentelemetry.android.uiload.activity.ActivityLoadInstrumentation
 
 /**
  * The main entrypoint for RUM OpenTelemetry on AWS.

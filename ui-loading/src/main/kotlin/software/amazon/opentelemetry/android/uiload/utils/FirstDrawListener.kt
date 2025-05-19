@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package software.amazon.opentelemetry.android.activity.utils
+package software.amazon.opentelemetry.android.uiload.utils
 
 import android.app.Activity
 import android.os.Build
@@ -21,45 +21,38 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.Window
-import java.util.concurrent.ConcurrentHashMap
+import software.amazon.opentelemetry.android.uiload.utils.CommonUtils.getVersionSDKInt
 
 /**
- * Listener that listen on when the first frame of the Activity has been drawn
+ * Listener that listen on when the first frame of the Activity has been drawn and unregister itself
+ * when the first draw is done
  *
  */
 class FirstDrawListener {
-    val activities: MutableSet<Activity> = ConcurrentHashMap.newKeySet()
-
     fun registerFirstDraw(
         activity: Activity,
         drawDoneCallback: () -> Unit,
     ) {
-        if (activities.add(activity)) {
-            val window = activity.window
-            window.onDecorViewReady {
-                val decorView = window.decorView
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O &&
-                    !(decorView.viewTreeObserver.isAlive && decorView.isAttachedToWindow)
-                ) {
-                    decorView.addOnAttachStateChangeListener(
-                        object : View.OnAttachStateChangeListener {
-                            override fun onViewAttachedToWindow(v: View) {
-                                decorView.viewTreeObserver.addOnDrawListener(NextDrawListener(decorView, drawDoneCallback))
-                                decorView.removeOnAttachStateChangeListener(this)
-                            }
+        val window = activity.window
+        window.onDecorViewReady {
+            val decorView = window.decorView
+            if (getVersionSDKInt() < Build.VERSION_CODES.O &&
+                !(decorView.viewTreeObserver.isAlive && decorView.isAttachedToWindow)
+            ) {
+                decorView.addOnAttachStateChangeListener(
+                    object : View.OnAttachStateChangeListener {
+                        override fun onViewAttachedToWindow(v: View) {
+                            decorView.viewTreeObserver.addOnDrawListener(NextDrawListener(decorView, drawDoneCallback))
+                            decorView.removeOnAttachStateChangeListener(this)
+                        }
 
-                            override fun onViewDetachedFromWindow(v: View) = Unit
-                        },
-                    )
-                } else {
-                    decorView.viewTreeObserver.addOnDrawListener(NextDrawListener(decorView, drawDoneCallback))
-                }
+                        override fun onViewDetachedFromWindow(v: View) = Unit
+                    },
+                )
+            } else {
+                decorView.viewTreeObserver.addOnDrawListener(NextDrawListener(decorView, drawDoneCallback))
             }
         }
-    }
-
-    fun unregisterFirstDraw(activity: Activity) {
-        activities.remove(activity)
     }
 
     fun Window.onDecorViewReady(callback: () -> Unit) {
