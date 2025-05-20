@@ -33,7 +33,7 @@ internal data class ApplicationConfig(
 
 @Serializable
 internal data class EndpointConfig(
-    val spans: String? = null,
+    val traces: String? = null,
     val logs: String? = null,
 )
 
@@ -81,7 +81,7 @@ internal object AwsRumAppMonitorConfigReader {
 
     internal fun buildRumEndpoint(region: String): String = "https://dataplane.rum.$region.amazonaws.com/v1/rum"
 
-    fun getSpansEndpoint(config: ConfigFile): String = config.rum.overrideEndpoint?.spans ?: buildRumEndpoint(config.rum.region)
+    fun getTracesEndpoint(config: ConfigFile): String = config.rum.overrideEndpoint?.traces ?: buildRumEndpoint(config.rum.region)
 
     fun getLogsEndpoint(config: ConfigFile): String = config.rum.overrideEndpoint?.logs ?: buildRumEndpoint(config.rum.region)
 }

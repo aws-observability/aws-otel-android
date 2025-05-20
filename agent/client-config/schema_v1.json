@@ -33,9 +33,9 @@
               "type": "string",
               "description": "Endpoint for the logs exporter"
             },
-            "spans": {
+            "traces": {
               "type": "string",
-              "description": "Endpoint for the spans exporter"
+              "description": "Endpoint for the traces exporter"
             }
           }
         }

@@ -4,7 +4,7 @@
     "appMonitorId": "YOUR-RUM-APP-MONITOR-ID",
     "overrideEndpoint": {
       "logs": "http://10.0.2.2:4318/v1/logs",
-      "spans": "http://10.0.2.2:4318/v1/spans"
+      "traces": "http://10.0.2.2:4318/v1/traces"
     }
   },
   "application": {

@@ -49,7 +49,7 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                             OtlpHttpSpanExporter
                                 .builder()
                                 .setEndpoint(
-                                    AwsRumAppMonitorConfigReader.getSpansEndpoint(config),
+                                    AwsRumAppMonitorConfigReader.getTracesEndpoint(config),
                                 ).build()
                         }.addLogRecordExporterCustomizer { _ ->
                             OtlpHttpLogRecordExporter

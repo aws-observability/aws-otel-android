@@ -45,7 +45,7 @@ class AwsRumAppMonitorConfigReaderTest {
                 "region": "test-region",
                 "overrideEndpoint":{
                     "logs":"http://test.com",
-                    "spans":"http://test123.com"
+                    "traces":"http://test123.com"
                 }
             },
             "application": {
@@ -165,7 +165,7 @@ class AwsRumAppMonitorConfigReaderTest {
         // Then
         assertNotNull(result)
         assertNotNull(result?.rum)
-        assertEquals("http://test123.com", AwsRumAppMonitorConfigReader.getSpansEndpoint(result!!))
+        assertEquals("http://test123.com", AwsRumAppMonitorConfigReader.getTracesEndpoint(result!!))
     }
 
     @Test
@@ -197,7 +197,7 @@ class AwsRumAppMonitorConfigReaderTest {
         assertNotNull(result?.rum)
         assertEquals(
             AwsRumAppMonitorConfigReader.buildRumEndpoint(result!!.rum.region),
-            AwsRumAppMonitorConfigReader.getSpansEndpoint(result),
+            AwsRumAppMonitorConfigReader.getTracesEndpoint(result),
         )
     }
 }
