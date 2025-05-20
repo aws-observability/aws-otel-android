@@ -15,7 +15,7 @@ androidPlugin = "8.9.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
 owasp = "12.1.0"
-aws-sdk-kotlin = "1.4.84"
+aws-sdk-kotlin = "1.4.87"
 aws-smithy-kotlin = "1.4.16"
 
 [libraries]
