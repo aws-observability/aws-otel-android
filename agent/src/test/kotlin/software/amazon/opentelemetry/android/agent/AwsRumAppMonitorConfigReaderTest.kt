@@ -40,18 +40,18 @@ class AwsRumAppMonitorConfigReaderTest {
     private val validJson =
         """
         {
-                "rum": {
-                    "appMonitorId": "testing",
-                    "region": "test-region",
-                    "overrideEndpoint":{
-                        "logs":"http://test.com",
-                        "spans":"http://test123.com"
-                    }
-                },
-                "application": {
-                    "applicationVersion":"1.0.0"
+            "rum": {
+                "appMonitorId": "testing",
+                "region": "test-region",
+                "overrideEndpoint":{
+                    "logs":"http://test.com",
+                    "spans":"http://test123.com"
                 }
+            },
+            "application": {
+                "applicationVersion":"1.0.0"
             }
+        }
         """.trimIndent()
 
     @Before
@@ -173,14 +173,14 @@ class AwsRumAppMonitorConfigReaderTest {
         val validJson =
             """
             {
-                    "rum": {
-                        "appMonitorId": "testing",
-                        "region": "test-region"
-                    },
-                    "application": {
-                        "applicationVersion":"1.0.0"
-                    }
+                "rum": {
+                    "appMonitorId": "testing",
+                    "region": "test-region"
+                },
+                "application": {
+                    "applicationVersion":"1.0.0"
                 }
+            }
             """.trimIndent()
         `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
             .thenReturn(0)
