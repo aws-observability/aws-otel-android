@@ -20,6 +20,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
 
@@ -43,7 +45,19 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                         .Builder(application)
                         .setAppMonitorConfig(awsRumAppMonitorConfig)
                         .setApplicationVersion(config.application.applicationVersion)
-                        .build()
+                        .addSpanExporterCustomizer { _ ->
+                            OtlpHttpSpanExporter
+                                .builder()
+                                .setEndpoint(
+                                    AwsRumAppMonitorConfigReader.getTracesEndpoint(config),
+                                ).build()
+                        }.addLogRecordExporterCustomizer { _ ->
+                            OtlpHttpLogRecordExporter
+                                .builder()
+                                .setEndpoint(
+                                    AwsRumAppMonitorConfigReader.getLogsEndpoint(config),
+                                ).build()
+                        }.build()
             }
         } else {
             Log.e(AwsRumAppMonitorConfigReader.TAG, "Context not available")

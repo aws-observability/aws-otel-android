@@ -25,6 +25,19 @@
         "appMonitorId": {
           "description": "App Monitor ID",
           "type": "string"
+        },
+        "overrideEndpoint": {
+          "type": "object",
+          "properties": {
+            "logs": {
+              "type": "string",
+              "description": "Endpoint for the logs exporter"
+            },
+            "traces": {
+              "type": "string",
+              "description": "Endpoint for the traces exporter"
+            }
+          }
         }
       }
     },
