@@ -40,6 +40,7 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                         config.rum.region,
                         config.rum.appMonitorId,
                     )
+                Log.d("Testinhg", config.rum.region)
                 val otelAgent =
                     OpenTelemetryAgent
                         .Builder(application)

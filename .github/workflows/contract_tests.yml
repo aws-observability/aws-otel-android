@@ -1,0 +1,36 @@
+name: Contract tests
+on:
+  push:
+    branches:
+      - main
+      - release/*
+
+jobs:
+  setup-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: |
+          docker compose version
+
+      - name: Initialize
+        uses: ./.github/actions/initialization
+
+      - name: Start Docker Compose services
+        working-directory: ./demo-apps/agent-demo
+        run: |
+          docker compose up -d
+
+      - name: Running Telemetry data generator
+        run: |
+          ./gradlew connectedCheck
+
+      - name: Run tests on the generated data
+        run: |
+          
+      
+      

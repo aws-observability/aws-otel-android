@@ -23,6 +23,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivitySecondBinding
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+
+
 
 class SecondActivity : AppCompatActivity() {
 
@@ -64,6 +70,20 @@ class SecondActivity : AppCompatActivity() {
             Log.d(TAG, "Returning to MainActivity")
             finish()
         }
+
+        binding.crashButton.setOnClickListener {
+            Log.d(TAG,"Crash test")
+            crashApplicationTest()
+        }
+
+        binding.httpCallButton.setOnClickListener {
+            Log.d(TAG, "Http Call button clicked")
+            makeHttpCall()
+        }
+    }
+
+    private fun crashApplicationTest() {
+        throw Exception("Testing Exception")
     }
 
     private fun listS3Buckets() {
@@ -107,4 +127,31 @@ class SecondActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun makeHttpCall() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP call..."
+
+                val result = withContext(Dispatchers.IO) {
+                    val url = URL("http://www.android.com/")
+                    val urlConnection = url.openConnection() as HttpURLConnection
+                    try {
+                        val `in`: InputStream = BufferedInputStream(urlConnection.inputStream)
+                        // Read the input stream and convert to string
+                        val response = `in`.bufferedReader().use { it.readText() }
+
+                    } finally {
+                        urlConnection.disconnect()
+                    }
+                }
+
+                binding.resultTextView.text = "HTTP call successful!"
+            } catch (e: Exception) {
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP call failed"
+            }
+        }
+    }
+
 }

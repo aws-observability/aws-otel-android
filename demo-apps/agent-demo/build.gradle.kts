@@ -11,10 +11,15 @@ android {
 
     defaultConfig {
         applicationId = "software.amazon.opentelemetry.android.demo.agent"
-        minSdk = (property("android.minSdk") as String).toInt()
+        minSdk = 24
+        targetSdk = (property("android.compileSdk") as String).toInt()
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions {
+        animationsDisabled = true
     }
 
     buildTypes {
@@ -51,8 +56,7 @@ dependencies {
     implementation("aws.sdk.kotlin:aws-core:1.4.69")
     
     // OpenTelemetry dependencies
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.31.0")
-    
+
     // Android dependencies
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -61,7 +65,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     
     // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation(libs.bundles.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.6.1")
 }
