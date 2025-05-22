@@ -16,7 +16,10 @@ class SessionContractTest {
     @Test
     fun `spans and logs should have a random sessionid in attributes`() {
         Assertions.assertTrue(
-            traces.resourceAttributeKeyExists("session.id")
+            traces.resources().attributeKeyExists("session.id")
+        )
+        Assertions.assertTrue(
+            logs.resources().attributeKeyExists("session.id")
         )
     }
 }
