@@ -11,21 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TraceRoot(
     @Required val resourceSpans: List<ResourceSpan>
-) {
-    fun findSpansByName(name: String): List<Span> =
-        resourceSpans
-            .flatMap { it.scopeSpans }
-            .flatMap { it.spans }
-            .filter { it.name == name }
-
-    fun validateResourceAttributesExist(attributes: Map<String, String>): Boolean =
-        resourceSpans.all { resourceSpan ->
-            attributes.all { (key, value) ->
-                resourceSpan.resource.attributes
-                    .any { it.key == key && it.value.stringValue == value }
-            }
-        }
-}
+)
 
 @Serializable
 data class ResourceSpan(
