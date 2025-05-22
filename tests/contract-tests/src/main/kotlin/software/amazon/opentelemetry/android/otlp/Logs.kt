@@ -16,6 +16,7 @@ package software.amazon.opentelemetry.android.otlp
 
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
 data class LogRoot(
@@ -35,6 +36,7 @@ data class ScopeLog(
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class LogRecord(
     val timeUnixNano: String = "",
     val observedTimeUnixNano: String = "",

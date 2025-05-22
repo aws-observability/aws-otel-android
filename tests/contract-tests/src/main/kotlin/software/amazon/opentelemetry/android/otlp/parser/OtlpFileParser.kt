@@ -22,18 +22,22 @@ import java.io.File
 object OtlpFileParser {
     fun readTracesFile(file: File): List<TraceRoot> {
         val logRoots = mutableListOf<TraceRoot>()
-        file.useLines { line ->
-            val root = Json.decodeFromString<TraceRoot>(line.toString())
-            logRoots.add(root)
+        file.useLines { lines ->
+            lines.forEach { line ->
+                val root = Json.decodeFromString<TraceRoot>(line)
+                logRoots.add(root)
+            }
         }
         return logRoots
     }
 
     fun readLogsFile(file: File): List<LogRoot> {
         val logRoots = mutableListOf<LogRoot>()
-        file.useLines { line ->
-            val root = Json.decodeFromString<LogRoot>(line.toString())
-            logRoots.add(root)
+        file.useLines { lines ->
+            lines.forEach { line ->
+                val root = Json.decodeFromString<LogRoot>(line)
+                logRoots.add(root)
+            }
         }
         return logRoots
     }

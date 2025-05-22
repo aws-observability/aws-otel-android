@@ -23,10 +23,10 @@ class SessionContractTest {
     @Test
     fun `spans and logs should have a random sessionid in attributes`(data: ParsedOtlpData) {
         Assertions.assertTrue(
-            data.traces.resources().attributeKeyExists("session.id"),
+            data.traces.attributeKeyExistsInSpans("session.id"),
         )
         Assertions.assertTrue(
-            data.logs.resources().attributeKeyExists("session.id"),
+            data.logs.attributeKeyExistsInLogRecords("session.id"),
         )
     }
 }

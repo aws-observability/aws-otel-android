@@ -16,6 +16,7 @@ package software.amazon.opentelemetry.android.otlp
 
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 /**
  * kotlinx.Serialization-compatible data types that roughly map out the OTLP Traces spec in JSON:
@@ -40,6 +41,7 @@ data class ScopeSpan(
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class Span(
     val traceId: String,
     val spanId: String,

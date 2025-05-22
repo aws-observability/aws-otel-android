@@ -29,8 +29,8 @@ data class ParsedOtlpData(
 
 class OtlpResolver : ParameterResolver {
     companion object {
-        const val LOGS_LOCATION = "/tmp/logs.txt"
-        const val TRACES_LOCATION = "/tmp/traces.txt"
+        const val LOGS_LOCATION = "/tmp/otel-android-collector/logs.txt"
+        const val TRACES_LOCATION = "/tmp/otel-android-collector/traces.txt"
     }
 
     override fun supportsParameter(
