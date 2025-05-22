@@ -1,25 +1,32 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package software.amazon.opentelemetry.android
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import software.amazon.opentelemetry.android.otlp.LogRoot
-import software.amazon.opentelemetry.android.otlp.TraceRoot
-import software.amazon.opentelemetry.android.otlp.parser.OtlpFileParser
-import java.io.File
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(OtlpResolver::class)
 class SessionContractTest {
-
-    val logs: List<LogRoot> = OtlpFileParser.readLogsFile(File("logs.txt"))
-
-    val traces: List<TraceRoot> = OtlpFileParser.readTracesFile(File("traces.txt"))
-
     @Test
-    fun `spans and logs should have a random sessionid in attributes`() {
+    fun `spans and logs should have a random sessionid in attributes`(data: ParsedOtlpData) {
         Assertions.assertTrue(
-            traces.resources().attributeKeyExists("session.id")
+            data.traces.resources().attributeKeyExists("session.id"),
         )
         Assertions.assertTrue(
-            logs.resources().attributeKeyExists("session.id")
+            data.logs.resources().attributeKeyExists("session.id"),
         )
     }
 }

@@ -1,3 +1,17 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package software.amazon.opentelemetry.android.otlp
 
 import kotlinx.serialization.Required
@@ -10,19 +24,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TraceRoot(
-    @Required val resourceSpans: List<ResourceSpan>
+    @Required val resourceSpans: List<ResourceSpan>,
 )
 
 @Serializable
 data class ResourceSpan(
     @Required val resource: Resource,
-    @Required val scopeSpans: List<ScopeSpan>
+    @Required val scopeSpans: List<ScopeSpan>,
 )
 
 @Serializable
 data class ScopeSpan(
     @Required val scope: Scope,
-    @Required val spans: List<Span>
+    @Required val spans: List<Span>,
 )
 
 @Serializable
@@ -37,11 +51,11 @@ data class Span(
     val endTimeUnixNano: String,
     val attributes: List<Attribute>,
     val droppedAttributesCount: Int? = null,
-    val events: List<SpanEvent>? = null
+    val events: List<SpanEvent>? = null,
 )
 
 @Serializable
 data class SpanEvent(
     val timeUnixNano: String,
-    val name: String
+    val name: String,
 )
