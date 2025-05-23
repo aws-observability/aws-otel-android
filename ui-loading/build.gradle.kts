@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "software.amazon.opentelemetry.android"
+    namespace = "software.amazon.opentelemetry.android.uiload"
 
     defaultConfig {
         buildConfigField("String", "RUM_SDK_VERSION", "\"$version\"")
@@ -23,7 +23,6 @@ dependencies {
     implementation(libs.opentelemetry.sdk)
     implementation(libs.opentelemetry.semconv)
     implementation(libs.opentelemetry.semconv.incubating)
-    implementation(project(":ui-loading"))
 }
 
 tasks.withType<Test> {
