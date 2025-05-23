@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests on the generated data
         run: |
-          ./gradlew tests:contract-tests:testDebugUnitTest
+          ./gradlew tests:contract-tests:testDebugUnitTest -PrunContractTests
           
       
       

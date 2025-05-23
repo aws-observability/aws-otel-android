@@ -15,6 +15,7 @@ tasks.withType<Test> {
         events("skipped", "failed")
     }
     maxParallelForks = max(1, Runtime.getRuntime().availableProcessors() / 2)
+    enabled = project.hasProperty("runContractTests")
 }
 
 dependencies {
