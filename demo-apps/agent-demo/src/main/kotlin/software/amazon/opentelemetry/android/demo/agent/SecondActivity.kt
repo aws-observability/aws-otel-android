@@ -28,8 +28,6 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-
-
 class SecondActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySecondBinding
