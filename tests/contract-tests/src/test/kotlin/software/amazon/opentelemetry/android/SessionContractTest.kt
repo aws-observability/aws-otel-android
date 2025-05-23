@@ -20,13 +20,21 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(OtlpResolver::class)
 class SessionContractTest {
+    companion object {
+        const val SESSION_ID_ATTR = "session.id"
+    }
+
     @Test
     fun `spans and logs should have a random sessionid in attributes`(data: ParsedOtlpData) {
         Assertions.assertTrue(
-            data.traces.attributeKeyExistsInSpans("session.id"),
+            data.traces.spans().all { span ->
+                span.attributes.has(SESSION_ID_ATTR)
+            },
         )
         Assertions.assertTrue(
-            data.logs.attributeKeyExistsInLogRecords("session.id"),
+            data.logs.logRecords().all { logRecord ->
+                logRecord.attributes.has(SESSION_ID_ATTR)
+            },
         )
     }
 }

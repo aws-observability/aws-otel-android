@@ -14,8 +14,11 @@
  */
 package software.amazon.opentelemetry.android
 
+import software.amazon.opentelemetry.android.otlp.Attribute
+import software.amazon.opentelemetry.android.otlp.LogRecord
 import software.amazon.opentelemetry.android.otlp.LogRoot
 import software.amazon.opentelemetry.android.otlp.Resource
+import software.amazon.opentelemetry.android.otlp.ScopeSpan
 import software.amazon.opentelemetry.android.otlp.Span
 import software.amazon.opentelemetry.android.otlp.TraceRoot
 
@@ -26,6 +29,38 @@ fun List<TraceRoot>.findSpansByName(name: String): List<Span> =
 
 @JvmName("traceRootResources")
 fun List<TraceRoot>.resources(): List<Resource> = this.flatMap { it.resourceSpans }.map { it.resource }
+
+fun List<TraceRoot>.scopeSpans(name: String): List<ScopeSpan> =
+    this
+        .flatMap { it.resourceSpans }
+        .flatMap { it.scopeSpans }
+        .filter { it.scope.name == name }
+
+fun List<TraceRoot>.spans(): List<Span> =
+    this
+        .flatMap { it.resourceSpans }
+        .flatMap { it.scopeSpans }
+        .flatMap { it.spans }
+
+fun List<ScopeSpan>.spans(name: String): List<Span> =
+    this
+        .flatMap { it.spans }
+        .filter { it.name == name }
+
+fun List<ScopeSpan>.spans(
+    name: String,
+    attributes: Map<String, String>,
+): List<Span> =
+    this
+        .flatMap { it.spans }
+        .filter { it.name == name }
+        .filter { it.attributes.has(attributes) }
+
+fun Span.findSpanEvents(spanEventNames: List<String>): Boolean =
+    this.events != null &&
+        spanEventNames.all { event ->
+            this.events.find { it.name == event } != null
+        }
 
 @JvmName("logRootResources")
 fun List<LogRoot>.resources(): List<Resource> = this.flatMap { it.resourceLogs }.map { it.resource }
@@ -40,22 +75,22 @@ fun List<Resource>.validateResourceAttributes(attributes: Map<String, String>): 
         }
     }
 
-fun List<TraceRoot>.attributeKeyExistsInSpans(keyName: String): Boolean =
-    this.all { traceRoot ->
-        traceRoot.resourceSpans.all { resourceSpan ->
-            resourceSpan.scopeSpans.all { scopeSpan ->
-                scopeSpan.spans.all { span -> span.attributes.any { it.key == keyName } }
-            }
-        }
-    }
+fun List<LogRoot>.logRecords(): List<LogRecord> =
+    this
+        .flatMap { it.resourceLogs }
+        .flatMap { it.scopeLogs }
+        .flatMap { it.logRecords }
 
-fun List<LogRoot>.attributeKeyExistsInLogRecords(keyName: String): Boolean =
-    this.all { logRoot ->
-        logRoot.resourceLogs.all { resourceLog ->
-            resourceLog.scopeLogs.all { scopeLog ->
-                scopeLog.logRecords.all { logRecord ->
-                    logRecord.attributes.any { it.key == keyName }
-                }
-            }
+fun List<Attribute>.has(keyName: String): Boolean = this.any { it.key == keyName }
+
+fun List<Attribute>.has(
+    keyName: String,
+    value: String,
+): Boolean = this.any { it.key == keyName && it.value.stringValue == value }
+
+fun List<Attribute>.has(compareAttributes: Map<String, String>): Boolean =
+    this.let { attributes ->
+        compareAttributes.all { (key, value) ->
+            attributes.any { it.key == key && it.value.stringValue == value }
         }
     }

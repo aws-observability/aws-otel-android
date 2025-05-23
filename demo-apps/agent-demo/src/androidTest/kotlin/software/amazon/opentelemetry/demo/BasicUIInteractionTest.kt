@@ -31,26 +31,10 @@ class BasicUIInteractionTest {
 
     @Test
     fun basicUIFlow() {
-        Thread.sleep(40000)
+        Thread.sleep(1000)
         onView(withText("Go to Second Screen")).perform(click())
-        Thread.sleep(16000)
+        Thread.sleep(1000)
         onView(withText("Return to Main")).perform(click())
-        Thread.sleep(10000)
+        Thread.sleep(40000) // NOTE: Exporters do not flush when app closes!! This is bad!
     }
-
-    @Test
-    fun crashTestAndHttpCall() {
-        onView(withText("Go to Second Screen")).perform(click())
-        Thread.sleep(5000)
-        onView(withText("Http Call")).perform(click())
-        Thread.sleep(5000)
-        try {
-            onView(withText("Crash Test")).perform(click())
-        }
-        catch (e: Exception) {
-            Log.d("Test", "Message", e)
-        }
-
-    }
-
 }

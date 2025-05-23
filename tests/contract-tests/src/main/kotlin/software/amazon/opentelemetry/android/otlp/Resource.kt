@@ -31,6 +31,8 @@ data class Attribute(
 @Serializable
 data class Value(
     val stringValue: String? = null,
+    val doubleValue: Double? = null,
+    val intValue: String? = null,
 )
 
 @Serializable

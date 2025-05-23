@@ -14,6 +14,7 @@
  */
 package software.amazon.opentelemetry.android
 
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
@@ -21,6 +22,7 @@ import software.amazon.opentelemetry.android.otlp.LogRoot
 import software.amazon.opentelemetry.android.otlp.TraceRoot
 import software.amazon.opentelemetry.android.otlp.parser.OtlpFileParser
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 data class ParsedOtlpData(
     val logs: List<LogRoot>,
@@ -31,6 +33,9 @@ class OtlpResolver : ParameterResolver {
     companion object {
         const val LOGS_LOCATION = "/tmp/otel-android-collector/logs.txt"
         const val TRACES_LOCATION = "/tmp/otel-android-collector/traces.txt"
+
+        var logData: List<LogRoot>? = null
+        var traceData: List<TraceRoot>? = null
     }
 
     override fun supportsParameter(
@@ -42,8 +47,27 @@ class OtlpResolver : ParameterResolver {
         parameterContext: ParameterContext,
         extensionContext: ExtensionContext,
     ): Any {
-        val logs: List<LogRoot> = OtlpFileParser.readLogsFile(File(LOGS_LOCATION))
-        val traces: List<TraceRoot> = OtlpFileParser.readTracesFile(File(TRACES_LOCATION))
-        return ParsedOtlpData(logs, traces)
+        parseData()
+        return ParsedOtlpData(logData!!, traceData!!)
+    }
+
+    private fun parseData() {
+        synchronized(this) {
+            if (!File(LOGS_LOCATION).exists() || !File(TRACES_LOCATION).exists()) {
+                await()
+                    .atMost(20, TimeUnit.SECONDS)
+                    .pollInterval(5, TimeUnit.SECONDS)
+                    .until {
+                        File(LOGS_LOCATION).exists() && File(TRACES_LOCATION).exists()
+                    }
+            }
+
+            if (logData == null) {
+                logData = OtlpFileParser.readLogsFile(File(LOGS_LOCATION))
+            }
+            if (traceData == null) {
+                traceData = OtlpFileParser.readTracesFile(File(TRACES_LOCATION))
+            }
+        }
     }
 }
