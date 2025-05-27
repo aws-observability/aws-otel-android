@@ -33,7 +33,7 @@ allprojects {
 
 subprojects {
     // Skip applying spotless to demo-apps projects
-    if (!project.path.startsWith(":demo-apps") && project.name != "aws-runtime") {
+    if (!project.path.startsWith(":demo-apps") && project.name != "aws-runtime" && project.name != "tests") {
         apply(plugin = "adot.spotless")
 
         afterEvaluate {
