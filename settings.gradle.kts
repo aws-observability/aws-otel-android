@@ -14,6 +14,7 @@ include(":aws-runtime:kotlin-sdk-auth")
 include(":aws-runtime:cognito-auth")
 include(":demo-apps:simple-aws-demo")
 include(":demo-apps:agent-demo")
+include(":demo-apps:crash-demo")
 include(":tests:contract-tests")
 
 include(":agent")
