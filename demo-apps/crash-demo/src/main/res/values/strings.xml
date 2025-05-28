@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">aws-otel-android Crash Demo</string>
+    <string name="crash_demo">Crash Demo</string>
+</resources>
