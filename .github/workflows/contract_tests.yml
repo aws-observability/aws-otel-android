@@ -76,7 +76,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            gradle :demo-apps:crash-demo:assembleDebug :demo-apps:crash-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 130 && echo "Restarting after crash..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 130
+            gradle :demo-apps:crash-demo:assembleDebug :demo-apps:crash-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && echo "Restarting after crash..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40
 
 
       - name: Run tests on the generated data

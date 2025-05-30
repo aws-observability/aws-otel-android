@@ -9,7 +9,7 @@ import software.amazon.opentelemetry.android.demo.crash.databinding.ActivityMain
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var countDownTimer: CountDownTimer
-    private val initialCountdown = 120 // 120 seconds
+    private val initialCountdown = CrashDemoApplication.DELAY_MILLISECONDS / 1000 // 120 seconds
     private val countDownInterval = 1000L // 1 second
     
     companion object {

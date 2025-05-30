@@ -36,7 +36,7 @@ class CrashContractTests {
     }
 
     @Test
-    fun `logs must be generated for device crash`(data: ParsedOtlpData) {
+    fun `Logs must be generated for device crash`(data: ParsedOtlpData) {
         val scopeLogs = data.logs.scopeLogs(CRASH_SCOPE)
 
         val logRecords = scopeLogs.logRecords()
