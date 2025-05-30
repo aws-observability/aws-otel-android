@@ -52,7 +52,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-35
+          key: avd-35-${{ runner.os }}-${{ github.sha }}
 
       - name: Running Telemetry data generator
         uses: reactivecircus/android-emulator-runner@v2
