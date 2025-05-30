@@ -21,22 +21,23 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(OtlpResolver::class)
 class FragmentInstrumentationTest {
     companion object {
-        const val SESSION_ID_ATTR = "session.id"
+        const val FRAGMENT_NAME_ATTR = "fragmentName"
+        const val SCREEN_NAME_ATTR = "screen.name"
     }
 
     @Test
-    fun `new fragment lifecycle span is created with all correct span events`(data: ParsedOtlpData) {
+    fun `New fragment lifecycle span is created with all correct span events`(data: ParsedOtlpData) {
         val scopeSpans = data.traces.scopeSpans("io.opentelemetry.lifecycle")
         val spans = scopeSpans.spans("Created")
 
         Assertions.assertTrue(
             spans.any {
-                it.attributes.has("fragmentName", "InstrumentationTestFragment")
+                it.attributes.has(FRAGMENT_NAME_ATTR, "InstrumentationTestFragment")
             },
         )
         Assertions.assertTrue(
             spans.any {
-                it.attributes.has("screen.name", "InstrumentationTestFragment")
+                it.attributes.has(SCREEN_NAME_ATTR, "InstrumentationTestFragment")
             },
         )
     }

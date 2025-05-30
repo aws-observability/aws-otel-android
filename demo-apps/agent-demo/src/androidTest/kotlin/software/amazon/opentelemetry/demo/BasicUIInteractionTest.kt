@@ -38,7 +38,7 @@ class BasicUIInteractionTest {
     }
 
     @Test
-    fun crashTestAndHttpCall() {
+    fun testHttpCall() {
         onView(withText("Go to Second Screen")).perform(click())
         Thread.sleep(5000)
         onView(withText("Http Call")).perform(click())
