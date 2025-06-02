@@ -15,6 +15,7 @@ include(":aws-runtime:cognito-auth")
 include(":demo-apps:simple-aws-demo")
 include(":demo-apps:agent-demo")
 include(":demo-apps:crash-demo")
+include("demo-apps:anr-demo")
 include(":tests:contract-tests")
 
 include(":agent")

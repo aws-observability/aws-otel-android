@@ -78,6 +78,17 @@ jobs:
           script: |
             gradle :demo-apps:crash-demo:assembleDebug :demo-apps:crash-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && echo "Restarting after crash..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40
 
+      - name: Running ANR App
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: 'aosp_atd'
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            gradle :demo-apps:anr-demo:assembleDebug :demo-apps:anr-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60
 
       - name: Run tests on the generated data
         run: |

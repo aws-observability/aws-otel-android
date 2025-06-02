@@ -22,6 +22,7 @@ import software.amazon.opentelemetry.android.otlp.ScopeLog
 import software.amazon.opentelemetry.android.otlp.ScopeSpan
 import software.amazon.opentelemetry.android.otlp.Span
 import software.amazon.opentelemetry.android.otlp.TraceRoot
+import software.amazon.opentelemetry.android.otlp.Value
 
 fun List<TraceRoot>.findSpansByName(name: String): List<Span> =
     this.flatMap { it.resourceSpans }.flatMap { it.scopeSpans }.flatMap { it.spans }.filter {
@@ -88,6 +89,8 @@ fun List<Attribute>.has(
     keyName: String,
     value: String,
 ): Boolean = this.any { it.key == keyName && it.value.stringValue == value }
+
+fun List<Attribute>.getValue(keyName: String): Value = this.first { it.key == keyName }.value
 
 fun List<Attribute>.has(compareAttributes: Map<String, String>): Boolean =
     this.let { attributes ->
