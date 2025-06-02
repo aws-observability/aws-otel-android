@@ -18,6 +18,7 @@ import software.amazon.opentelemetry.android.otlp.Attribute
 import software.amazon.opentelemetry.android.otlp.LogRecord
 import software.amazon.opentelemetry.android.otlp.LogRoot
 import software.amazon.opentelemetry.android.otlp.Resource
+import software.amazon.opentelemetry.android.otlp.ScopeLog
 import software.amazon.opentelemetry.android.otlp.ScopeSpan
 import software.amazon.opentelemetry.android.otlp.Span
 import software.amazon.opentelemetry.android.otlp.TraceRoot
@@ -94,3 +95,20 @@ fun List<Attribute>.has(compareAttributes: Map<String, String>): Boolean =
             attributes.any { it.key == key && it.value.stringValue == value }
         }
     }
+
+fun List<LogRoot>.scopeLogs(name: String): List<ScopeLog> =
+    this
+        .flatMap { it.resourceLogs }
+        .flatMap { it.scopeLogs }
+        .filter { it.scope.name == name }
+
+@JvmName("scopeLogToLogRecords")
+fun List<ScopeLog>.logRecords(): List<LogRecord> =
+    this
+        .flatMap { it.logRecords }
+
+fun List<LogRecord>.attributes(keyName: String): Attribute =
+    this
+        .flatMap { it.attributes }
+        .filter { it.key == keyName }
+        .first()

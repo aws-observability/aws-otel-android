@@ -9,7 +9,7 @@ import software.amazon.opentelemetry.android.demo.crash.databinding.ActivityMain
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var countDownTimer: CountDownTimer
-    private val initialCountdown = 120 // 120 seconds
+    private val initialCountdown = CrashDemoApplication.DELAY_MILLISECONDS / 1000
     private val countDownInterval = 1000L // 1 second
     
     companion object {
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / countDownInterval
                 binding.timerTextView.text = secondsRemaining.toString()
-                Log.d(TAG, "Timer: $secondsRemaining seconds remaining")
             }
 
             override fun onFinish() {

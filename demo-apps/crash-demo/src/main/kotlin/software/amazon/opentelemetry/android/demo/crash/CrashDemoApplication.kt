@@ -8,7 +8,7 @@ import android.util.Log
 class CrashDemoApplication : Application() {
     companion object {
         private const val TAG = "CrashDemoApplication"
-        private const val DELAY_MILLISECONDS = 120000L // 120 seconds
+        const val DELAY_MILLISECONDS = 30000L // 30 seconds
     }
 
     override fun onCreate() {
