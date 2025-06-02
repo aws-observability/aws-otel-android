@@ -38,7 +38,7 @@ class SessionContractTest {
 
     @Test
     fun `Spans and logs should have a random session Id generated`(data: ParsedOtlpData) {
-        val sessionIds =
+        val sessionIdsFromSpans =
             data.traces
                 .spans()
                 .flatMap { span ->
@@ -48,8 +48,21 @@ class SessionContractTest {
                         }.map { attribute -> attribute.value.stringValue }
                 }.toSet()
 
+        val sessionIdsFromLogs =
+            data.logs
+                .logRecords()
+                .flatMap { span ->
+                    span.attributes
+                        .filter { attribute ->
+                            attribute.key == SESSION_ID_ATTR
+                        }.map { attribute -> attribute.value.stringValue }
+                }.toSet()
+
         Assertions.assertTrue(
-            sessionIds.count() > 1,
+            sessionIdsFromSpans.count() > 1,
+        )
+        Assertions.assertTrue(
+            sessionIdsFromLogs.count() > 1,
         )
     }
 }
