@@ -5,6 +5,7 @@ plugins {
 
 val javaVersion = rootProject.extra["java_version"] as JavaVersion
 
+
 android {
     namespace = "software.amazon.opentelemetry.android.demo.agent"
     compileSdk = (property("android.compileSdk") as String).toInt()

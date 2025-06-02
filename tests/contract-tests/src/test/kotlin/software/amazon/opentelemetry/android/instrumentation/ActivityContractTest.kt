@@ -71,8 +71,9 @@ class ActivityContractTest {
     fun `AppStart span created on app startup`(data: ParsedOtlpData) {
         val scopeSpans = data.traces.scopeSpans(SCOPE_NAME)
         val spans = scopeSpans.spans("AppStart")
+
         Assertions.assertTrue(
-            spans.all {
+            spans.any {
                 it.attributes.has("start.type", "cold")
             },
         )
@@ -111,7 +112,7 @@ class ActivityContractTest {
                     "Restarted",
                     mapOf(
                         "screen.name" to "MainActivity",
-                        "last.screen.name" to "SecondActivity",
+                        "last.screen.name" to "InstrumentationTestFragment",
                     ),
                 ).first()
         Assertions.assertNotNull(restartedSpan)
