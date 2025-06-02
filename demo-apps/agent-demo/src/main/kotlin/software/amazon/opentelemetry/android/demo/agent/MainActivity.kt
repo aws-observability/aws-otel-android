@@ -36,12 +36,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupUI()
+        addInstrumentationTestFragment()
     }
 
     private fun setupUI() {
         binding.buttonPerformAction.setOnClickListener {
             navigateToSecondActivity()
         }
+    }
+
+    private fun addInstrumentationTestFragment() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        
+        val fragment = InstrumentationTestFragment.newInstance()
+        fragmentTransaction.add(R.id.fragmentContainer, fragment)
+        fragmentTransaction.commit()
     }
 
     private fun navigateToSecondActivity() {

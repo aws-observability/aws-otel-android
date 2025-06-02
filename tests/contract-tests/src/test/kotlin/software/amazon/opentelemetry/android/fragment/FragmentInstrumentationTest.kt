@@ -19,19 +19,25 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(OtlpResolver::class)
-class SessionContractTest {
+class FragmentInstrumentationTest {
     companion object {
-        const val SESSION_ID_ATTR = "session.id"
+        const val FRAGMENT_NAME_ATTR = "fragmentName"
+        const val SCREEN_NAME_ATTR = "screen.name"
     }
 
     @Test
-    fun `spans and logs should have a sessionid in attributes`(data: ParsedOtlpData) {
+    fun `New fragment lifecycle span is created with all correct span events`(data: ParsedOtlpData) {
+        val scopeSpans = data.traces.scopeSpans("io.opentelemetry.lifecycle")
+        val spans = scopeSpans.spans("Created")
+
         Assertions.assertTrue(
-            data.traces.spans().all { span -> span.attributes.has(SESSION_ID_ATTR) },
+            spans.any {
+                it.attributes.has(FRAGMENT_NAME_ATTR, "InstrumentationTestFragment")
+            },
         )
         Assertions.assertTrue(
-            data.logs.logRecords().all { logRecord ->
-                logRecord.attributes.has(SESSION_ID_ATTR)
+            spans.any {
+                it.attributes.has(SCREEN_NAME_ATTR, "InstrumentationTestFragment")
             },
         )
     }

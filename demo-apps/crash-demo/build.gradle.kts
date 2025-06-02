@@ -5,22 +5,16 @@ plugins {
 
 val javaVersion = rootProject.extra["java_version"] as JavaVersion
 
-
 android {
-    namespace = "software.amazon.opentelemetry.android.demo.agent"
+    namespace = "software.amazon.opentelemetry.android.demo.crash"
     compileSdk = (property("android.compileSdk") as String).toInt()
 
     defaultConfig {
-        applicationId = "software.amazon.opentelemetry.android.demo.agent"
+        applicationId = "software.amazon.opentelemetry.android.demo.crash"
         minSdk = 24
-        targetSdk = (property("android.compileSdk") as String).toInt()
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    testOptions {
-        animationsDisabled = true
     }
 
     buildTypes {
@@ -40,7 +34,6 @@ android {
     
     kotlinOptions {
         jvmTarget = javaVersion.toString()
-        freeCompilerArgs += listOf("-Xjvm-default=all")
     }
     
     buildFeatures {
@@ -50,25 +43,15 @@ android {
 
 dependencies {
     implementation(project(":agent"))
-
-    // AWS SDK for Kotlin dependencies
-    implementation("aws.sdk.kotlin:s3:1.4.69")
-    implementation("aws.sdk.kotlin:cognitoidentity:1.4.87")
-    implementation("aws.sdk.kotlin:aws-core:1.4.69")
     
-    // OpenTelemetry dependencies
-
     // Android dependencies
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     
     // Testing
-    testImplementation(libs.bundles.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.test:runner:1.6.1")
-    androidTestImplementation("androidx.test:rules:1.6.1")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
