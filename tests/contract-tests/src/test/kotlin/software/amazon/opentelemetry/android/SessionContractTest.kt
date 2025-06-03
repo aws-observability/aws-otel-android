@@ -25,7 +25,7 @@ class SessionContractTest {
     }
 
     @Test
-    fun `spans and logs should have a sessionid in attributes`(data: ParsedOtlpData) {
+    fun `Spans and logs should have a sessionid in attributes`(data: ParsedOtlpData) {
         Assertions.assertTrue(
             data.traces.spans().all { span -> span.attributes.has(SESSION_ID_ATTR) },
         )
@@ -33,6 +33,36 @@ class SessionContractTest {
             data.logs.logRecords().all { logRecord ->
                 logRecord.attributes.has(SESSION_ID_ATTR)
             },
+        )
+    }
+
+    @Test
+    fun `Spans and logs should have a random session Id generated`(data: ParsedOtlpData) {
+        val sessionIdsFromSpans =
+            data.traces
+                .spans()
+                .flatMap { span ->
+                    span.attributes
+                        .filter { attribute ->
+                            attribute.key == SESSION_ID_ATTR
+                        }.map { attribute -> attribute.value.stringValue }
+                }.toSet()
+
+        val sessionIdsFromLogs =
+            data.logs
+                .logRecords()
+                .flatMap { span ->
+                    span.attributes
+                        .filter { attribute ->
+                            attribute.key == SESSION_ID_ATTR
+                        }.map { attribute -> attribute.value.stringValue }
+                }.toSet()
+
+        Assertions.assertTrue(
+            sessionIdsFromSpans.count() > 1,
+        )
+        Assertions.assertTrue(
+            sessionIdsFromLogs.count() > 1,
         )
     }
 }

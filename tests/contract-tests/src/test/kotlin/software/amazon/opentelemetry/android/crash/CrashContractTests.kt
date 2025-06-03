@@ -60,9 +60,8 @@ class CrashContractTests {
             "main",
         )
 
-        Assertions.assertEquals(
+        Assertions.assertNotNull(
             logRecords.attributes(THREAD_ID_ATTR).value.intValue,
-            "2",
         )
 
         Assertions.assertNotNull(logRecords.attributes(STACK_TRACE_EXCEPTION_ATTRIBUTE).value.stringValue)

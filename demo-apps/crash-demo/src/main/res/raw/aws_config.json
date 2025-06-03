@@ -1,7 +1,7 @@
 {
   "rum": {
     "region": "YOUR-AWS-REGION",
-    "appMonitorId": "YOUR-RUM-APP-MONITOR-ID",
+    "appMonitorId": "YOUR-RUM-APP-MONITOR-ID-FOR-CRASH-APP",
     "overrideEndpoint": {
       "logs": "http://10.0.2.2:4318/v1/logs",
       "traces": "http://10.0.2.2:4318/v1/traces"
