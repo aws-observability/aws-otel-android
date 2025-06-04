@@ -1,10 +1,8 @@
 [versions]
-opentelemetry-instrumentation-alpha = "2.14.0-alpha"
-#opentelemetry-instrumentation = "2.9.0" // alpha bom includes non-alpha bom
+opentelemetry-instrumentation-alpha = "2.15.0-alpha"
 opentelemetry-semconv = "1.32.0"
-opentelemetry = "1.48.0"
 opentelemetry-semconv-alpha = "1.32.0-alpha"
-opentelemetry-contrib = "1.45.0-alpha"
+opentelemetry-android = "0.11.0-alpha"
 mockito = "5.17.0"
 junit = "5.12.1"
 byteBuddy = "1.17.5"
@@ -19,8 +17,6 @@ aws-sdk-kotlin = "1.4.87"
 aws-smithy-kotlin = "1.4.16"
 
 [libraries]
-opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
-opentelemetry-platform = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom" }
 androidx-navigation-fragment = "androidx.navigation:navigation-fragment:2.7.7"
 androidx-core = "androidx.core:core:1.16.0"
 androidx-annotation = "androidx.annotation:annotation:1.9.1"
@@ -28,31 +24,24 @@ androidx-lifecycle-process = "androidx.lifecycle:lifecycle-process:2.8.7"
 androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 findbugs-jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
-opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.11.0-alpha" }
-opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
-opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
-opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
-opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
+opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
+opentelemetry-platform = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom" }
+opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version.ref = "opentelemetry-android" }
+opentelemetry-android-common = { module = "io.opentelemetry.android:common", version.ref = "opentelemetry-android" }
+opentelemetry-android-session = { module = "io.opentelemetry.android:session", version.ref = "opentelemetry-android" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
 opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv-alpha" }
-opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api" }
-opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator" }
-opentelemetry-sdk-extension-incubator = { module = "io.opentelemetry:opentelemetry-sdk-extension-incubator" }
-opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry" }
-opentelemetry-context = { module = "io.opentelemetry:opentelemetry-context" }
-opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging" }
-opentelemetry-diskBuffering = { module = "io.opentelemetry.contrib:opentelemetry-disk-buffering", version.ref = "opentelemetry-contrib" }
-opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
-opentelemetry-exporter-otlp-common = { module = "io.opentelemetry:opentelemetry-exporter-otlp-common", version.ref = "opentelemetry" }
-volley = "com.android.volley:volley:1.2.1"
-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
-auto-service-processor = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp" }
+opentelemetry-exporter-otlp-common = { module = "io.opentelemetry:opentelemetry-exporter-otlp-common" }
 aws-smithy-kotlin-aws-credentials = { module = "aws.smithy.kotlin:aws-credentials", version.ref = "aws-smithy-kotlin" }
 aws-smithy-kotlin-aws-signing-default = { module = "aws.smithy.kotlin:aws-signing-default", version.ref = "aws-smithy-kotlin" }
 aws-smithy-kotlin-http-auth-api = { module = "aws.smithy.kotlin:http-auth-api", version.ref = "aws-smithy-kotlin" }
 aws-smithy-kotlin-http-auth-aws = { module = "aws.smithy.kotlin:http-auth-aws", version.ref = "aws-smithy-kotlin" }
 aws-sdk-kotlin-cognitoidentity = { module = "aws.sdk.kotlin:cognitoidentity", version.ref=  "aws-sdk-kotlin" }
 serialization = {module= "org.jetbrains.kotlinx:kotlinx-serialization-json", version="1.8.0"}
+auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
+auto-service-processor = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
 
 
 

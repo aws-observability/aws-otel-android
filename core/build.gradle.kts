@@ -16,6 +16,7 @@ android {
 }
 
 dependencies {
+    api(platform(libs.opentelemetry.platform.alpha))
     implementation(libs.opentelemetry.android)
     implementation(libs.opentelemetry.android.common)
     implementation(libs.opentelemetry.android.session)

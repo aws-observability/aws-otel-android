@@ -11,6 +11,7 @@ android {
 }
 
 dependencies {
+    api(platform(libs.opentelemetry.platform.alpha))
     implementation(libs.opentelemetry.exporter.otlp)
     implementation(libs.opentelemetry.exporter.otlp.common)
     implementation(libs.opentelemetry.sdk)
