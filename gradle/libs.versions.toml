@@ -28,7 +28,7 @@ androidx-lifecycle-process = "androidx.lifecycle:lifecycle-process:2.8.7"
 androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 findbugs-jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
-opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.10.0-alpha" }
+opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.11.0-alpha" }
 opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
 opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
 opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
