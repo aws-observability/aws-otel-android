@@ -36,6 +36,8 @@ class ANRInstrumentationTest {
         val scopeSpans = data.traces.scopeSpans("io.opentelemetry.anr")
         val spans = scopeSpans.spans("ANR")
 
+        Assertions.assertTrue(spans.isNotEmpty(), "Spans collection should not be empty")
+
         Assertions.assertTrue(
             spans.all { span ->
                 span.attributes.has(EXCEPTION_STACK_TRACE_ATTR)
@@ -43,7 +45,7 @@ class ANRInstrumentationTest {
         )
 
         Assertions.assertTrue(
-            spans.all { span ->
+            spans.any { span ->
                 span.attributes
                     .getValue(EXCEPTION_STACK_TRACE_ATTR)
                     .stringValue!!

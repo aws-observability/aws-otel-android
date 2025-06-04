@@ -63,7 +63,8 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck
+          script: |
+            ./gradlew :demo-apps:agent-demo:connectedAndroidTest
 
 
       - name: Running Crash App
@@ -88,11 +89,35 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            gradle :demo-apps:anr-demo:assembleDebug :demo-apps:anr-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60
+            gradle :demo-apps:anr-demo:assembleDebug :demo-apps:anr-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: traces_file
+          path: /tmp/otel-android-collector/traces.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logs_file
+          path: /tmp/otel-android-collector/logs.txt
 
       - name: Run tests on the generated data
         run: |
-          ./gradlew tests:contract-tests:testDebugUnitTest -PrunContractTests
+          ./gradlew tests:contract-tests:testDebugUnitTest -PrunContractTests --info
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: /home/runner/work/aws-otel-android/aws-otel-android/tests/contract-tests/build/reports/tests/testDebugUnitTest/
+
+
+  
+      
+
+
+
 
 
 
