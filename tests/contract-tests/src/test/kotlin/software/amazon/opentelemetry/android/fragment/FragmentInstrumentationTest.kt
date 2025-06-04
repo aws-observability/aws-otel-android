@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(OtlpResolver::class)
 class FragmentInstrumentationTest {
     companion object {
-        const val FRAGMENT_NAME_ATTR = "fragmentName"
+        const val FRAGMENT_NAME_ATTR = "fragment.name"
         const val SCREEN_NAME_ATTR = "screen.name"
     }
 
