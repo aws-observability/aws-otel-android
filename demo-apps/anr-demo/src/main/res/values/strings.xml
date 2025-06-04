@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">aws-otel-android ANR Demo</string>
+    <string name="anr_demo">ANR Demo</string>
+    <string name="trigger_anr">Trigger ANR</string>
+    <string name="anr_info">Post completion of the timer, an very long loop is run, triggering the ANR event</string>
+</resources>
