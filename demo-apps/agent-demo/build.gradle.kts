@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "software.amazon.opentelemetry.android.demo.agent"
-        minSdk = 24
+        minSdk = (property("android.minSdk") as String).toInt()
         targetSdk = (property("android.compileSdk") as String).toInt()
         versionCode = 1
         versionName = "1.0"
