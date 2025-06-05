@@ -23,7 +23,6 @@ import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.InputStream
 import java.nio.charset.StandardCharsets
 
 @Serializable
@@ -67,9 +66,10 @@ internal object AwsRumAppMonitorConfigReader {
                 Log.w(TAG, "Config file not found")
                 return null
             }
-            val inputStream: InputStream = context.getResources().openRawResource(rawResourceId)
-            val jsonConfig = String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-            return Json.decodeFromString<ConfigFile>(jsonConfig)
+            return context.resources.openRawResource(rawResourceId).use { inputStream ->
+                val jsonConfig = String(inputStream.readBytes(), StandardCharsets.UTF_8)
+                Json.decodeFromString<ConfigFile>(jsonConfig)
+            }
         } catch (e: MissingFieldException) {
             Log.e(TAG, "Missing fields in config: ${e.missingFields}")
             return null
