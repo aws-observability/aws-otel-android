@@ -18,5 +18,6 @@ class AwsRumConstants {
     companion object {
         public const val AWS_REGION = "awsRegion"
         public const val RUM_APP_MONITOR_ID = "awsRumAppMonitorId"
+        public const val RUM_ALIAS = "awsRumAlias"
     }
 }

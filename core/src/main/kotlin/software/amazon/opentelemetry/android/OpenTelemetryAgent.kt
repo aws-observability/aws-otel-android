@@ -23,7 +23,9 @@ import io.opentelemetry.android.instrumentation.AndroidInstrumentation
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
+import io.opentelemetry.sdk.trace.samplers.Sampler
 import software.amazon.opentelemetry.android.uiload.activity.ActivityLoadInstrumentation
+import java.time.Duration
 
 /**
  * The main entrypoint for RUM OpenTelemetry on AWS.
@@ -52,6 +54,8 @@ class OpenTelemetryAgent(
         private var applicationVersion: String? = null
         private val spanExporterCustomizers: MutableList<(SpanExporter) -> SpanExporter> = mutableListOf()
         private val logRecordExporterCustomizers: MutableList<(LogRecordExporter) -> LogRecordExporter> = mutableListOf()
+        private var sessionInactivityTimeout: Duration = Duration.ofMinutes(5)
+        private var tracerSampler: Sampler? = null
 
         /**
          * Point the Agent to an AppMonitor resource in AWS Real User Monitoring.
@@ -102,6 +106,22 @@ class OpenTelemetryAgent(
             return this
         }
 
+        /**
+         * Set the session background inactivity timeout
+         */
+        fun setSessionInactivityTimeout(timeout: Duration): Builder {
+            sessionInactivityTimeout = timeout
+            return this
+        }
+
+        /**
+         * Define the trace sampler for SdkTracerProvider
+         */
+        fun setTracerSampler(sampler: Sampler): Builder {
+            tracerSampler = sampler
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -112,6 +132,7 @@ class OpenTelemetryAgent(
             val otelRumConfig =
                 OtelRumConfig()
                     .setDiskBufferingConfig(diskBufferingConfig)
+                    .setSessionTimeout(sessionInactivityTimeout)
 
             val delegateBuilder =
                 OpenTelemetryRumBuilder
@@ -127,6 +148,12 @@ class OpenTelemetryAgent(
 
             additionalInstrumentations.forEach { instrumentation ->
                 delegateBuilder.addInstrumentation(instrumentation)
+            }
+
+            if (tracerSampler != null) {
+                delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
+                    tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
+                }
             }
 
             return OpenTelemetryAgent(delegateBuilder.build())
