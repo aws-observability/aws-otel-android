@@ -26,6 +26,15 @@
           "description": "App Monitor ID",
           "type": "string"
         },
+        "alias": {
+          "description": "Adds an alias to all requests. This is compared against the rum:alias service context in AppMonitors with resource based policies attached",
+          "type": "string"
+        },
+        "sessionInactivityTimeout": {
+          "description": "The maximum duration, in seconds, that a session can be inactive for before a new session is created",
+          "type": "integer",
+          "default": 300
+        },
         "overrideEndpoint": {
           "type": "object",
           "properties": {

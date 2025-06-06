@@ -24,6 +24,7 @@ import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import java.time.Duration
 
 internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
     override fun onCreate(): Boolean {
@@ -39,12 +40,15 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                     AwsRumAppMonitorConfig(
                         config.rum.region,
                         config.rum.appMonitorId,
+                        config.rum.alias,
                     )
-                val otelAgent =
+
+                val builder =
                     OpenTelemetryAgent
                         .Builder(application)
                         .setAppMonitorConfig(awsRumAppMonitorConfig)
                         .setApplicationVersion(config.application.applicationVersion)
+                        .setSessionInactivityTimeout(Duration.ofSeconds(config.rum.sessionInactivityTimeout.toLong()))
                         .addSpanExporterCustomizer { _ ->
                             OtlpHttpSpanExporter
                                 .builder()
@@ -57,7 +61,9 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                                 .setEndpoint(
                                     AwsRumAppMonitorConfigReader.getLogsEndpoint(config),
                                 ).build()
-                        }.build()
+                        }
+
+                builder.build()
             }
         } else {
             Log.e(AwsRumAppMonitorConfigReader.TAG, "Context not available")

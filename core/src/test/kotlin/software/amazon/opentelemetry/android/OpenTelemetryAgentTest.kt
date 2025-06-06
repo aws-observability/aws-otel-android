@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Duration
 
 @ExtendWith(MockKExtension::class)
 class OpenTelemetryAgentTest {
@@ -104,6 +105,7 @@ class OpenTelemetryAgentTest {
                 ),
             ).addSpanExporterCustomizer(spanExporterCustomizer)
             .addLogRecordExporterCustomizer(logExporterCustomizer)
+            .setSessionInactivityTimeout(Duration.ofMinutes(1))
             .build()
 
         // Validate the expected delegate builder method calls

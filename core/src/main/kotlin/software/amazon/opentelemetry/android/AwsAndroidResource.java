@@ -46,7 +46,7 @@ class AwsAndroidResource {
         ResourceBuilder resourceBuilder =
                 Resource.getDefault().toBuilder().put(SERVICE_NAME, appName);
 
-        return resourceBuilder
+        resourceBuilder
                 .put(RUM_SDK_VERSION, BuildConfig.RUM_SDK_VERSION)
                 .put(DEVICE_MODEL_NAME, Build.MODEL)
                 .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
@@ -56,8 +56,13 @@ class AwsAndroidResource {
                 .put(OS_VERSION, Build.VERSION.RELEASE)
                 .put(OS_DESCRIPTION, getOSDescription())
                 .put(AwsRumConstants.AWS_REGION, config.getRegion())
-                .put(AwsRumConstants.RUM_APP_MONITOR_ID, config.getAppMonitorId())
-                .build();
+                .put(AwsRumConstants.RUM_APP_MONITOR_ID, config.getAppMonitorId());
+
+        if (config.getAlias() != null && !(config.getAlias().isEmpty())) {
+            resourceBuilder.put(AwsRumConstants.RUM_ALIAS, config.getAlias());
+        }
+
+        return resourceBuilder.build();
     }
 
     private static String readAppName(Application application) {

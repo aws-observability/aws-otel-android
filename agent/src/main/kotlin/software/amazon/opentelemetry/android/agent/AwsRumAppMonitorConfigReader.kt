@@ -40,6 +40,8 @@ internal data class EndpointConfig(
 internal data class RumConfig(
     @Required val region: String,
     @Required val appMonitorId: String,
+    val alias: String? = null,
+    val sessionInactivityTimeout: Int = 300,
     val overrideEndpoint: EndpointConfig? = null,
 )
 

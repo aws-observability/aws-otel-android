@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(libs.serialization)
+    implementation(libs.opentelemetry.android)
     implementation(libs.opentelemetry.exporter.otlp)
 }
 
