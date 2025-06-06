@@ -85,6 +85,7 @@ class AwsRumAppMonitorConfigReaderTest {
         assertEquals("testing", result!!.rum.appMonitorId)
         assertEquals("test-region", result.rum.region)
         assertEquals("my-alias", result.rum.alias)
+        assertEquals(100, result.rum.sessionInactivityTimeout)
     }
 
     @Test
