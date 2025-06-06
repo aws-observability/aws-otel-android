@@ -84,6 +84,7 @@ class AwsRumAppMonitorConfigReaderTest {
         assertNotNull(result?.rum)
         assertEquals("testing", result!!.rum.appMonitorId)
         assertEquals("test-region", result.rum.region)
+        assertEquals("my-alias", result.rum.alias)
     }
 
     @Test
