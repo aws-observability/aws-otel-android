@@ -14,6 +14,7 @@
  */
 package software.amazon.opentelemetry.android.instrumentation
 
+import android.os.Build
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,33 +32,45 @@ class ActivityContractTest {
 
         val CREATED_SPAN_EVENTS =
             listOf(
-                "activityPreCreated",
                 "activityCreated",
+                "activityStarted",
+                "activityResumed",
+            )
+        val CREATED_SPAN_EVENTS_POST_ANDROID_Q =
+            listOf(
+                "activityPreCreated",
                 "activityPostCreated",
                 "activityPreStarted",
-                "activityStarted",
                 "activityPostStarted",
                 "activityPreResumed",
-                "activityResumed",
                 "activityPostResumed",
             )
 
         val PAUSED_SPAN_EVENTS =
             listOf(
-                "activityPrePaused",
                 "activityPaused",
+            )
+
+        val PAUSED_SPAN_EVENTS_POST_ANDROID_Q =
+            listOf(
+                "activityPrePaused",
                 "activityPostPaused",
             )
 
         val RESTARTED_SPAN_EVENTS =
             listOf(
-                "activityPreStarted",
                 "activityStarted",
+                "activityResumed",
+            )
+
+        val RESTARTED_SPAN_EVENTS_POST_ANDROID_Q =
+            listOf(
+                "activityPreStarted",
                 "activityPostStarted",
                 "activityPreResumed",
-                "activityResumed",
                 "activityPostResumed",
             )
+        val androidVersion = System.getProperty("androidVersion")!!.toInt()
     }
 
     @Test
@@ -84,7 +97,17 @@ class ActivityContractTest {
         val scopeSpans = data.traces.scopeSpans(SCOPE_NAME)
         val createdSpan = scopeSpans.spans("Created", mapOf("screen.name" to "MainActivity")).first()
         Assertions.assertNotNull(createdSpan)
-        Assertions.assertTrue(createdSpan.findSpanEvents(CREATED_SPAN_EVENTS))
+        if (androidVersion >= Build.VERSION_CODES.Q) {
+            Assertions.assertTrue(
+                createdSpan.findSpanEvents(
+                    CREATED_SPAN_EVENTS.plus(
+                        CREATED_SPAN_EVENTS_POST_ANDROID_Q,
+                    ),
+                ),
+            )
+        } else {
+            Assertions.assertTrue(createdSpan.findSpanEvents(CREATED_SPAN_EVENTS))
+        }
     }
 
     @Test
@@ -92,7 +115,18 @@ class ActivityContractTest {
         val scopeSpans = data.traces.scopeSpans(SCOPE_NAME)
         val pausedSpan = scopeSpans.spans("Paused", mapOf("screen.name" to "MainActivity")).first()
         Assertions.assertNotNull(pausedSpan)
-        Assertions.assertTrue(pausedSpan.findSpanEvents(PAUSED_SPAN_EVENTS))
+
+        if (androidVersion >= Build.VERSION_CODES.Q) {
+            Assertions.assertTrue(
+                pausedSpan.findSpanEvents(
+                    PAUSED_SPAN_EVENTS.plus(
+                        PAUSED_SPAN_EVENTS_POST_ANDROID_Q,
+                    ),
+                ),
+            )
+        } else {
+            Assertions.assertTrue(pausedSpan.findSpanEvents(PAUSED_SPAN_EVENTS))
+        }
     }
 
     @Test
@@ -100,7 +134,18 @@ class ActivityContractTest {
         val scopeSpans = data.traces.scopeSpans(SCOPE_NAME)
         val createdSpan = scopeSpans.spans("Created", mapOf("screen.name" to "SecondActivity")).first()
         Assertions.assertNotNull(createdSpan)
-        Assertions.assertTrue(createdSpan.findSpanEvents(CREATED_SPAN_EVENTS))
+
+        if (androidVersion >= Build.VERSION_CODES.Q) {
+            Assertions.assertTrue(
+                createdSpan.findSpanEvents(
+                    CREATED_SPAN_EVENTS.plus(
+                        CREATED_SPAN_EVENTS_POST_ANDROID_Q,
+                    ),
+                ),
+            )
+        } else {
+            Assertions.assertTrue(createdSpan.findSpanEvents(CREATED_SPAN_EVENTS))
+        }
     }
 
     @Test
@@ -116,6 +161,16 @@ class ActivityContractTest {
                     ),
                 ).first()
         Assertions.assertNotNull(restartedSpan)
-        Assertions.assertTrue(restartedSpan.findSpanEvents(RESTARTED_SPAN_EVENTS))
+        if (androidVersion >= Build.VERSION_CODES.Q) {
+            Assertions.assertTrue(
+                restartedSpan.findSpanEvents(
+                    RESTARTED_SPAN_EVENTS.plus(
+                        RESTARTED_SPAN_EVENTS_POST_ANDROID_Q,
+                    ),
+                ),
+            )
+        } else {
+            Assertions.assertTrue(restartedSpan.findSpanEvents(RESTARTED_SPAN_EVENTS))
+        }
     }
 }

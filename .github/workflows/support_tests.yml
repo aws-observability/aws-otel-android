@@ -1,0 +1,38 @@
+name: Contract Tests Matrix
+
+on:
+  pull_request:
+    branches:
+      - release/*
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [26, 31, 34, 35]
+      fail-fast: false  # This allows all matrix jobs to complete even if one fails
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize
+        uses: ./.github/actions/initialization
+
+      - name: Run Contract Tests
+        uses: ./.github/actions/contract_tests
+        with:
+          sdk-version: ${{ matrix.api-level }}
+
+  summary:
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "Contract Tests Summary:"
+          echo "Completed tests for API levels: ${{ join(needs.contract-tests.matrix.api-level, ', ') }}"
+          echo "Overall status: ${{ needs.contract-tests.result }}"
+
