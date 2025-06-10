@@ -52,7 +52,7 @@ dependencies {
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.4.69")
     implementation("aws.sdk.kotlin:cognitoidentity:1.4.87")
-    implementation("aws.sdk.kotlin:aws-core:1.4.69")
+    implementation("aws.sdk.kotlin:aws-core:1.4.101")
     
     // OpenTelemetry dependencies
     implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.31.0")
