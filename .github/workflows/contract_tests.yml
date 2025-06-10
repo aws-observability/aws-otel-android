@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - release/*
+      - test/suport_tests
 
   pull_request:
     branches:
