@@ -23,7 +23,16 @@ runs:
       working-directory: ./tests/contract-tests
       run: |
         docker compose up -d
-        sleep 40  # Give more time for initialization
+
+    - name: Wait for service to be ready
+      uses: iFaxity/wait-on-action
+      with:
+        resource: http://localhost:4318
+
+
+    - name: Print directory
+      shell: bash
+      run: |
         ls -la /tmp/otel-android-collector
 
     - name: Enable KVM
