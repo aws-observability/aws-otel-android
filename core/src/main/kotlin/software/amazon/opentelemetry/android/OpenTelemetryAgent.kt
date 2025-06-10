@@ -40,8 +40,8 @@ class OpenTelemetryAgent(
     class Builder constructor(
         private val application: Application,
     ) {
-        private val additionalInstrumentations: List<AndroidInstrumentation> =
-            listOf(
+        private val additionalInstrumentations: MutableList<AndroidInstrumentation> =
+            mutableListOf(
                 ActivityLoadInstrumentation(),
             )
         private var diskBufferingConfig: DiskBufferingConfig =
@@ -103,6 +103,11 @@ class OpenTelemetryAgent(
          */
         fun addLogRecordExporterCustomizer(logRecordExporterCustomizer: (LogRecordExporter) -> LogRecordExporter): Builder {
             logRecordExporterCustomizers.add(logRecordExporterCustomizer)
+            return this
+        }
+
+        fun addInstrumentation(instrumentation: AndroidInstrumentation): Builder {
+            additionalInstrumentations.add(instrumentation)
             return this
         }
 
