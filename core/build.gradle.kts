@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.opentelemetry.sdk)
     implementation(libs.opentelemetry.semconv)
     implementation(libs.opentelemetry.semconv.incubating)
+    api(libs.opentelemetry.android.httpurlconnection)
     implementation(project(":ui-loading"))
 }
 

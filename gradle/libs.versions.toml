@@ -31,6 +31,9 @@ byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
 opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.10.0-alpha" }
 opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
 opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
+opentelemetry-android-instrumentation = {module = "io.opentelemetry.android.instrumentation:android-instrumentation", version = "0.10.0-alpha"}
+opentelemetry-android-httpurlconnection = {module = "io.opentelemetry.android:httpurlconnection-library", version = "0.9.1-alpha"}
+opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.android:httpurlconnection-agent", version="0.9.1-alpha"}
 opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
 opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
