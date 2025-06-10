@@ -1,6 +1,10 @@
 name: Contract Tests Matrix
 
 on:
+  push:
+    branches:
+      - test/suport_tests
+
   pull_request:
     branches:
       - release/*

@@ -41,7 +41,8 @@ runs:
           ~/.android/adb*
         key: avd-${{ inputs.sdk-version }}-${{ runner.os }}-${{ github.sha }}
 
-    - name: Running Telemetry data generator
+    - name: Generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ inputs.sdk-version }}
@@ -49,6 +50,17 @@ runs:
         arch: x86_64
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: echo "Generated AVD snapshot for caching."
+
+    - name: Running Telemetry data generator
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.sdk-version }}
+        target: ${{ inputs.sdk-version < 30 && 'google_apis' || 'aosp_atd' }}
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: ./gradlew :demo-apps:agent-demo:connectedAndroidTest
 
@@ -59,7 +71,7 @@ runs:
         target: ${{ inputs.sdk-version < 30 && 'google_apis' || 'aosp_atd' }}
         arch: x86_64
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: |
           adb uninstall software.amazon.opentelemetry.android.demo.crash || true && gradle :demo-apps:crash-demo:assembleDebug :demo-apps:crash-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && adb shell am force-stop software.amazon.opentelemetry.android.demo.crash && sleep 5 && echo "Restarting after crash..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && adb logcat -d > logcat.txt
@@ -71,7 +83,7 @@ runs:
         target: ${{ inputs.sdk-version < 30 && 'google_apis' || 'aosp_atd' }}
         arch: x86_64
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: |
           adb uninstall software.amazon.opentelemetry.android.demo.anr || true && gradle :demo-apps:anr-demo:assembleDebug :demo-apps:anr-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr
