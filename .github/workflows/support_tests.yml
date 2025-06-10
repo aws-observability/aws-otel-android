@@ -21,8 +21,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Initialize
-        uses: ./.github/actions/initialization
+#      - name: Initialize
+#        uses: ./.github/actions/initialization
 
       - name: Run Contract Tests
         uses: ./.github/actions/contract_tests

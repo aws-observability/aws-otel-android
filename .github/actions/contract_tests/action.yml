@@ -25,10 +25,10 @@ runs:
         docker compose up -d
 
     - name: Wait for service to be ready
-      uses: iFaxity/wait-on-action
+      uses: iFaxity/wait-on-action@v1.2.1
       with:
-        resource: http://localhost:4318
-
+        resource: file:///tmp/otel-android-collector/logs.txt
+        timeout: 30000
 
     - name: Print directory
       shell: bash
