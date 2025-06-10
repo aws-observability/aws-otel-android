@@ -1,10 +1,6 @@
 name: Contract Tests Matrix
 
 on:
-  push:
-    branches:
-      - test/suport_tests
-
   pull_request:
     branches:
       - release/*
@@ -27,7 +23,7 @@ jobs:
       - name: Run Contract Tests
         uses: ./.github/actions/contract_tests
         with:
-          sdk-version: ${{ matrix.api-level }}
+          api-level: ${{ matrix.api-level }}
 
   summary:
     needs: contract-tests

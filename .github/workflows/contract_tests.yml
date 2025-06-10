@@ -24,4 +24,4 @@ jobs:
       - name: Run contract tests
         uses: ./.github/actions/contract_tests
         with:
-          sdk-version: 35
+          api-level: 35
