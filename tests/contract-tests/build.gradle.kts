@@ -16,6 +16,7 @@ tasks.withType<Test> {
     }
     maxParallelForks = max(1, Runtime.getRuntime().availableProcessors() / 2)
     enabled = project.hasProperty("runContractTests")
+    systemProperty("androidVersion", project.findProperty("androidVersion") ?: 35)
 }
 
 dependencies {

@@ -1,0 +1,126 @@
+name: 'Contract Tests Action'
+description: 'Reusable contract tests action with specified Android SDK version'
+inputs:
+  api-level:
+    description: 'Android SDK version to use (e.g., 35)'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Compose
+      shell: bash
+      run: docker compose version
+
+    - name: Prepare directory
+      shell: bash
+      run: |
+        sudo mkdir -p /tmp/otel-android-collector  
+        sudo chmod 777 /tmp/otel-android-collector 
+
+    - name: Start Docker Compose services
+      shell: bash
+      working-directory: ./tests/contract-tests
+      run: |
+        docker compose up -d
+
+    - name: Wait for service to be ready
+      uses: iFaxity/wait-on-action@v1.2.1
+      with:
+        resource: file:///tmp/otel-android-collector/logs.txt
+        timeout: 30000
+
+    - name: Print directory
+      shell: bash
+      run: |
+        ls -la /tmp/otel-android-collector
+
+    - name: Enable KVM
+      shell: bash
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+
+    - name: AVD cache
+      id: avd-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ inputs.api-level }}-${{ runner.os }}-${{ github.sha }}
+
+    - name: Generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.api-level }}
+        target: ${{ inputs.api-level < 30 && 'google_apis' || 'aosp_atd' }}
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: echo "Generated AVD snapshot for caching."
+
+    - name: Running Telemetry data generator
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.api-level }}
+        target: ${{ inputs.api-level < 30 && 'google_apis' || 'aosp_atd' }}
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: ./gradlew :demo-apps:agent-demo:connectedAndroidTest
+
+    - name: Running Crash App with Logcat Monitoring
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.api-level }}
+        target: ${{ inputs.api-level < 30 && 'google_apis' || 'aosp_atd' }}
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: |
+          adb uninstall software.amazon.opentelemetry.android.demo.crash || true && gradle :demo-apps:crash-demo:assembleDebug :demo-apps:crash-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && adb shell am force-stop software.amazon.opentelemetry.android.demo.crash && sleep 5 && echo "Restarting after crash..." && adb shell am start -n software.amazon.opentelemetry.android.demo.crash/.MainActivity && sleep 40 && adb logcat -d > logcat.txt
+
+    - name: Running ANR App
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ inputs.api-level }}
+        target: ${{ inputs.api-level < 30 && 'google_apis' || 'aosp_atd' }}
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: |
+          adb uninstall software.amazon.opentelemetry.android.demo.anr || true && gradle :demo-apps:anr-demo:assembleDebug :demo-apps:anr-demo:installDebug && adb wait-for-device && echo "First launch..." && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr && adb shell am start -n software.amazon.opentelemetry.android.demo.anr/.MainActivity && sleep 60 && adb shell am force-stop software.amazon.opentelemetry.android.demo.anr
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: traces_file-sdk-${{ inputs.api-level }}
+        path: /tmp/otel-android-collector/traces.txt
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: logs_file-sdk-${{ inputs.api-level }}
+        path: /tmp/otel-android-collector/logs.txt
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: logs_file-logcat-${{ inputs.api-level }}
+        path: logcat.txt
+
+    - name: Run tests on the generated data
+      shell: bash
+      run: |
+        ./gradlew tests:contract-tests:testDebugUnitTest -PrunContractTests -PandroidVersion=${{ inputs.api-level }} --info
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-sdk-${{ inputs.api-level }}
+        path: /home/runner/work/aws-otel-android/aws-otel-android/tests/contract-tests/build/reports/tests/testDebugUnitTest/
