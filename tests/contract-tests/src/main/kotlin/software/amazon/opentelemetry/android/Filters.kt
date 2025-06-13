@@ -115,3 +115,16 @@ fun List<LogRecord>.attributes(keyName: String): Attribute =
         .flatMap { it.attributes }
         .filter { it.key == keyName }
         .first()
+
+fun Span.getAttributes(keyName: String): Attribute =
+    this
+        .attributes
+        .filter { it.key == keyName }
+        .first()
+
+@JvmName("spanToAttributes")
+fun List<Span>.attributes(keyName: String): Attribute =
+    this
+        .flatMap { it.attributes }
+        .filter { it.key == keyName }
+        .first()
