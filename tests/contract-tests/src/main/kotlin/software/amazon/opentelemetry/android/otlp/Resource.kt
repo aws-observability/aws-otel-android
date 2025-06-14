@@ -16,6 +16,7 @@ package software.amazon.opentelemetry.android.otlp
 
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
 data class Resource(
@@ -36,6 +37,7 @@ data class Value(
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class Scope(
     @Required val name: String,
 )

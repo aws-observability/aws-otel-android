@@ -69,7 +69,9 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation(libs.okhttp3)
     byteBuddy(libs.opentelemetry.android.httpurlconnection.agent)
+    byteBuddy(libs.opentelemetry.android.okhttp3.agent)
     // Testing
     testImplementation(libs.bundles.junit)
     androidTestImplementation(libs.androidx.junit)

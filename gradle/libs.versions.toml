@@ -17,6 +17,8 @@ autoService = "1.1.1"
 owasp = "12.1.0"
 aws-sdk-kotlin = "1.4.87"
 aws-smithy-kotlin = "1.4.16"
+http-instrumentation = "0.10.0-alpha"
+okhttp = "4.12.0"
 
 [libraries]
 opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
@@ -32,8 +34,10 @@ opentelemetry-android = { module = "io.opentelemetry.android:android-agent", ver
 opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
 opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
 opentelemetry-android-instrumentation = {module = "io.opentelemetry.android.instrumentation:android-instrumentation", version = "0.10.0-alpha"}
-opentelemetry-android-httpurlconnection = {module = "io.opentelemetry.android:httpurlconnection-library", version = "0.9.1-alpha"}
-opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.android:httpurlconnection-agent", version="0.9.1-alpha"}
+opentelemetry-android-httpurlconnection = {module = "io.opentelemetry.android:instrumentation-httpurlconnection-library", version.ref = "http-instrumentation"}
+opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.android:instrumentation-httpurlconnection-agent", version.ref="http-instrumentation"}
+opentelemetry-android-okhttp3 = {module = "io.opentelemetry.android:instrumentation-okhttp-3.0-library", version.ref = "http-instrumentation"}
+opentelemetry-android-okhttp3-agent = {module = "io.opentelemetry.android:instrumentation-okhttp-3.0-agent", version.ref = "http-instrumentation"}
 opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
 opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
@@ -56,7 +60,7 @@ aws-smithy-kotlin-http-auth-api = { module = "aws.smithy.kotlin:http-auth-api", 
 aws-smithy-kotlin-http-auth-aws = { module = "aws.smithy.kotlin:http-auth-aws", version.ref = "aws-smithy-kotlin" }
 aws-sdk-kotlin-cognitoidentity = { module = "aws.sdk.kotlin:cognitoidentity", version.ref=  "aws-sdk-kotlin" }
 serialization = {module= "org.jetbrains.kotlinx:kotlinx-serialization-json", version="1.8.0"}
-
+okhttp3 = {module = "com.squareup.okhttp3:okhttp", version.ref="okhttp"}
 
 
 #Test tools
