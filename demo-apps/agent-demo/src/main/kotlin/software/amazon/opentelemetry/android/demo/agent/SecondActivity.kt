@@ -26,7 +26,10 @@ import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivitySecondBinding
+import java.io.IOException
 
 class CustomException(message: String) : Exception(message)
 
@@ -75,6 +78,10 @@ class SecondActivity : AppCompatActivity() {
         binding.httpCallButton.setOnClickListener {
             Log.d(TAG, "Http Call button clicked")
             makeHttpCall()
+        }
+        binding.okhttp3.setOnClickListener {
+            Log.d(TAG, "Ok Http3 call")
+            makeOkHttp3Call()
         }
     }
 
@@ -150,6 +157,32 @@ class SecondActivity : AppCompatActivity() {
                 binding.resultTextView.text = result // Show the actual response
             } catch (e: Exception) {
                 Log.d(TAG, e.message!!)
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP call failed"
+            }
+        }
+    }
+
+    private fun makeOkHttp3Call() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP call..."
+
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("https://www.android.com")
+                    .build()
+
+                val result = withContext(Dispatchers.IO) {
+                    client.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                        response.body?.string() ?: ""
+                    }
+                }
+
+                binding.resultTextView.text = result // Show the actual response
+            } catch (e: Exception) {
+                Log.d(TAG, e.message ?: "Unknown error")
                 Log.e(TAG, "Http Error: ", e)
                 binding.resultTextView.text = "HTTP call failed"
             }
