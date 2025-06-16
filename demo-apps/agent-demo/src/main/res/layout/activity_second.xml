@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:paddingTop="?attr/actionBarSize"
     tools:context=".SecondActivity">
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="AWS OpenTelemetry Demo"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -32,94 +34,167 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
-    <Button
-        android:id="@+id/listS3BucketsButton"
+    <!-- First row of buttons -->
+    <LinearLayout
+        android:id="@+id/firstButtonRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/aws_s3_list_button"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewMessage" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewMessage">
 
-    <Button
-        android:id="@+id/getCognitoIdentityButton"
+        <Button
+            android:id="@+id/listS3BucketsButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="@string/aws_s3_list_button" />
+
+        <Button
+            android:id="@+id/getCognitoIdentityButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="@string/aws_cognito_button" />
+    </LinearLayout>
+
+    <!-- Second row of buttons -->
+    <LinearLayout
+        android:id="@+id/secondButtonRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/aws_cognito_button"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listS3BucketsButton" />
+        app:layout_constraintTop_toBottomOf="@+id/firstButtonRow">
 
-    <Button
-        android:id="@+id/buttonReturn"
+        <Button
+            android:id="@+id/buttonReturn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Return to Main" />
+
+        <Button
+            android:id="@+id/crashButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Crash Test" />
+    </LinearLayout>
+
+    <!-- Third row of buttons -->
+    <LinearLayout
+        android:id="@+id/thirdButtonRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Return to Main"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getCognitoIdentityButton" />
+        app:layout_constraintTop_toBottomOf="@+id/secondButtonRow">
 
-    <Button
-        android:id="@+id/crashButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="84dp"
-        android:layout_marginEnd="16dp"
-        android:text="Crash Test"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getCognitoIdentityButton" />
+        <Button
+            android:id="@+id/httpCallButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Http Call" />
 
-    <Button
-        android:id="@+id/httpCallButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="148dp"
-        android:layout_marginEnd="16dp"
-        android:text="Http Call"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getCognitoIdentityButton" />
-
-    <Button
+        <Button
             android:id="@+id/okhttp3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="200dp"
-            android:layout_marginEnd="16dp"
-            android:text="OkHttp3 Call"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/getCognitoIdentityButton" />
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="OkHttp3 Call" />
+    </LinearLayout>
+
+    <!-- Fourth row of buttons -->
+    <LinearLayout
+        android:id="@+id/fourthButtonRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/thirdButtonRow">
+
+        <Button
+            android:id="@+id/okhttp3Call400"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="OkHttp3 Call 400" />
+
+        <Button
+            android:id="@+id/okhttp3Call500"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="OkHttp3 Call 500" />
+    </LinearLayout>
+
+    <!-- Fifth row of buttons -->
+    <LinearLayout
+        android:id="@+id/fifthButtonRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fourthButtonRow">
+
+        <Button
+            android:id="@+id/httpCall400Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Http Call 400" />
+
+        <Button
+            android:id="@+id/httpCall500Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Http Call 500" />
+    </LinearLayout>
 
     <ScrollView
-            android:layout_width="388dp"
-            android:layout_height="180dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonReturn"
-            app:layout_constraintVertical_bias="0.754">
+            app:layout_constraintTop_toBottomOf="@+id/fifthButtonRow">
 
         <TextView
                 android:id="@+id/resultTextView"

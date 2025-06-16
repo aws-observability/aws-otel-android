@@ -48,6 +48,17 @@ class SecondActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySecondBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        // Ensure proper window insets handling for Android API level 35
+        window.decorView.setOnApplyWindowInsetsListener { view, insets ->
+            view.setPadding(
+                insets.systemWindowInsetLeft,
+                0, // We handle this with paddingTop in the layout
+                insets.systemWindowInsetRight,
+                insets.systemWindowInsetBottom
+            )
+            insets
+        }
 
         Log.d(TAG, "Second Activity created")
 
@@ -79,9 +90,30 @@ class SecondActivity : AppCompatActivity() {
             Log.d(TAG, "Http Call button clicked")
             makeHttpCall()
         }
+        
         binding.okhttp3.setOnClickListener {
             Log.d(TAG, "Ok Http3 call")
             makeOkHttp3Call()
+        }
+        
+        binding.okhttp3Call400.setOnClickListener {
+            Log.d(TAG, "OkHttp3 Call 400")
+            makeOkHttp3Call400()
+        }
+        
+        binding.okhttp3Call500.setOnClickListener {
+            Log.d(TAG, "OkHttp3 Call 500")
+            makeOkHttp3Call500()
+        }
+        
+        binding.httpCall400Button.setOnClickListener {
+            Log.d(TAG, "Http Call 400 button clicked")
+            makeHttpCall400()
+        }
+        
+        binding.httpCall500Button.setOnClickListener {
+            Log.d(TAG, "Http Call 500 button clicked")
+            makeHttpCall500()
         }
     }
 
@@ -185,6 +217,108 @@ class SecondActivity : AppCompatActivity() {
                 Log.d(TAG, e.message ?: "Unknown error")
                 Log.e(TAG, "Http Error: ", e)
                 binding.resultTextView.text = "HTTP call failed"
+            }
+        }
+    }
+    
+    private fun makeOkHttp3Call400() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP 400 call..."
+
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("https://httpstat.us/400")
+                    .build()
+
+                val result = withContext(Dispatchers.IO) {
+                    client.newCall(request).execute().use { response ->
+                        "Response code: ${response.code}, message: ${response.message}"
+                    }
+                }
+
+                binding.resultTextView.text = result
+            } catch (e: Exception) {
+                Log.d(TAG, e.message ?: "Unknown error")
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP 400 call failed: ${e.message}"
+            }
+        }
+    }
+
+    private fun makeOkHttp3Call500() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP 400 call..."
+
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("https://httpstat.us/500")
+                    .build()
+
+                val result = withContext(Dispatchers.IO) {
+                    client.newCall(request).execute().use { response ->
+                        "Response code: ${response.code}, message: ${response.message}"
+                    }
+                }
+
+                binding.resultTextView.text = result
+            } catch (e: Exception) {
+                Log.d(TAG, e.message ?: "Unknown error")
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP 400 call failed: ${e.message}"
+            }
+        }
+    }
+
+    private fun makeHttpCall400() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP 400 call using HttpURLConnection..."
+
+                val result = withContext(Dispatchers.IO) {
+                    val url = URL("https://httpstat.us/400")
+                    val urlConnection = url.openConnection() as HttpURLConnection
+                    try {
+                        val responseCode = urlConnection.responseCode
+                        val responseMessage = urlConnection.responseMessage
+                        "Response code: $responseCode, message: $responseMessage"
+                    } finally {
+                        urlConnection.disconnect()
+                    }
+                }
+
+                binding.resultTextView.text = result
+            } catch (e: Exception) {
+                Log.d(TAG, e.message ?: "Unknown error")
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP 400 call failed: ${e.message}"
+            }
+        }
+    }
+
+    private fun makeHttpCall500() {
+        lifecycleScope.launch {
+            try {
+                binding.resultTextView.text = "Making HTTP 500 call using HttpURLConnection..."
+
+                val result = withContext(Dispatchers.IO) {
+                    val url = URL("https://httpstat.us/500")
+                    val urlConnection = url.openConnection() as HttpURLConnection
+                    try {
+                        val responseCode = urlConnection.responseCode
+                        val responseMessage = urlConnection.responseMessage
+                        "Response code: $responseCode, message: $responseMessage"
+                    } finally {
+                        urlConnection.disconnect()
+                    }
+                }
+
+                binding.resultTextView.text = result
+            } catch (e: Exception) {
+                Log.d(TAG, e.message ?: "Unknown error")
+                Log.e(TAG, "Http Error: ", e)
+                binding.resultTextView.text = "HTTP 500 call failed: ${e.message}"
             }
         }
     }

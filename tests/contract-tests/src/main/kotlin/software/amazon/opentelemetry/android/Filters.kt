@@ -128,3 +128,9 @@ fun List<Span>.attributes(keyName: String): Attribute =
         .flatMap { it.attributes }
         .filter { it.key == keyName }
         .first()
+
+@JvmName("spanToAllAttributes")
+fun List<Span>.allAttributes(keyName: String): List<Attribute> =
+    this
+        .flatMap { it.attributes }
+        .filter { it.key == keyName }
