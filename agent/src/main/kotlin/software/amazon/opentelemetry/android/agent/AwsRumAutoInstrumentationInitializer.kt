@@ -22,10 +22,9 @@ import android.net.Uri
 import android.util.Log
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
-import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
-import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.TelemetryConfig
 import java.time.Duration
 
 internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
@@ -63,8 +62,14 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                                 .setEndpoint(
                                     AwsRumAppMonitorConfigReader.getLogsEndpoint(config),
                                 ).build()
-                        }.addInstrumentation(HttpUrlInstrumentation())
-                        .addInstrumentation(OkHttpInstrumentation())
+                        }
+
+                val telemetryConfig =
+                    config.rum.enabledTelemetry
+                        ?.mapNotNull { TelemetryConfig.mapConfigFlag(it) }
+                        ?: TelemetryConfig.getDefault()
+
+                builder.setEnabledTelemetry(telemetryConfig)
 
                 builder.build()
             }

@@ -43,6 +43,7 @@ internal data class RumConfig(
     val alias: String? = null,
     val sessionInactivityTimeout: Int = 300,
     val overrideEndpoint: EndpointConfig? = null,
+    val enabledTelemetry: List<String>? = null,
 )
 
 @Serializable

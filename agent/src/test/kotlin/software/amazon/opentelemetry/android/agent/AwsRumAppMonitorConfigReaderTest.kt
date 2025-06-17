@@ -45,6 +45,7 @@ class AwsRumAppMonitorConfigReaderTest {
                 "region": "test-region",
                 "alias": "my-alias",
                 "sessionInactivityTimeout": 100,
+                "enabledTelemetry": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup"]
                 "overrideEndpoint":{
                     "logs":"http://test.com",
                     "traces":"http://test123.com"

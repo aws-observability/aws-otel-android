@@ -19,12 +19,10 @@ import io.opentelemetry.android.OpenTelemetryRum
 import io.opentelemetry.android.OpenTelemetryRumBuilder
 import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfig
-import io.opentelemetry.android.instrumentation.AndroidInstrumentation
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
-import software.amazon.opentelemetry.android.uiload.activity.ActivityLoadInstrumentation
 import java.time.Duration
 
 /**
@@ -40,10 +38,6 @@ class OpenTelemetryAgent(
     class Builder constructor(
         private val application: Application,
     ) {
-        private val additionalInstrumentations: MutableList<AndroidInstrumentation> =
-            mutableListOf(
-                ActivityLoadInstrumentation(),
-            )
         private var diskBufferingConfig: DiskBufferingConfig =
             DiskBufferingConfig(
                 enabled = true,
@@ -56,6 +50,7 @@ class OpenTelemetryAgent(
         private val logRecordExporterCustomizers: MutableList<(LogRecordExporter) -> LogRecordExporter> = mutableListOf()
         private var sessionInactivityTimeout: Duration = Duration.ofMinutes(5)
         private var tracerSampler: Sampler? = null
+        private var enabledTelemetry: MutableList<TelemetryConfig>? = null
 
         /**
          * Point the Agent to an AppMonitor resource in AWS Real User Monitoring.
@@ -106,11 +101,6 @@ class OpenTelemetryAgent(
             return this
         }
 
-        fun addInstrumentation(instrumentation: AndroidInstrumentation): Builder {
-            additionalInstrumentations.add(instrumentation)
-            return this
-        }
-
         /**
          * Set the session background inactivity timeout
          */
@@ -127,6 +117,20 @@ class OpenTelemetryAgent(
             return this
         }
 
+        fun setEnabledTelemetry(telemetries: List<TelemetryConfig>): Builder {
+            enabledTelemetry = telemetries.toMutableList()
+            return this
+        }
+
+        fun addEnabledTelemetry(telemetry: TelemetryConfig): Builder {
+            if (enabledTelemetry == null) {
+                enabledTelemetry = mutableListOf(telemetry)
+            } else {
+                enabledTelemetry!!.add(telemetry)
+            }
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -138,6 +142,18 @@ class OpenTelemetryAgent(
                 OtelRumConfig()
                     .setDiskBufferingConfig(diskBufferingConfig)
                     .setSessionTimeout(sessionInactivityTimeout)
+                    .disableInstrumentationDiscovery()
+
+            val telemetry =
+                if (enabledTelemetry == null) {
+                    TelemetryConfig.getDefault().toMutableList()
+                } else {
+                    enabledTelemetry!!
+                }
+
+            if (telemetry.find { it.configFlag == "sdk_initialization" } == null) {
+                otelRumConfig.disableSdkInitializationEvents()
+            }
 
             val delegateBuilder =
                 OpenTelemetryRumBuilder
@@ -151,13 +167,16 @@ class OpenTelemetryAgent(
                 delegateBuilder.addLogRecordExporterCustomizer(customizer)
             }
 
-            additionalInstrumentations.forEach { instrumentation ->
-                delegateBuilder.addInstrumentation(instrumentation)
-            }
-
             if (tracerSampler != null) {
                 delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
                     tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
+                }
+            }
+
+            // Add all enabled telemetry instrumentations
+            telemetry.forEach { telemetryConfig ->
+                telemetryConfig.instrumentation?.let {
+                    delegateBuilder.addInstrumentation(telemetryConfig.instrumentation)
                 }
             }
 
