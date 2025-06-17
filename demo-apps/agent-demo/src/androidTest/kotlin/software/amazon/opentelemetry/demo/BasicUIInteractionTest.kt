@@ -42,8 +42,11 @@ class BasicUIInteractionTest {
         onView(withText("Go to Second Screen")).perform(click())
         Thread.sleep(5000)
         onView(withText("Http Call")).perform(click())
-        Thread.sleep(5000)
         onView(withText("OkHttp3 Call")).perform(click())
+        onView(withText("OkHttp3 Call 400")).perform(click())
+        onView(withText("OkHttp3 Call 500")).perform(click())
+        onView(withText("Http Call 400")).perform(click())
+        onView(withText("Http Call 500")).perform(click())
         Thread.sleep(60000)
     }
 

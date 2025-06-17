@@ -19,8 +19,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import software.amazon.opentelemetry.android.OtlpResolver
 import software.amazon.opentelemetry.android.ParsedOtlpData
+import software.amazon.opentelemetry.android.allAttributes
 import software.amazon.opentelemetry.android.attributes
 import software.amazon.opentelemetry.android.getAttributes
+import software.amazon.opentelemetry.android.otlp.Span
 import software.amazon.opentelemetry.android.scopeSpans
 import software.amazon.opentelemetry.android.spans
 
@@ -51,9 +53,37 @@ class HttpInstrumentationTest {
             spans.attributes(STATUS_CODE_ATTR).value.intValue,
         )
 
-        Assertions.assertEquals(
-            spans.attributes(URL_FULL).value.stringValue,
-            "https://www.android.com",
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://www.android.com"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans
+                .filter { span: Span ->
+                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                }.attributes(STATUS_CODE_ATTR)
+                .value.intValue == "500",
+        )
+        Assertions.assertTrue(
+            spans
+                .filter { span: Span ->
+                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                }.attributes(STATUS_CODE_ATTR)
+                .value.intValue == "400",
         )
     }
 
@@ -72,9 +102,16 @@ class HttpInstrumentationTest {
             spans.attributes(STATUS_CODE_ATTR).value.intValue,
         )
 
-        Assertions.assertEquals(
-            spans.attributes(URL_FULL).value.stringValue,
-            "https://www.android.com/",
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://www.android.com/"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+            },
         )
 
         Assertions.assertNotNull(
@@ -83,6 +120,38 @@ class HttpInstrumentationTest {
 
         Assertions.assertNotNull(
             spans.attributes(SERVER_PORT_ATTR).value.intValue,
+        )
+
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans.any { span ->
+                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+            },
+        )
+
+        Assertions.assertTrue(
+            spans
+                .filter { span: Span ->
+                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                }.allAttributes(STATUS_CODE_ATTR)
+                .all { attribute ->
+                    attribute.value.intValue == "500"
+                },
+        )
+
+        Assertions.assertTrue(
+            spans
+                .filter { span: Span ->
+                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                }.allAttributes(STATUS_CODE_ATTR)
+                .all { attribute ->
+                    attribute.value.intValue == "400"
+                },
         )
     }
 }
