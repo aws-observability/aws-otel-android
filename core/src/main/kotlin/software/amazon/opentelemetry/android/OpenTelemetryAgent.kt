@@ -132,7 +132,7 @@ class OpenTelemetryAgent(
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
             }
 
-            val resource = AwsAndroidResource.createDefault(application, awsRumAppMonitorConfig, applicationName)
+            val resource = ResourceProvider.createDefault(application, awsRumAppMonitorConfig!!, applicationName)
 
             val otelRumConfig =
                 OtelRumConfig()

@@ -29,6 +29,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.semconv.ServiceAttributes
+import io.opentelemetry.semconv.incubating.CloudIncubatingAttributes
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -108,13 +109,16 @@ class OpenTelemetryAgentTest {
             .setSessionInactivityTimeout(Duration.ofMinutes(1))
             .build()
 
-        // Validate the expected delegate builder method calls
+        // Validate the expected delegate builder
         verify(exactly = 1) {
             delegateBuilder.setResource(
                 withArg {
                     Assertions.assertEquals("testAppName", it.getAttribute(ServiceAttributes.SERVICE_NAME))
-                    Assertions.assertEquals("us-east-1", it.getAttribute(AttributeKey.stringKey(AwsRumConstants.AWS_REGION)))
-                    Assertions.assertEquals("1234", it.getAttribute(AttributeKey.stringKey(AwsRumConstants.RUM_APP_MONITOR_ID)))
+                    Assertions.assertEquals(
+                        "us-east-1",
+                        it.getAttribute(AttributeKey.stringKey(CloudIncubatingAttributes.CLOUD_REGION.key)),
+                    )
+                    Assertions.assertEquals("1234", it.getAttribute(AttributeKey.stringKey(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID)))
                 },
             )
             delegateBuilder.addSpanExporterCustomizer(
