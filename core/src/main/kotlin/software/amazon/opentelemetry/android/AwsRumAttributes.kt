@@ -14,10 +14,7 @@
  */
 package software.amazon.opentelemetry.android
 
-class AwsRumConstants {
-    companion object {
-        public const val AWS_REGION = "awsRegion"
-        public const val RUM_APP_MONITOR_ID = "awsRumAppMonitorId"
-        public const val RUM_ALIAS = "awsRumAlias"
-    }
+object AwsRumAttributes {
+    const val AWS_RUM_APP_MONITOR_ID = "aws.rum.appmonitor.id"
+    const val AWS_RUM_APP_MONITOR_ALIAS = "aws.rum.appmonitor.alias"
 }

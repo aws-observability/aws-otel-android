@@ -17,35 +17,35 @@ package software.amazon.opentelemetry.android
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.Build
+import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit5.MockKExtension
 import io.opentelemetry.android.common.RumConstants
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.ServiceAttributes
+import io.opentelemetry.semconv.incubating.CloudIncubatingAttributes
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Answers
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.jupiter.MockitoExtension
 
-@ExtendWith(MockitoExtension::class)
-internal class AwsAndroidResourceTest {
+@ExtendWith(MockKExtension::class)
+class ResourceProviderTest {
     private val appName = "awsTestApp"
     private val rumSdkVersion = BuildConfig.RUM_SDK_VERSION
     private val osDescription = "Android Version ${Build.VERSION.RELEASE} (Build ${Build.ID} API level ${Build.VERSION.SDK_INT})"
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private val app: Application? = null
+    @RelaxedMockK
+    lateinit var application: Application
 
     @Test
-    fun `should Create Correct Resource Type With Region And Rum App Monitor Id`() {
+    fun `should create correct resource type`() {
         val appInfo = ApplicationInfo()
         appInfo.labelRes = 12345
 
-        Mockito.`when`(app!!.applicationContext.applicationInfo).thenReturn(appInfo)
-        Mockito.`when`(app.applicationContext.getString(appInfo.labelRes)).thenReturn(appName)
+        every { application.applicationContext.applicationInfo } returns appInfo
+        every { application.applicationContext.getString(appInfo.labelRes) } returns appName
 
         val expected =
             Resource
@@ -55,32 +55,24 @@ internal class AwsAndroidResourceTest {
                         .builder()
                         .put(ServiceAttributes.SERVICE_NAME, appName)
                         .put(RumConstants.RUM_SDK_VERSION, rumSdkVersion)
-                        .put(
-                            DeviceIncubatingAttributes.DEVICE_MODEL_NAME,
-                            Build.MODEL,
-                        ).put(
-                            DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER,
-                            Build.MODEL,
-                        ).put(
-                            DeviceIncubatingAttributes.DEVICE_MANUFACTURER,
-                            Build.MANUFACTURER,
-                        ).put(OsIncubatingAttributes.OS_NAME, "Android")
+                        .put(DeviceIncubatingAttributes.DEVICE_MODEL_NAME, Build.MODEL)
+                        .put(DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER, Build.MODEL)
+                        .put(DeviceIncubatingAttributes.DEVICE_MANUFACTURER, Build.MANUFACTURER)
+                        .put(OsIncubatingAttributes.OS_NAME, "Android")
                         .put(OsIncubatingAttributes.OS_TYPE, "linux")
-                        .put(
-                            OsIncubatingAttributes.OS_VERSION,
-                            Build.VERSION.RELEASE,
-                        ).put(OsIncubatingAttributes.OS_DESCRIPTION, osDescription)
-                        .put(
-                            AwsRumConstants.RUM_APP_MONITOR_ID,
-                            "test-app-monitor-id",
-                        ).put(AwsRumConstants.AWS_REGION, "test-region")
+                        .put(OsIncubatingAttributes.OS_DESCRIPTION, osDescription)
+                        .put(CloudIncubatingAttributes.CLOUD_PLATFORM, "aws_rum")
+                        .put(CloudIncubatingAttributes.CLOUD_PROVIDER, "aws")
+                        .put(CloudIncubatingAttributes.CLOUD_REGION, "test-region")
+                        .put(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID, "test-app-monitor-id")
+                        .put(AwsRumAttributes.AWS_RUM_APP_MONITOR_ALIAS, "alias")
                         .build(),
                 )
 
         val result =
-            AwsAndroidResource.createDefault(
-                app,
-                AwsRumAppMonitorConfig("test-region", "test-app-monitor-id"),
+            ResourceProvider.createDefault(
+                application,
+                AwsRumAppMonitorConfig("test-region", "test-app-monitor-id", "alias"),
                 null,
             )
 
