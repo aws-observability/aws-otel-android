@@ -35,6 +35,14 @@
           "type": "integer",
           "default": 300
         },
+        "enabledTelemetry": {
+          "description": "The types of RUM telemetry you wish to collect on your application.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup", "http_urlconnection", "okhttp_3.0", "ui_load"]
+        },
         "overrideEndpoint": {
           "type": "object",
           "properties": {

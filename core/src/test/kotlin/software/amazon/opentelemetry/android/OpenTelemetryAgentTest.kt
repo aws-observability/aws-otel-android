@@ -15,6 +15,7 @@
 package software.amazon.opentelemetry.android
 
 import android.app.Application
+import android.os.Looper
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
@@ -82,6 +83,8 @@ class OpenTelemetryAgentTest {
     @Test
     fun `builder should pass all functions to delegate builder`() {
         mockkStatic(OpenTelemetryRumBuilder::class)
+        mockkStatic(Looper::class)
+        every { Looper.getMainLooper() } returns mockk()
 
         val delegateBuilder = mockk<OpenTelemetryRumBuilder>(relaxed = true)
         every { OpenTelemetryRumBuilder.create(application, any()) } returns delegateBuilder
@@ -106,6 +109,7 @@ class OpenTelemetryAgentTest {
             ).addSpanExporterCustomizer(spanExporterCustomizer)
             .addLogRecordExporterCustomizer(logExporterCustomizer)
             .setSessionInactivityTimeout(Duration.ofMinutes(1))
+            .setEnabledTelemetry(listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR))
             .build()
 
         // Validate the expected delegate builder method calls
@@ -127,6 +131,8 @@ class OpenTelemetryAgentTest {
                     Assertions.assertEquals(logRecordExporter, it.apply(logRecordExporter))
                 },
             )
+            delegateBuilder.addInstrumentation(TelemetryConfig.ACTIVITY.instrumentation!!)
+            delegateBuilder.addInstrumentation(TelemetryConfig.ANR.instrumentation!!)
         }
     }
 
