@@ -34,24 +34,58 @@ enum class TelemetryConfig(
     val instrumentation: AndroidInstrumentation? = null,
 ) {
     /**
-     * Generates SDK initialization telemetry upon building the Otel client
+     * Enables SDK initialization telemetry upon building the Otel client
      */
     SDK_INITIALIZATION_EVENTS("sdk_initialization"),
 
     /**
-     *
+     * Enables telemetry for Activity lifecycle monitoring
      */
     ACTIVITY("activity", ActivityLifecycleInstrumentation()),
+
+    /**
+     * Enables telemetry for Android "Application Not Responding" error monitoring
+     */
     ANR("anr", AnrInstrumentation()),
+
+    /**
+     * Enables telemetry for Android crash reporting
+     */
     CRASH("crash", CrashReporterInstrumentation()),
+
+    /**
+     * Enables telemetry for Fragment lifecycle monitoring
+     */
     FRAGMENT("fragment", FragmentLifecycleInstrumentation()),
+
+    /**
+     * Enables telemetry for Android network event monitoring
+     */
     NETWORK("network", NetworkChangeInstrumentation()),
+
+    /**
+     * Enables telemetry for Android UI slow rendering reports
+     */
     SLOW_RENDERING("slow_rendering", SlowRenderingInstrumentation()),
+
+    /**
+     * Enables telemetry for Android application startup monitoring
+     */
     STARTUP("startup", StartupInstrumentation()),
 
+    /**
+     * Enables telemetry for URLConnection / HttpURLConnection / HttpsURLConnection monitoring
+     */
     HTTP_URLCONNECTION("http_urlconnection", HttpUrlInstrumentation()),
+
+    /**
+     * Enables telemetry for OkHttp version 3.0 or higher
+     */
     OKHTTP_3("okhttp_3.0", OkHttpInstrumentation()),
 
+    /**
+     * Enables telemetry for UI load monitoring
+     */
     UI_LOADING("ui_load", ActivityLoadInstrumentation()),
     ;
 
