@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import software.amazon.opentelemetry.android.api.AwsRum
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivitySecondBinding
 import java.io.IOException
 
@@ -66,9 +67,20 @@ class SecondActivity : AppCompatActivity() {
         val message = intent.getStringExtra("MESSAGE") ?: "No message received"
         binding.textViewMessage.text = message
 
-        awsService = AwsService(cognitoPoolId, awsRegion)
-
-        setupButtons()
+        AwsRum.executeSpan(
+            name = "custom-parent-span",
+            screenName = this.javaClass.simpleName
+        ) {
+            parent ->
+                awsService = AwsService(cognitoPoolId, awsRegion)
+                AwsRum.executeSpan(
+                    name = "custom-child-span",
+                    screenName = this.javaClass.simpleName,
+                    parent
+                ) {
+                    setupButtons()
+                }
+        }
     }
 
     private fun setupButtons() {

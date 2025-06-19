@@ -62,6 +62,7 @@ dependencies {
     implementation("aws.sdk.kotlin:aws-core:1.4.69")
     
     // OpenTelemetry dependencies
+    compileOnly(libs.opentelemetry.api)
 
     // Android dependencies
     implementation("androidx.core:core-ktx:1.16.0")

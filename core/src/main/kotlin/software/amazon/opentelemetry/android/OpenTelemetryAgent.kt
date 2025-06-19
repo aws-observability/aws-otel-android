@@ -31,6 +31,18 @@ import java.time.Duration
 class OpenTelemetryAgent(
     private val delegate: OpenTelemetryRum,
 ) : OpenTelemetryRum {
+    companion object {
+        @Volatile
+        private var openTelemetryAgent: OpenTelemetryAgent? = null
+
+        @Synchronized
+        fun setInstance(agent: OpenTelemetryAgent) {
+            openTelemetryAgent = agent
+        }
+
+        fun getOpenTelemetryAgent(): OpenTelemetryAgent? = openTelemetryAgent
+    }
+
     override fun getOpenTelemetry(): OpenTelemetry = delegate.openTelemetry
 
     override fun getRumSessionId(): String = delegate.rumSessionId
@@ -180,7 +192,9 @@ class OpenTelemetryAgent(
                 }
             }
 
-            return OpenTelemetryAgent(delegateBuilder.build())
+            val openTelemetryAgent = OpenTelemetryAgent(delegateBuilder.build())
+            setInstance(openTelemetryAgent)
+            return openTelemetryAgent
         }
     }
 }
