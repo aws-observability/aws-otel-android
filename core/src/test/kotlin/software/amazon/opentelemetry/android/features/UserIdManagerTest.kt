@@ -54,6 +54,12 @@ class UserIdManagerTest {
 
         Assertions.assertTrue(userIdManager.userId.isNotBlank())
         Assertions.assertEquals("my-random-id", userIdManager.userId)
+        Assertions.assertEquals(
+            mapOf(
+                UserIdManager.USER_ID_ATTR to "my-random-id",
+            ),
+            userIdManager.buildAttributes(),
+        )
     }
 
     @Test
@@ -64,5 +70,11 @@ class UserIdManagerTest {
         userIdManager.install(application, context)
 
         Assertions.assertEquals("my-existing-id", userIdManager.userId)
+        Assertions.assertEquals(
+            mapOf(
+                UserIdManager.USER_ID_ATTR to "my-existing-id",
+            ),
+            userIdManager.buildAttributes(),
+        )
     }
 }

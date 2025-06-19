@@ -24,7 +24,7 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
-import software.amazon.opentelemetry.android.features.UserIdManager
+import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
 import java.time.Duration
 
 /**
@@ -179,19 +179,19 @@ class OpenTelemetryAgent(
                 otelRumConfig.disableSdkInitializationEvents()
             }
 
-            features.forEach { config ->
-                config.feature?.install(application, application.applicationContext)
-            }
-
-            // Special attributes
+            // Special attributes from AttributesProvidingFeatures
             val globalAttributesBuilder = Attributes.builder()
 
-            features.find { it.configFlag == FeatureConfig.USER_ID.configFlag }?.let {
-                globalAttributesBuilder.put(UserIdManager.USER_ID_ATTR, (it.feature as UserIdManager).userId)
+            features.forEach { config ->
+                config.feature?.install(application, application.applicationContext)
+                if (config.feature is AttributesProvidingFeature) {
+                    config.feature.buildAttributes().forEach { (key, value) ->
+                        globalAttributesBuilder.put(key, value)
+                    }
+                }
             }
 
             val attributes = globalAttributesBuilder.build()
-
             if (!attributes.isEmpty) {
                 otelRumConfig.setGlobalAttributes(attributes)
             }

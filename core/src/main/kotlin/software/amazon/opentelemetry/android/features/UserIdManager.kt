@@ -21,7 +21,8 @@ import java.util.Random
 
 internal class UserIdManager(
     private val diskManager: DiskManager,
-) : ModularFeature {
+) : ModularFeature,
+    AttributesProvidingFeature {
     companion object {
         const val USER_ID_FILE = "software.amazon.opentelemetry.android.userid"
         const val USER_ID_ATTR = "user.id"
@@ -45,6 +46,14 @@ internal class UserIdManager(
             diskManager.writeToFile(context, USER_ID_FILE, userId.toByteArray())
         } else {
             userId = readUserId
+        }
+    }
+
+    override fun buildAttributes(): Map<String, String> {
+        return if (userId.isNotBlank()) {
+            mapOf(USER_ID_ATTR to userId)
+        } else {
+            return mapOf()
         }
     }
 
