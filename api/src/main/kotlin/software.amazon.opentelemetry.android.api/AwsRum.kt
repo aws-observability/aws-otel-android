@@ -15,19 +15,13 @@
 package software.amazon.opentelemetry.android.api
 
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import software.amazon.opentelemetry.android.api.internal.AwsRumImpl
 import software.amazon.opentelemetry.android.api.internal.AwsRumSdkApi
 
-class AwsRum private constructor(
-    private val impl: AwsRumImpl = AwsRumImpl(),
-) : AwsRumSdkApi {
-    companion object {
-        private val instance: AwsRum = AwsRum()
-
-        @JvmStatic
-        fun getInstance() = instance
-    }
+object AwsRum : AwsRumSdkApi {
+    private val impl: AwsRumImpl = AwsRumImpl()
 
     override fun getTracer(instrumentationScope: String): Tracer = impl.getTracer(instrumentationScope)
 
@@ -35,14 +29,42 @@ class AwsRum private constructor(
         name: String,
         screenName: String?,
         attributes: Map<String, Any>?,
-    ): Span = impl.startSpan(name, screenName, attributes)
+        spanKind: SpanKind?,
+    ): Span = impl.startSpan(name, screenName, attributes, spanKind)
+
+    override fun startSpan(
+        name: String,
+        startTimeMs: Long,
+        screenName: String?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+    ): Span = impl.startSpan(name, startTimeMs, screenName, attributes, spanKind)
 
     override fun startChildSpan(
         name: String,
         parent: Span,
         screenName: String?,
         attributes: Map<String, Any>?,
-    ): Span = impl.startChildSpan(name, parent, screenName, attributes)
+        spanKind: SpanKind?,
+    ): Span = impl.startChildSpan(name, parent, screenName, attributes, spanKind)
+
+    override fun startChildSpan(
+        name: String,
+        parent: Span,
+        startTimeMs: Long,
+        screenName: String?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+    ): Span = impl.startChildSpan(name, parent, startTimeMs, screenName, attributes, spanKind)
+
+    override fun <T> executeSpan(
+        name: String,
+        screenName: String?,
+        parent: Span?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+        codeBlock: (Span) -> T,
+    ): T = impl.executeSpan(name, screenName, parent, attributes, spanKind, codeBlock)
 
     override fun startFragmentTTFDSpan(fragmentName: String): Span = impl.startFragmentTTFDSpan(fragmentName)
 }

@@ -16,12 +16,14 @@ package software.amazon.opentelemetry.android.api.internal
 
 import io.opentelemetry.android.common.RumConstants.SCREEN_NAME_KEY
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.api.trace.Tracer
 import io.opentelemetry.context.Context
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
-import software.amazon.opentelemetry.android.api.internal.Constants.Reserved.FRAGMENT_NAME_KEY
-import software.amazon.opentelemetry.android.api.internal.Constants.Reserved.TIME_TO_FIRST_DRAW
-import software.amazon.opentelemetry.android.uiload.activity.ActivityLoadInstrumentation.Companion.INSTRUMENTATION_SCOPE
+import software.amazon.opentelemetry.android.api.internal.Constants.FRAGMENT_NAME_KEY
+import software.amazon.opentelemetry.android.api.internal.Constants.SpanName.TIME_TO_FIRST_DRAW
+import java.util.concurrent.TimeUnit
 
 internal class AwsRumSpanApiImpl(
     private val openTelemetryAgent: OpenTelemetryAgent = getDefaultAgent(),
@@ -36,20 +38,68 @@ internal class AwsRumSpanApiImpl(
         name: String,
         screenName: String?,
         attributes: Map<String, Any>?,
-    ): Span = startSpanInternal(name, screenName = screenName, attributes = attributes)
+        spanKind: SpanKind?,
+    ): Span = startSpanInternal(name, screenName = screenName, attributes = attributes, spanKind = spanKind)
+
+    override fun startSpan(
+        name: String,
+        startTimeMs: Long,
+        screenName: String?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+    ): Span = startSpanInternal(name, screenName = screenName, attributes = attributes, spanKind = spanKind, startTimeMs = startTimeMs)
 
     override fun startChildSpan(
         name: String,
         parent: Span,
         screenName: String?,
         attributes: Map<String, Any>?,
-    ): Span = startSpanInternal(name, parentSpan = parent, screenName = screenName, attributes = attributes)
+        spanKind: SpanKind?,
+    ): Span = startSpanInternal(name, parentSpan = parent, screenName = screenName, attributes = attributes, spanKind = spanKind)
+
+    override fun startChildSpan(
+        name: String,
+        parent: Span,
+        startTimeMs: Long,
+        screenName: String?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+    ): Span =
+        startSpanInternal(
+            name,
+            parentSpan = parent,
+            screenName = screenName,
+            attributes = attributes,
+            spanKind = spanKind,
+            startTimeMs = startTimeMs,
+        )
+
+    override fun <T> executeSpan(
+        name: String,
+        screenName: String?,
+        parent: Span?,
+        attributes: Map<String, Any>?,
+        spanKind: SpanKind?,
+        codeBlock: (Span) -> T,
+    ): T {
+        val span = startSpanInternal(name, attributes = attributes, parentSpan = parent, screenName = screenName, spanKind = spanKind, null)
+
+        try {
+            return codeBlock(span)
+        } catch (t: Throwable) {
+            span.setStatus(StatusCode.ERROR)
+            throw t
+        } finally {
+            span.end()
+        }
+    }
 
     override fun startFragmentTTFDSpan(fragmentName: String): Span {
         val span =
-            getTracer(INSTRUMENTATION_SCOPE)
+            getTracer(Constants.TraceScope.AWS_RUM_CUSTOM_TRACER)
                 .spanBuilder(TIME_TO_FIRST_DRAW)
                 .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
+                .setSpanKind(SpanKind.CLIENT)
                 .startSpan()
         // Override the default screen.name set by RumAttributeAppender
         span.setAttribute(SCREEN_NAME_KEY, fragmentName)
@@ -61,12 +111,21 @@ internal class AwsRumSpanApiImpl(
         attributes: Map<String, Any>? = null,
         parentSpan: Span? = null,
         screenName: String? = null,
+        spanKind: SpanKind? = null,
+        startTimeMs: Long? = null,
     ): Span {
-        val spanBuilder = getTracer().spanBuilder(name)
+        val spanBuilder = getTracer(Constants.TraceScope.AWS_RUM_CUSTOM_TRACER).spanBuilder(name)
 
         parentSpan?.let { parent ->
             val parentContext = parent.storeInContext(Context.current())
             spanBuilder.setParent(parentContext)
+        }
+        spanKind?.let { spanBuilder.setSpanKind(spanKind) }
+
+        startTimeMs?.let {
+            // Convert to nanoseconds to align with default sdk behavior
+            val msToNs = TimeUnit.MILLISECONDS.toNanos(startTimeMs)
+            spanBuilder.setStartTimestamp(msToNs, TimeUnit.NANOSECONDS)
         }
 
         val span = spanBuilder.startSpan()

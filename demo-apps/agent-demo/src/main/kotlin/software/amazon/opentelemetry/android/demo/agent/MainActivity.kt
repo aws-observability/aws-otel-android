@@ -19,16 +19,19 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import io.opentelemetry.api.trace.Span
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import software.amazon.opentelemetry.android.api.AwsRum
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val TAG = "MainActivity"
+    private lateinit var fakeTtfdFragmentSpan: Span
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +49,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val startTime = System.currentTimeMillis()
+        val customSpan = AwsRum.startSpan("custom-span-1", startTime, this.javaClass.simpleName)
         setupUI()
+        customSpan.end()
         addInstrumentationTestFragment()
     }
 
@@ -58,11 +64,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun addInstrumentationTestFragment() {
         val fragmentManager = supportFragmentManager
+        fakeTtfdFragmentSpan = AwsRum.startFragmentTTFDSpan("InstrumentationTestFragment")
         val fragmentTransaction = fragmentManager.beginTransaction()
         
         val fragment = InstrumentationTestFragment.newInstance()
         fragmentTransaction.add(R.id.fragmentContainer, fragment)
         fragmentTransaction.commit()
+        fakeTtfdFragmentSpan.end()
     }
 
     private fun navigateToSecondActivity() {

@@ -16,17 +16,23 @@ package software.amazon.opentelemetry.android.api.internal
 
 import io.opentelemetry.api.common.AttributeKey
 
-internal object Constants {
+object Constants {
+    val FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("fragment.name")
+
     object TraceScope {
-        const val DEFAULT = "software.amazon.opentelemetry.custom-spans"
+        const val OTEL_TRACER_PREFIX = "io.opentelemetry."
+        const val AWS_RUM_TRACER_PREFIX = "software.amazon.opentelemetry."
+        const val AWS_RUM_CUSTOM_TRACER = "custom-spans"
+
+        val Reserved =
+            setOf(
+                OTEL_TRACER_PREFIX,
+                AWS_RUM_TRACER_PREFIX,
+                AWS_RUM_CUSTOM_TRACER,
+            )
     }
 
-    object Reserved {
+    object SpanName {
         const val TIME_TO_FIRST_DRAW = "TimeToFirstDraw"
-        val FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("fragment.name")
-        val reserved =
-            setOf(
-                TIME_TO_FIRST_DRAW,
-            )
     }
 }

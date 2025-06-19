@@ -15,6 +15,7 @@
 package software.amazon.opentelemetry.android.api.internal
 
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 
 internal interface AwsRumSpanApi {
@@ -22,12 +23,12 @@ internal interface AwsRumSpanApi {
      * Get a tracer with the specified instrumentation scope name.
      * This method provides direct access to OpenTelemetry tracer for advanced use cases.
      *
-     * @param instrumentationScope The name identifying the instrumentation scope. If not provided, the default scope will be used.
+     * @param instrumentationScope The name identifying the instrumentation scope. Reserved scope name should not be used.
      * @return An OpenTelemetry [Tracer] instance that can be used to create spans.
      *
      * Example usage:
      * ```
-     * val customTracer = AwsRum.getInstance().getTracer("network-operations")
+     * val customTracer = AwsRum.getTracer("network-operations")
      * val span = customTracer.spanBuilder("http-request")
      *     .setAttribute("http.method", "GET")
      *     .startSpan()
@@ -38,10 +39,9 @@ internal interface AwsRumSpanApi {
      * }
      * ```
      *
-     * Note: For most use cases, prefer using [startSpan] or [startChildSpan] instead of creating spans directly
-     * with the tracer. Direct tracer access should only be used when you need more control over tracer scope and span creation.
+     * Note: Direct tracer access should only be used when you need more control over tracer scope and span creation.
      */
-    fun getTracer(instrumentationScope: String = Constants.TraceScope.DEFAULT): Tracer
+    fun getTracer(instrumentationScope: String): Tracer
 
     /**
      * Create and automatically start a custom span.
@@ -52,18 +52,20 @@ internal interface AwsRumSpanApi {
      *                  View details: https://github.com/open-telemetry/opentelemetry-android/blob/20e253b87e85fe6f7fe0f52654dacab48186f138/services/src/main/java/io/opentelemetry/android/internal/services/visiblescreen.
      * @param attributes Optional map of key-value pairs to add as span attributes.
      *                  Supported value types are String, Boolean, Int, Long, and Double. Other types will be ignored.
+     * @param spanKind Optional type of the span. if not provided, the implementation will provide a default value SpanKind.CLIENT.
      * @return The started span, which must be ended by calling [Span.end] when the operation completes.
      *
      * Example usage:
      * ```
-     * val span = AwsRum.getInstance().startSpan(
+     * val span = AwsRum.startSpan(
      *     name = "load_user_data",
      *     screenName = "UserProfile",
      *     attributes = mapOf(
      *         "user_id" to "12345",
      *         "count" to 4,
      *         "visible" to true
-     *     )
+     *     ),
+     *     spanKind = SpanKind.CONSUMER
      * )
      * span.end()
      * ```
@@ -72,10 +74,42 @@ internal interface AwsRumSpanApi {
         name: String,
         screenName: String? = null,
         attributes: Map<String, Any>? = null,
+        spanKind: SpanKind? = SpanKind.CLIENT,
     ): Span
 
     /**
-     * Create and automatically start a child span with a parent span.
+     * Create and automatically start a custom span with an explicit start timestamp.
+     *
+     * @param name The name of the span.
+     * @param startTimeMs The explicit start timestamp (epoch time in milliseconds).
+     * @param screenName Optional name of the screen where the span is created. If not provided,
+     *                  the current screen name will be automatically detected which is last resumed activity or fragment.
+     *                  View details: https://github.com/open-telemetry/opentelemetry-android/blob/20e253b87e85fe6f7fe0f52654dacab48186f138/services/src/main/java/io/opentelemetry/android/internal/services/visiblescreen.
+     * @param attributes Optional map of key-value pairs to add as span attributes.
+     *                  Supported value types are String, Boolean, Int, Long, and Double. Other types will be ignored.
+     * @param spanKind Optional type of the span. if not provided, the implementation will provide a default value SpanKind.CLIENT.
+     * @return The started span, which must be ended by calling [Span.end] when the operation completes.
+     *
+     * Example usage:
+     * ```
+     * val span = AwsRum.startSpan(
+     *   name = "load_user_data",
+     *   startTimeMs = 1750315397543
+     *   screenName = "UserProfile",
+     * )
+     * span.end()
+     * ```
+     */
+    fun startSpan(
+        name: String,
+        startTimeMs: Long,
+        screenName: String? = null,
+        attributes: Map<String, Any>? = null,
+        spanKind: SpanKind? = SpanKind.CLIENT,
+    ): Span
+
+    /**
+     * Create and automatically start a child span for a parent span.
      * Child spans are used to track sub-operations within a larger operation.
      *
      * @param name The name of the child span.
@@ -84,6 +118,7 @@ internal interface AwsRumSpanApi {
      *                  the current screen name will be automatically detected.
      * @param attributes Optional map of key-value pairs to add as span attributes.
      *                  Supported value types are String, Boolean, Int, Long, and Double. Other types will be ignored.
+     * @param spanKind Optional type of the span. if not provided, the implementation will provide a default value SpanKind.CLIENT.
      * @return The started child span, which must be ended by calling [Span.end] when the operation completes.
      */
     fun startChildSpan(
@@ -91,7 +126,77 @@ internal interface AwsRumSpanApi {
         parent: Span,
         screenName: String? = null,
         attributes: Map<String, Any>? = null,
+        spanKind: SpanKind? = SpanKind.CLIENT,
     ): Span
+
+    /**
+     * Create and automatically start a child span for a parent span and with an explicit start timestamp.
+     * Child spans are used to track sub-operations within a larger operation.
+     *
+     * @param name The name of the child span.
+     * @param parent The parent span that this span will be associated with.
+     * @param startTimeMs The explicit start timestamp (epoch time in milliseconds).
+     * @param screenName Optional name of the screen where the span is created. If not provided,
+     *                  the current screen name will be automatically detected.
+     * @param attributes Optional map of key-value pairs to add as span attributes.
+     *                  Supported value types are String, Boolean, Int, Long, and Double. Other types will be ignored.
+     * @param spanKind Optional type of the span. if not provided, the implementation will provide a default value SpanKind.CLIENT.
+     * @return The started child span, which must be ended by calling [Span.end] when the operation completes.
+     */
+    fun startChildSpan(
+        name: String,
+        parent: Span,
+        startTimeMs: Long,
+        screenName: String? = null,
+        attributes: Map<String, Any>? = null,
+        spanKind: SpanKind? = SpanKind.CLIENT,
+    ): Span
+
+    /**
+     * Executes a block of code within a span context and automatically manages the span's lifecycle.
+     *
+     * @param name The name of the span.
+     * @param screenName Optional screen name where the span is created.
+     * @param parent Optional parent span.
+     * @param attributes Optional attributes to add to the span.
+     * @param spanKind Optional type of the span. if not provided, the implementation will provide a default value SpanKind.CLIENT.
+     * @param codeBlock The code block to execute within the span's lifecycle.
+     * @return The result of the code block.
+     *
+     * Example usage:
+     * ```
+     * AwsRum.executeSpan(
+     *   name = "operation1",
+     *   screenName = "TestScreen"
+     * ) {
+     *   // traced code block
+     *   fetchingData()
+     * }
+     * ```
+     * ```
+     * AwsRum.executeSpan(
+     *   name = "parent-operation",
+     *   screenName = "TestScreen"
+     * ) {
+     *   parent ->
+     *     // traced parent code block
+     *     loadTabs()
+     *
+     *     AwsRum.executeSpan(
+     *       name = "child-operation",
+     *       parent
+     *     ) { // traced child codeBlock }
+     * }
+     * ```
+     */
+    fun <T> executeSpan(
+        name: String,
+        screenName: String? = null,
+        parent: Span? = null,
+        attributes: Map<String, Any>? = null,
+        spanKind: SpanKind? = SpanKind.CLIENT,
+        codeBlock: (Span) -> T,
+    ): T
 
     /**
      * Create a span for tracking Fragment Time To First Draw (TTFD).
