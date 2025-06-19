@@ -57,6 +57,7 @@ data class Span(
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class SpanEvent(
     val timeUnixNano: String,
     val name: String,
