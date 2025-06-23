@@ -43,8 +43,8 @@
           },
           "default": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup", "http_urlconnection", "okhttp_3.0", "ui_load"]
         },
-        "enabledFeatures": {
-          "description": "Special features you wish to enable to enrich collected telemetry",
+        "addonFeatures": {
+          "description": "Add-on features you wish to explicitly enable to enrich collected telemetry",
           "item": "array",
           "items": {
             "type": "string"

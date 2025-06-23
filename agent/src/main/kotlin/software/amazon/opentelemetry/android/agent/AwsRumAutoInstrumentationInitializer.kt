@@ -71,7 +71,7 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                         ?: TelemetryConfig.getDefault()
 
                 val featureConfig =
-                    config.rum.enabledFeatures
+                    config.rum.addonFeatures
                         ?.mapNotNull { FeatureConfig.mapConfigFlag(it) }
                         ?: FeatureConfig.getDefault()
 
