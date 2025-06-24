@@ -20,9 +20,11 @@ import io.opentelemetry.android.OpenTelemetryRumBuilder
 import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfig
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
+import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
 import java.time.Duration
 
 /**
@@ -63,6 +65,7 @@ class OpenTelemetryAgent(
         private var sessionInactivityTimeout: Duration = Duration.ofMinutes(5)
         private var tracerSampler: Sampler? = null
         private var enabledTelemetry: MutableList<TelemetryConfig>? = null
+        private var enabledFeatures: MutableList<FeatureConfig>? = null
 
         /**
          * Point the Agent to an AppMonitor resource in AWS Real User Monitoring.
@@ -143,6 +146,20 @@ class OpenTelemetryAgent(
             return this
         }
 
+        fun setEnabledFeatures(features: List<FeatureConfig>): Builder {
+            enabledFeatures = features.toMutableList()
+            return this
+        }
+
+        fun addEnabledFeature(feature: FeatureConfig): Builder {
+            if (enabledFeatures == null) {
+                enabledFeatures = mutableListOf(feature)
+            } else {
+                enabledFeatures!!.add(feature)
+            }
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -163,8 +180,32 @@ class OpenTelemetryAgent(
                     enabledTelemetry!!
                 }
 
-            if (telemetry.find { it.configFlag == "sdk_initialization" } == null) {
+            val features =
+                if (enabledFeatures == null) {
+                    FeatureConfig.getDefault().toMutableList()
+                } else {
+                    enabledFeatures!!
+                }
+
+            if (telemetry.find { it.configFlag == TelemetryConfig.SDK_INITIALIZATION_EVENTS.configFlag } == null) {
                 otelRumConfig.disableSdkInitializationEvents()
+            }
+
+            // Special attributes from AttributesProvidingFeatures
+            val globalAttributesBuilder = Attributes.builder()
+
+            features.forEach { config ->
+                config.feature?.install(application, application.applicationContext)
+                if (config.feature is AttributesProvidingFeature) {
+                    config.feature.buildAttributes().forEach { (key, value) ->
+                        globalAttributesBuilder.put(key, value)
+                    }
+                }
+            }
+
+            val attributes = globalAttributesBuilder.build()
+            if (!attributes.isEmpty) {
+                otelRumConfig.setGlobalAttributes(attributes)
             }
 
             val delegateBuilder =

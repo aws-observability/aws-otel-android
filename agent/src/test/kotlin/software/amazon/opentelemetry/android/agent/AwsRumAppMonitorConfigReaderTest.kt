@@ -46,6 +46,7 @@ class AwsRumAppMonitorConfigReaderTest {
                 "alias": "my-alias",
                 "sessionInactivityTimeout": 100,
                 "enabledTelemetry": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup"]
+                "addonFeatures": ["attribute:user.id"],
                 "overrideEndpoint":{
                     "logs":"http://test.com",
                     "traces":"http://test123.com"
