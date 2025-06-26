@@ -5,7 +5,7 @@ The ADOT Android Agent provides (nearly) zero-code instrumentation for Android a
 In short, all you need to do is:
 1. Create an `aws_config.json` file to point your telemetry to your CloudWatch Real User Monitoring [AppMonitor](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-rum-appmonitor.html).
 2. Include the `agent` dependency in your Android application
-3. (Optional) Include extra ByteBuddy dependencies for additional automated instrumentation 
+3. (Optional) Include extra ByteBuddy dependencies for additional automated instrumentation
 
 ## What it does
 
@@ -79,7 +79,7 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
     "sessionInactivityTimeout": 600,
     "enabledTelemetry": [
       "activity",
-      "fragment", 
+      "fragment",
       "network",
       "crash",
       "anr",

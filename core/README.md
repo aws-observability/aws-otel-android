@@ -18,13 +18,13 @@ dependencies {
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        
+
         val config = AwsRumAppMonitorConfig(
             region = "us-east-1",
             appMonitorId = "your-app-monitor-id",
             alias = "your-app-alias"
         )
-        
+
         OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(config)
             .setApplicationVersion("1.0.0")

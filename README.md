@@ -30,7 +30,7 @@ Add to your app's `build.gradle.kts`:
 dependencies {
     // For automatic instrumentation (recommended; see below for programmatic configuration)
     implementation("software.amazon.opentelemetry.android:agent:LATEST_VERSION")
-    
+
     // For ByteBuddy instrumentation (optional)
     byteBuddy("io.opentelemetry.android:instrumentation-okhttp-3.0-agent:LATEST_VERSION")           // if you are using OkHttp-3.0
     byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:LATEST_VERSION")    // if you are using URLConnection / HttpURLConnection / HttpsURLConnection
@@ -72,13 +72,13 @@ dependencies {
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        
+
         val config = AwsRumAppMonitorConfig(
             region = "us-east-1",
             appMonitorId = "your-app-monitor-id",
             alias = "your-app-alias"
         )
-        
+
         OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(config)
             .setApplicationVersion("1.0.0")

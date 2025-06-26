@@ -38,15 +38,15 @@ For Fragments, use the API module for manual instrumentation:
 ```kotlin
 class MyFragment : Fragment() {
     private var ttfdSpan: Span? = null
-    
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         ttfdSpan = AwsRum.startFragmentTTFDSpan("MyFragment")
         return inflater.inflate(R.layout.fragment_my, container, false)
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)

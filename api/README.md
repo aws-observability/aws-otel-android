@@ -28,12 +28,12 @@ import software.amazon.opentelemetry.android.api.AwsRum
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         // Simple span creation
         val span = AwsRum.startSpan("user_login")
         performLogin()
         span.end()
-        
+
         // Or use executeSpan for automatic span lifecycle management
         AwsRum.executeSpan("load_user_data") { span ->
             loadUserData()
@@ -92,7 +92,7 @@ AwsRum.executeSpan("database_query") { span ->
 AwsRum.executeSpan("parent_operation") { parentSpan ->
     // Parent operation work
     setupOperation()
-    
+
     // Child span
     AwsRum.executeSpan(
         name = "child_operation",
@@ -100,7 +100,7 @@ AwsRum.executeSpan("parent_operation") { parentSpan ->
     ) { childSpan ->
         performChildWork()
     }
-    
+
     // More parent work
     cleanupOperation()
 }
@@ -111,16 +111,16 @@ AwsRum.executeSpan("parent_operation") { parentSpan ->
 ```kotlin
 class MyFragment : Fragment() {
     private var ttfdSpan: Span? = null
-    
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Start TTFD measurement
         ttfdSpan = AwsRum.startFragmentTTFDSpan("MyFragment")
         return inflater.inflate(R.layout.fragment_my, container, false)
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         // End TTFD when first draw is complete
         view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
