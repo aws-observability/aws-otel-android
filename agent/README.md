@@ -83,7 +83,7 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
       "network",
       "crash",
       "anr",
-      "ui_load"
+      "ui_loading"
     ],
     "addonFeatures": [
       "attribute:user.id"
@@ -101,16 +101,16 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 
 ## Telemetry Types
 
-| Type | Description |
-|------|-------------|
-| `activity` | Activity lifecycle events |
-| `fragment` | Fragment lifecycle events |
-| `network` | HTTP request monitoring |
-| `crash` | Crash detection and reporting |
-| `anr` | Application Not Responding detection |
-| `ui_load` | UI loading performance |
-| `slow_rendering` | Slow rendering detection |
-| `startup` | App startup performance |
+| Type             | Description                          |
+|------------------|--------------------------------------|
+| `activity`       | Activity lifecycle events            |
+| `fragment`       | Fragment lifecycle events            |
+| `network`        | HTTP request monitoring              |
+| `crash`          | Crash detection and reporting        |
+| `anr`            | Application Not Responding detection |
+| `ui_loading`     | UI loading performance               |
+| `slow_rendering` | Slow rendering detection             |
+| `startup`        | App startup performance              |
 
 ## Architecture
 

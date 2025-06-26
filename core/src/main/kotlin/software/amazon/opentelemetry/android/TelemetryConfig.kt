@@ -86,7 +86,7 @@ enum class TelemetryConfig(
     /**
      * Enables telemetry for UI load monitoring
      */
-    UI_LOADING("ui_load", ActivityLoadInstrumentation()),
+    UI_LOADING("ui_loading", ActivityLoadInstrumentation()),
     ;
 
     companion object {
