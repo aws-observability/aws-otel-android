@@ -7,9 +7,9 @@
 This repo contains the AWS Distro for OpenTelemetry (ADOT) on Android. It is a bundle that ships a few things out of the box:
 1. OpenTelemetry Java SDK (https://github.com/open-telemetry/opentelemetry-java)
 2. OpenTelemetry Android automated instrumentation (https://github.com/open-telemetry/opentelemetry-android)
-   3. This includes instrumentation for telemetry like ANRs, Crashes, Activity lifecycle, etc
+   - This includes instrumentation for telemetry like ANRs, Crashes, Activity lifecycle, etc
 4. UI component loading instrumentation (for "Time to first draw" telemetry)
-5. AWS-specific exporter and auth configuration that works out of the box when exporting telemetry to AWS CloudWatch Real User Monitoring
+5. AWS-specific exporter and auth configuration that works out of the box when exporting telemetry to AWS CloudWatch Real User Monitoring (RUM)
 
 The distro is preconfigured for seamless integration with AWS RUM.
 
@@ -31,7 +31,7 @@ dependencies {
     // For automatic instrumentation (recommended; see below for programmatic configuration)
     implementation("software.amazon.opentelemetry.android:agent:LATEST_VERSION")
 
-    // For ByteBuddy instrumentation (optional)
+    // For HTTP instrumentation with ByteBuddy
     byteBuddy("io.opentelemetry.android:instrumentation-okhttp-3.0-agent:LATEST_VERSION")           // if you are using OkHttp-3.0
     byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:LATEST_VERSION")    // if you are using URLConnection / HttpURLConnection / HttpsURLConnection
 }
@@ -46,7 +46,7 @@ Create `res/raw/aws_config.json`:
 ```json
 {
   "rum": {
-    "region": "us-east-1", // or whatever region you care to monitor in
+    "region": "us-east-1", // specify the AWS region you wish to monitor
     "appMonitorId": "<your-app-monitor-id>",
     "alias": "<your-app-alias>",
   },
@@ -108,17 +108,17 @@ AwsRum.executeSpan("database_query") { span ->
 }
 ```
 
-## Architecture
+## Feature modules
 
 The library consists of several modules designed for flexibility and modularity:
 
-| Module                                   | Description                                 | Use Case |
-|------------------------------------------|---------------------------------------------|----------|
+| Module                                   | Description                                 | Use Case                           |
+|------------------------------------------|---------------------------------------------|------------------------------------|
 | **[agent](agent/README.md)**             | Zero-code auto-instrumentation              | Easiest setup, automatic telemetry |
-| **[core](core/README.md)**               | Main OpenTelemetry client and configuration | Manual setup, full control |
-| **[api](api/README.md)**                 | Public API for custom instrumentation       | Adding custom spans and metrics |
-| **[ui-loading](ui-loading/README.md)**   | UI performance monitoring                   | Time-to-first-draw tracking |
-| **[aws-runtime](aws-runtime/README.md)** | AWS authentication and exporters            | Cognito auth, SigV4 signing |
+| **[core](core/README.md)**               | Main OpenTelemetry client and configuration | Manual setup, full control         |
+| **[api](api/README.md)**                 | Public API for custom instrumentation       | Adding custom spans and metrics    |
+| **[ui-loading](ui-loading/README.md)**   | UI performance monitoring                   | Time-to-first-draw tracking        |
+| **[aws-runtime](aws-runtime/README.md)** | AWS authentication and exporters            | Cognito auth, SigV4 signing        |
 
 ## Supported Instrumentation
 
@@ -168,6 +168,10 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## License
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
+
+## Security issue notifications
+
+If you discover a potential security issue in this project we ask that you notify AWS/Amazon Security via our [vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public github issue.
 
 ## Related Projects
 
