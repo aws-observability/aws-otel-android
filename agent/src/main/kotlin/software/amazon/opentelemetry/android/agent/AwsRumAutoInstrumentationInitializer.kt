@@ -23,7 +23,6 @@ import android.util.Log
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
-import software.amazon.opentelemetry.android.FeatureConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
 import software.amazon.opentelemetry.android.TelemetryConfig
 import java.time.Duration
@@ -40,17 +39,16 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                 // Default configuration - sends data to AWS RUM
                 val awsRumAppMonitorConfig =
                     AwsRumAppMonitorConfig(
-                        config.rum.region,
-                        config.rum.appMonitorId,
-                        config.rum.alias,
+                        config.aws.region,
+                        config.aws.rumAppMonitorId,
+                        config.aws.rumAlias,
                     )
 
                 val builder =
                     OpenTelemetryAgent
                         .Builder(application)
                         .setAppMonitorConfig(awsRumAppMonitorConfig)
-                        .setApplicationVersion(config.application.applicationVersion)
-                        .setSessionInactivityTimeout(Duration.ofSeconds(config.rum.sessionInactivityTimeout.toLong()))
+                        .setSessionInactivityTimeout(Duration.ofSeconds(config.sessionTimeout.toLong()))
                         .addSpanExporterCustomizer { _ ->
                             OtlpHttpSpanExporter
                                 .builder()
@@ -65,18 +63,27 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                                 ).build()
                         }
 
-                val telemetryConfig =
-                    config.rum.enabledTelemetry
-                        ?.mapNotNull { TelemetryConfig.mapConfigFlag(it) }
-                        ?: TelemetryConfig.getDefault()
+                val telemetry = config.telemetry
 
-                val featureConfig =
-                    config.rum.addonFeatures
-                        ?.mapNotNull { FeatureConfig.mapConfigFlag(it) }
-                        ?: FeatureConfig.getDefault()
-
-                builder.setEnabledTelemetry(telemetryConfig)
-                builder.setEnabledFeatures(featureConfig)
+                if (telemetry != null) {
+                    val enabledTelemetries =
+                        listOfNotNull(
+                            TelemetryConfig.ACTIVITY.takeIf { telemetry.activity == null || telemetry.activity.enabled },
+                            TelemetryConfig.ANR.takeIf { telemetry.anr == null || telemetry.anr.enabled },
+                            TelemetryConfig.CRASH.takeIf { telemetry.crash == null || telemetry.crash.enabled },
+                            TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment == null || telemetry.fragment.enabled },
+                            TelemetryConfig.NETWORK.takeIf { telemetry.network == null || telemetry.network.enabled },
+                            TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering == null || telemetry.slowRendering.enabled },
+                            TelemetryConfig.STARTUP.takeIf { telemetry.startup == null || telemetry.startup.enabled },
+                            TelemetryConfig.HTTP_URLCONNECTION.takeIf {
+                                telemetry.httpUrlConnection == null ||
+                                    telemetry.httpUrlConnection.enabled
+                            },
+                            TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3 == null || telemetry.okHttp3.enabled },
+                            TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad == null || telemetry.uiLoad.enabled },
+                        )
+                    builder.setEnabledTelemetry(enabledTelemetries)
+                }
 
                 builder.build()
             }

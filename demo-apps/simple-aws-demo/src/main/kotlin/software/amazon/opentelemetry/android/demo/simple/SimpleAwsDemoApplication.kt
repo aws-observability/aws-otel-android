@@ -42,7 +42,6 @@ class SimpleAwsDemoApplication : Application() {
         // Default configuration - sends data to X-Ray only (for now)
         val otelAgent = OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(appMonitorConfig)
-            .setApplicationVersion("1.0.0")
             .addSpanExporterCustomizer {
                 AwsSigV4SpanExporter.builder()
                     .setRegion(awsRegion)

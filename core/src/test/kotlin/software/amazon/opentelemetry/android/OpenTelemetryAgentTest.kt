@@ -119,7 +119,6 @@ class OpenTelemetryAgentTest {
         OpenTelemetryAgent
             .Builder(application)
             .setApplicationName("testAppName")
-            .setApplicationVersion("1.0")
             .setAppMonitorConfig(
                 AwsRumAppMonitorConfig(
                     region = "us-east-1",

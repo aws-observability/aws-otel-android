@@ -17,40 +17,54 @@ package software.amazon.opentelemetry.android.agent
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import java.nio.charset.StandardCharsets
 
 @Serializable
-internal data class ApplicationConfig(
-    @Required val applicationVersion: String,
+internal data class AwsConfig(
+    @Required val region: String,
+    @Required val rumAppMonitorId: String,
+    val rumAlias: String? = null,
 )
 
 @Serializable
-internal data class EndpointConfig(
+internal data class ExportOverrideConfig(
     val traces: String? = null,
     val logs: String? = null,
 )
 
 @Serializable
-internal data class RumConfig(
-    @Required val region: String,
-    @Required val appMonitorId: String,
-    val alias: String? = null,
-    val sessionInactivityTimeout: Int = 300,
-    val overrideEndpoint: EndpointConfig? = null,
-    val enabledTelemetry: List<String>? = null,
-    val addonFeatures: List<String>? = null,
+internal data class TelemetryConfigs(
+    val activity: TelemetryOption? = null,
+    val anr: TelemetryOption? = null,
+    val crash: TelemetryOption? = null,
+    val fragment: TelemetryOption? = null,
+    val network: TelemetryOption? = null,
+    val slowRendering: TelemetryOption? = null,
+    val startup: TelemetryOption? = null,
+    val httpUrlConnection: TelemetryOption? = null,
+    val okHttp3: TelemetryOption? = null,
+    val uiLoad: TelemetryOption? = null,
 )
 
 @Serializable
-internal data class ConfigFile(
-    @Contextual @Required val rum: RumConfig,
-    @Required val application: ApplicationConfig,
+internal data class AgentConfig(
+    @Required val aws: AwsConfig,
+    val version: String = "1.0.0",
+    val exportOverride: ExportOverrideConfig? = null,
+    val telemetry: TelemetryConfigs? = null,
+    val sessionTimeout: Int = 300,
+    val applicationAttributes: Map<String, JsonPrimitive>? = null,
+)
+
+@Serializable
+data class TelemetryOption(
+    val enabled: Boolean,
 )
 
 @SuppressLint("DiscouragedApi") // Necessary for library modules
@@ -59,7 +73,7 @@ internal object AwsRumAppMonitorConfigReader {
     val TAG = "AWS Otel Android"
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun readConfig(context: Context): ConfigFile? {
+    fun readConfig(context: Context): AgentConfig? {
         try {
             val rawResourceId: Int =
                 context
@@ -72,7 +86,7 @@ internal object AwsRumAppMonitorConfigReader {
             }
             return context.resources.openRawResource(rawResourceId).use { inputStream ->
                 val jsonConfig = String(inputStream.readBytes(), StandardCharsets.UTF_8)
-                Json.decodeFromString<ConfigFile>(jsonConfig)
+                Json.decodeFromString<AgentConfig>(jsonConfig)
             }
         } catch (e: MissingFieldException) {
             Log.e(TAG, "Missing fields in config: ${e.missingFields}")
@@ -85,7 +99,7 @@ internal object AwsRumAppMonitorConfigReader {
 
     internal fun buildRumEndpoint(region: String): String = "https://dataplane.rum.$region.amazonaws.com/v1/rum"
 
-    fun getTracesEndpoint(config: ConfigFile): String = config.rum.overrideEndpoint?.traces ?: buildRumEndpoint(config.rum.region)
+    fun getTracesEndpoint(config: AgentConfig): String = config.exportOverride?.traces ?: buildRumEndpoint(config.aws.region)
 
-    fun getLogsEndpoint(config: ConfigFile): String = config.rum.overrideEndpoint?.logs ?: buildRumEndpoint(config.rum.region)
+    fun getLogsEndpoint(config: AgentConfig): String = config.exportOverride?.logs ?: buildRumEndpoint(config.aws.region)
 }

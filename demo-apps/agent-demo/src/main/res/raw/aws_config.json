@@ -1,14 +1,28 @@
 {
-  "rum": {
-    "region": "YOUR-AWS-REGION",
-    "appMonitorId": "YOUR-RUM-APP-MONITOR-ID-FOR-AGENT-DEMO",
-    "sessionInactivityTimeout": 100,
-    "overrideEndpoint": {
-      "logs": "http://10.0.2.2:4318/v1/logs",
-      "traces": "http://10.0.2.2:4318/v1/traces"
-    }
+  "aws": {
+    "region": "us-east-1",
+    "rumAppMonitorId": "YOUR-RUM-APP-MONITOR-ID",
+    "rumAlias": "YOUR-RUM-ALIAS"
   },
-  "application": {
-    "applicationVersion": "YOUR-APPLICATION-VERSION"
+  "exportOverride": {
+    "logs": "http://10.0.2.2:4318/v1/logs",
+    "traces": "http://10.0.2.2:4318/v1/traces"
+  },
+  "telemetry": {
+    "activity": { "enabled": true },
+    "anr": { "enabled": true },
+    "crash": { "enabled": true },
+    "fragment": { "enabled": true },
+    "network": { "enabled": true },
+    "slowRendering": { "enabled": true },
+    "startup": { "enabled": true },
+    "httpUrlConnection": { "enabled": true },
+    "okHttp3": { "enabled": true },
+    "uiLoad": { "enabled": true }
+  },
+  "sessionTimeout": 100,
+  "applicationAttributes": {
+    "application.version": "1.0.0",
+    "demo": true
   }
 }

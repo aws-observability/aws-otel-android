@@ -1,10 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "software.amazon.opentelemetry.android.config",
-  "title": "AwsAgentConfig",
-  "description": "AWS Opentelemetry Android Configuration",
+  "title": "ADOT Android Agent Config",
+  "description": "A spec for configuring the ADOT (AWS Distro for OpenTelemetry) Android agent",
   "type": "object",
-  "required": ["rum", "application"],
   "additionalProperties": false,
   "properties": {
     "version": {
@@ -12,70 +11,114 @@
       "const": "1.0.0",
       "type": "string"
     },
-    "rum": {
-      "required": ["region", "appMonitorId"],
-      "additionalProperties": false,
-      "description": "Configuration for RUM",
+    "aws": {
       "type": "object",
+      "description": "Settings to configure OpenTelemetry for AWS",
       "properties": {
         "region": {
-          "description": "AWS region",
-          "type": "string"
+          "type": "string",
+          "description": "AWS region you intend to export telemetry to (example: \"us-east-1\")"
         },
-        "appMonitorId": {
-          "description": "App Monitor ID",
-          "type": "string"
+        "rumAppMonitorId": {
+          "type": "string",
+          "description": "AWS RUM Application Monitor ID (example: \"00000000-0000-0000-0000-000000000000\")"
         },
-        "alias": {
-          "description": "Adds an alias to all requests. This is compared against the rum:alias service context in AppMonitors with resource based policies attached",
-          "type": "string"
+        "rumAlias": {
+          "type": "string",
+          "description": "Adds an alias to all requests. This is compared against the rum:alias service context in app monitors with resource based policies attached"
+        }
+      },
+      "required": ["region", "rumAppMonitorId"]
+    },
+    "exportOverride": {
+      "type": "object",
+      "description": "Settings to override the default ADOT exporting behavior",
+      "properties": {
+        "logs": {
+          "type": "string",
+          "format": "uri",
+          "description": "Override the export destination for otel Logs"
         },
-        "sessionInactivityTimeout": {
-          "description": "The maximum duration, in seconds, that a session can be inactive for before a new session is created",
-          "type": "integer",
-          "default": 300
-        },
-        "enabledTelemetry": {
-          "description": "The types of RUM telemetry you wish to collect on your application.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup", "http_urlconnection", "okhttp_3.0", "ui_loading"]
-        },
-        "addonFeatures": {
-          "description": "Add-on features you wish to explicitly enable to enrich collected telemetry",
-          "item": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": ["attribute:user.id"]
-        },
-        "overrideEndpoint": {
-          "type": "object",
-          "properties": {
-            "logs": {
-              "type": "string",
-              "description": "Endpoint for the logs exporter"
-            },
-            "traces": {
-              "type": "string",
-              "description": "Endpoint for the traces exporter"
-            }
-          }
+        "traces": {
+          "type": "string",
+          "format": "uri",
+          "description": "Override the export destination for otel Traces"
         }
       }
     },
-    "application": {
-      "required": ["applicationVersion"],
-      "description": "Application specific settings",
+    "telemetry": {
       "type": "object",
+      "description": "Settings that allow you finer control over all types of instrumented telemetry",
       "properties": {
-        "applicationVersion": {
-          "description": "Application Version",
-          "type": "string"
+        "activity": {
+          "type": "object",
+          "description": "Configure activity lifecycle monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "anr": {
+          "type": "object",
+          "description": "Configure ANR (Application Not Responding) detection",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "crash": {
+          "type": "object",
+          "description": "Configure crash reporting",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "fragment": {
+          "type": "object",
+          "description": "Configure fragment lifecycle monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "network": {
+          "type": "object",
+          "description": "Configure network state monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "slow_rendering": {
+          "type": "object",
+          "description": "Configure detection of slow UI rendering",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "startup": {
+          "type": "object",
+          "description": "Configure application startup monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "http_urlconnection": {
+          "type": "object",
+          "description": "Configure HttpURLConnection monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "okhttp_3.0": {
+          "type": "object",
+          "description": "Configure OkHttp 3.0 monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
+        },
+        "ui_load": {
+          "type": "object",
+          "description": "Configure UI load time monitoring",
+          "properties": { "enabled": { "type": "boolean" } }
         }
       }
+    },
+    "sessionTimeout": {
+      "type": "integer",
+      "description": "The maximum duration, in seconds, that a session can be inactive for before a new session is created",
+      "minimum": 0,
+      "default": 300
+    },
+    "applicationAttributes": {
+      "type": "object",
+      "description": "Custom OpenTelemetry attributes injected into every Span and LogRecorded vended by your app. You can use this to include custom metadata with your telemetry.",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" },
+          { "type": "boolean" }
+        ]
+      }
     }
-  }
+  },
+  "required": [ "aws" ]
 }
