@@ -36,6 +36,12 @@ class CustomException(message: String) : Exception(message)
 
 class SecondActivity : AppCompatActivity() {
 
+    companion object {
+        const val HTTP_200_URL = "http://10.0.2.2:8181/200"
+        const val HTTP_404_URL = "http://10.0.2.2:8181/404"
+        const val HTTP_500_URL = "http://10.0.2.2:8181/500"
+    }
+
     private lateinit var binding: ActivitySecondBinding
     private val TAG = "SecondActivity"
 
@@ -186,7 +192,7 @@ class SecondActivity : AppCompatActivity() {
 
                 val result =
                         withContext(Dispatchers.IO) {
-                            val url = URL("https://www.android.com")
+                            val url = URL(HTTP_200_URL)
                             val urlConnection = url.openConnection() as HttpURLConnection
                             try {
                                 val `in`: InputStream =
@@ -214,7 +220,7 @@ class SecondActivity : AppCompatActivity() {
 
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("https://www.android.com")
+                    .url(HTTP_200_URL)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -240,7 +246,7 @@ class SecondActivity : AppCompatActivity() {
 
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("https://httpstat.us/400")
+                    .url(HTTP_404_URL)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -265,7 +271,7 @@ class SecondActivity : AppCompatActivity() {
 
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("https://httpstat.us/500")
+                    .url(HTTP_500_URL)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -289,7 +295,7 @@ class SecondActivity : AppCompatActivity() {
                 binding.resultTextView.text = "Making HTTP 400 call using HttpURLConnection..."
 
                 val result = withContext(Dispatchers.IO) {
-                    val url = URL("https://httpstat.us/400")
+                    val url = URL(HTTP_404_URL)
                     val urlConnection = url.openConnection() as HttpURLConnection
                     try {
                         val responseCode = urlConnection.responseCode
@@ -315,7 +321,7 @@ class SecondActivity : AppCompatActivity() {
                 binding.resultTextView.text = "Making HTTP 500 call using HttpURLConnection..."
 
                 val result = withContext(Dispatchers.IO) {
-                    val url = URL("https://httpstat.us/500")
+                    val url = URL(HTTP_500_URL)
                     val urlConnection = url.openConnection() as HttpURLConnection
                     try {
                         val responseCode = urlConnection.responseCode
