@@ -36,6 +36,10 @@ class HttpInstrumentationTest {
         const val URL_FULL = "url.full"
         const val SERVER_ADDR_ATTR = "server.address"
         const val SERVER_PORT_ATTR = "server.port"
+
+        const val HTTP_200_URL = "http://10.0.2.2:8181/200"
+        const val HTTP_404_URL = "http://10.0.2.2:8181/404"
+        const val HTTP_500_URL = "http://10.0.2.2:8181/500"
     }
 
     @Test
@@ -55,35 +59,35 @@ class HttpInstrumentationTest {
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://www.android.com"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_200_URL
             },
         )
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
             },
         )
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_500_URL
             },
         )
 
         Assertions.assertTrue(
             spans
                 .filter { span: Span ->
-                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                    span.getAttributes(URL_FULL).value.stringValue == HTTP_500_URL
                 }.attributes(STATUS_CODE_ATTR)
                 .value.intValue == "500",
         )
         Assertions.assertTrue(
             spans
                 .filter { span: Span ->
-                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                    span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
                 }.attributes(STATUS_CODE_ATTR)
-                .value.intValue == "400",
+                .value.intValue == "404",
         )
     }
 
@@ -104,13 +108,13 @@ class HttpInstrumentationTest {
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://www.android.com/"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_200_URL
             },
         )
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
             },
         )
 
@@ -124,20 +128,20 @@ class HttpInstrumentationTest {
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
             },
         )
 
         Assertions.assertTrue(
             spans.any { span ->
-                span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                span.getAttributes(URL_FULL).value.stringValue == HTTP_500_URL
             },
         )
 
         Assertions.assertTrue(
             spans
                 .filter { span: Span ->
-                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/500"
+                    span.getAttributes(URL_FULL).value.stringValue == HTTP_500_URL
                 }.allAttributes(STATUS_CODE_ATTR)
                 .all { attribute ->
                     attribute.value.intValue == "500"
@@ -147,10 +151,10 @@ class HttpInstrumentationTest {
         Assertions.assertTrue(
             spans
                 .filter { span: Span ->
-                    span.getAttributes(URL_FULL).value.stringValue == "https://httpstat.us/400"
+                    span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
                 }.allAttributes(STATUS_CODE_ATTR)
                 .all { attribute ->
-                    attribute.value.intValue == "400"
+                    attribute.value.intValue == "404"
                 },
         )
     }

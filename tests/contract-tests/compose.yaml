@@ -9,3 +9,10 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC
       - "4318:4318" # OTLP HTTP
+  
+  contract-test-endpoint:
+    build:
+      context: ../../tools/contract-test-endpoint
+    ports:
+      - "8181:8080"
+    stop_grace_period: 1s  # Set a shorter grace period for shutdown
