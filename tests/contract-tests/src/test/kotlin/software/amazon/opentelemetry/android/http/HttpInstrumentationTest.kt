@@ -85,9 +85,9 @@ class HttpInstrumentationTest {
         Assertions.assertTrue(
             spans
                 .filter { span: Span ->
-                    span.getAttributes(URL_FULL).value.stringValue == HTTP_500_URL
+                    span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
                 }.attributes(STATUS_CODE_ATTR)
-                .value.intValue == "400",
+                .value.intValue == "404",
         )
     }
 
@@ -154,7 +154,7 @@ class HttpInstrumentationTest {
                     span.getAttributes(URL_FULL).value.stringValue == HTTP_404_URL
                 }.allAttributes(STATUS_CODE_ATTR)
                 .all { attribute ->
-                    attribute.value.intValue == "400"
+                    attribute.value.intValue == "404"
                 },
         )
     }
