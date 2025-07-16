@@ -68,19 +68,18 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                 if (telemetry != null) {
                     val enabledTelemetries =
                         listOfNotNull(
-                            TelemetryConfig.ACTIVITY.takeIf { telemetry.activity == null || telemetry.activity.enabled },
-                            TelemetryConfig.ANR.takeIf { telemetry.anr == null || telemetry.anr.enabled },
-                            TelemetryConfig.CRASH.takeIf { telemetry.crash == null || telemetry.crash.enabled },
-                            TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment == null || telemetry.fragment.enabled },
-                            TelemetryConfig.NETWORK.takeIf { telemetry.network == null || telemetry.network.enabled },
-                            TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering == null || telemetry.slowRendering.enabled },
-                            TelemetryConfig.STARTUP.takeIf { telemetry.startup == null || telemetry.startup.enabled },
+                            TelemetryConfig.ACTIVITY.takeIf { telemetry.activity?.enabled == true },
+                            TelemetryConfig.ANR.takeIf { telemetry.anr?.enabled == true },
+                            TelemetryConfig.CRASH.takeIf { telemetry.crash?.enabled == true },
+                            TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment?.enabled == true },
+                            TelemetryConfig.NETWORK.takeIf { telemetry.network?.enabled == true },
+                            TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering?.enabled == true },
+                            TelemetryConfig.STARTUP.takeIf { telemetry.startup?.enabled == true },
                             TelemetryConfig.HTTP_URLCONNECTION.takeIf {
-                                telemetry.httpUrlConnection == null ||
-                                    telemetry.httpUrlConnection.enabled
+                                telemetry.httpUrlConnection?.enabled == true
                             },
-                            TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3 == null || telemetry.okHttp3.enabled },
-                            TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad == null || telemetry.uiLoad.enabled },
+                            TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3?.enabled == true },
+                            TelemetryConfig.UI_LOADING.takeIf {telemetry.uiLoad?.enabled == true },
                         )
                     builder.setEnabledTelemetry(enabledTelemetries)
                 }
