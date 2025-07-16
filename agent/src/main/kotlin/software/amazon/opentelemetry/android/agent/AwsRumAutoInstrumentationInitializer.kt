@@ -79,7 +79,7 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                                 telemetry.httpUrlConnection?.enabled == true
                             },
                             TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3?.enabled == true },
-                            TelemetryConfig.UI_LOADING.takeIf {telemetry.uiLoad?.enabled == true },
+                            TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad?.enabled == true },
                         )
                     builder.setEnabledTelemetry(enabledTelemetries)
                 }
