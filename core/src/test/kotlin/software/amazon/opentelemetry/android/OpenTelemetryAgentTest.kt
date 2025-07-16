@@ -129,7 +129,11 @@ class OpenTelemetryAgentTest {
             .setSessionInactivityTimeout(Duration.ofMinutes(1))
             .setEnabledTelemetry(listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR))
             .setEnabledFeatures(listOf(FeatureConfig.USER_ID))
-            .build()
+            .setCustomApplicationAttributes(
+                mapOf(
+                    "app.test" to "123",
+                ),
+            ).build()
 
         // Validate the expected delegate builder
         verify(exactly = 1) {
@@ -163,6 +167,8 @@ class OpenTelemetryAgentTest {
         val userIdAttribute = attributes.get(AttributeKey.stringKey(UserIdManager.USER_ID_ATTR))
         Assertions.assertNotNull(userIdAttribute)
         Assertions.assertEquals(userId, userIdAttribute)
+
+        Assertions.assertEquals("123", attributes.get(AttributeKey.stringKey("app.test")))
     }
 
     @Test
