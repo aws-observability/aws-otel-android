@@ -40,21 +40,32 @@ class AwsRumAppMonitorConfigReaderTest {
     private val validJson =
         """
         {
-            "rum": {
-                "appMonitorId": "testing",
-                "region": "test-region",
-                "alias": "my-alias",
-                "sessionInactivityTimeout": 100,
-                "enabledTelemetry": ["activity", "anr", "crash", "fragment", "network", "slow_rendering", "startup"]
-                "addonFeatures": ["attribute:user.id"],
-                "overrideEndpoint":{
-                    "logs":"http://test.com",
-                    "traces":"http://test123.com"
-                }
-            },
-            "application": {
-                "applicationVersion":"1.0.0"
-            }
+          "aws": {
+            "region": "us-east-1",
+            "rumAppMonitorId": "testing",
+            "rumAlias": "my-alias"
+          },
+          "exportOverride": {
+            "logs": "testlogs",
+            "traces": "testtraces"
+          },
+          "telemetry": {
+            "activity": { "enabled": true },
+            "anr": { "enabled": true },
+            "crash": { "enabled": true },
+            "fragment": { "enabled": true },
+            "network": { "enabled": true },
+            "slowRendering": { "enabled": true },
+            "startup": { "enabled": true },
+            "httpUrlConnection": { "enabled": true },
+            "okHttp3": { "enabled": true },
+            "uiLoad": { "enabled": true }
+          },
+          "sessionTimeout": 100,
+          "applicationAttributes": {
+            "application.version": "1.0.0",
+            "demo": true
+          }
         }
         """.trimIndent()
 
@@ -83,11 +94,20 @@ class AwsRumAppMonitorConfigReaderTest {
 
         // Then
         assertNotNull(result)
-        assertNotNull(result?.rum)
-        assertEquals("testing", result!!.rum.appMonitorId)
-        assertEquals("test-region", result.rum.region)
-        assertEquals("my-alias", result.rum.alias)
-        assertEquals(100, result.rum.sessionInactivityTimeout)
+        assertNotNull(result?.aws)
+        assertNotNull(result?.exportOverride)
+        assertNotNull(result?.telemetry)
+        assertNotNull(result?.applicationAttributes)
+        assertEquals("testing", result!!.aws.rumAppMonitorId)
+        assertEquals("us-east-1", result.aws.region)
+        assertEquals("my-alias", result.aws.rumAlias)
+        assertEquals(true, result.telemetry!!.activity!!.enabled)
+        assertEquals(true, result.telemetry!!.anr!!.enabled)
+        assertEquals(true, result.telemetry!!.crash!!.enabled)
+        assertEquals(true, result.telemetry!!.uiLoad!!.enabled)
+        assertEquals(100, result.sessionTimeout)
+        assertEquals("testlogs", result.exportOverride!!.logs)
+        assertEquals("testtraces", result.exportOverride!!.traces)
     }
 
     @Test
@@ -111,10 +131,7 @@ class AwsRumAppMonitorConfigReaderTest {
         val invalidJson =
             """
             {
-                 "rum": {
-                    "appMonitorId": "testing",
-                    "region": "test-region"
-                }
+                 "telemetry": {}
             }
             """.trimIndent()
 
@@ -133,45 +150,9 @@ class AwsRumAppMonitorConfigReaderTest {
         io.mockk.verify {
             Log.e(
                 AwsRumAppMonitorConfigReader.TAG,
-                "Missing fields in config: [application]",
+                "Missing fields in config: [aws]",
             )
         }
-    }
-
-    @Test
-    fun `test should return specified logs endpoint`() {
-        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
-            .thenReturn(0)
-        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
-            .thenReturn(456)
-        `when`(mockResources.openRawResource(456))
-            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
-
-        // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
-
-        // Then
-        assertNotNull(result)
-        assertNotNull(result?.rum)
-        assertEquals("http://test.com", AwsRumAppMonitorConfigReader.getLogsEndpoint(result!!))
-    }
-
-    @Test
-    fun `test should return specified spans endpoint`() {
-        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
-            .thenReturn(0)
-        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
-            .thenReturn(456)
-        `when`(mockResources.openRawResource(456))
-            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
-
-        // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
-
-        // Then
-        assertNotNull(result)
-        assertNotNull(result?.rum)
-        assertEquals("http://test123.com", AwsRumAppMonitorConfigReader.getTracesEndpoint(result!!))
     }
 
     @Test
@@ -179,12 +160,10 @@ class AwsRumAppMonitorConfigReaderTest {
         val validJson =
             """
             {
-                "rum": {
-                    "appMonitorId": "testing",
-                    "region": "test-region"
-                },
-                "application": {
-                    "applicationVersion":"1.0.0"
+                "aws": {
+                    "region": "us-east-1",
+                    "rumAppMonitorId": "testing",
+                    "rumAlias": "my-alias"
                 }
             }
             """.trimIndent()
@@ -200,9 +179,9 @@ class AwsRumAppMonitorConfigReaderTest {
 
         // Then
         assertNotNull(result)
-        assertNotNull(result?.rum)
+        assertNotNull(result?.aws)
         assertEquals(
-            AwsRumAppMonitorConfigReader.buildRumEndpoint(result!!.rum.region),
+            AwsRumAppMonitorConfigReader.buildRumEndpoint(result!!.aws.region),
             AwsRumAppMonitorConfigReader.getTracesEndpoint(result),
         )
     }
@@ -212,13 +191,10 @@ class AwsRumAppMonitorConfigReaderTest {
         val validJson =
             """
             {
-                "rum": {
-                    "appMonitorId": "testing",
-                    "region": "test-region",
-                    "alias": "my-alias"
-                },
-                "application": {
-                    "applicationVersion":"1.0.0"
+                "aws": {
+                    "region": "us-east-1",
+                    "rumAppMonitorId": "testing",
+                    "rumAlias": "my-alias"
                 }
             }
             """.trimIndent()
@@ -234,10 +210,10 @@ class AwsRumAppMonitorConfigReaderTest {
 
         // Then
         assertNotNull(result)
-        assertNotNull(result?.rum)
+        assertNotNull(result?.aws)
         assertEquals(
             300,
-            result?.rum?.sessionInactivityTimeout,
+            result?.sessionTimeout,
         )
     }
 }

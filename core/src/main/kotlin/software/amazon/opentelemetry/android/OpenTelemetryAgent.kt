@@ -59,7 +59,6 @@ class OpenTelemetryAgent(
             )
         private var awsRumAppMonitorConfig: AwsRumAppMonitorConfig? = null
         private var applicationName: String? = null
-        private var applicationVersion: String? = null
         private val spanExporterCustomizers: MutableList<(SpanExporter) -> SpanExporter> = mutableListOf()
         private val logRecordExporterCustomizers: MutableList<(LogRecordExporter) -> LogRecordExporter> = mutableListOf()
         private var sessionInactivityTimeout: Duration = Duration.ofMinutes(5)
@@ -81,14 +80,6 @@ class OpenTelemetryAgent(
          */
         fun setApplicationName(config: String): Builder {
             applicationName = config
-            return this
-        }
-
-        /**
-         * Configure an application version to send with your spans and logs
-         */
-        fun setApplicationVersion(config: String): Builder {
-            applicationVersion = config
             return this
         }
 
