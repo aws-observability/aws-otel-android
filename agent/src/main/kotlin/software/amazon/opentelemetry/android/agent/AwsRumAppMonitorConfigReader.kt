@@ -50,6 +50,7 @@ internal data class TelemetryConfigs(
     val httpUrlConnection: TelemetryOption? = null,
     val okHttp3: TelemetryOption? = null,
     val uiLoad: TelemetryOption? = null,
+    val sessionEvents: TelemetryOption? = null,
 )
 
 @Serializable

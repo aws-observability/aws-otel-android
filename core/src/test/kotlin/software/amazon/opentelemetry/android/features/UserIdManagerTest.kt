@@ -19,12 +19,12 @@ import android.content.Context
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.mockkStatic
-import io.opentelemetry.api.trace.TraceId
+import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import software.amazon.opentelemetry.android.generator.UniqueIdGenerator
 
 @ExtendWith(MockKExtension::class)
 class UserIdManagerTest {
@@ -47,8 +47,8 @@ class UserIdManagerTest {
         val userIdManager = UserIdManager(diskManager)
         every { diskManager.readFromFileIfExists(context, any()) } returns null
 
-        mockkStatic(TraceId::class)
-        every { TraceId.fromLongs(any(), any()) } returns "my-random-id"
+        mockkObject(UniqueIdGenerator)
+        every { UniqueIdGenerator.generateId() } returns "my-random-id"
 
         userIdManager.install(application, context)
 

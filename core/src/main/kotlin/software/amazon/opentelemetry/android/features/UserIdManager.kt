@@ -16,8 +16,7 @@ package software.amazon.opentelemetry.android.features
 
 import android.app.Application
 import android.content.Context
-import io.opentelemetry.api.trace.TraceId
-import java.util.Random
+import software.amazon.opentelemetry.android.generator.UniqueIdGenerator
 
 internal class UserIdManager(
     private val diskManager: DiskManager,
@@ -42,7 +41,7 @@ internal class UserIdManager(
 
         val readUserId = diskManager.readFromFileIfExists(context, USER_ID_FILE)
         if (readUserId == null) {
-            userId = generateUserId()
+            userId = UniqueIdGenerator.generateId()
             diskManager.writeToFile(context, USER_ID_FILE, userId.toByteArray())
         } else {
             userId = readUserId
@@ -55,10 +54,5 @@ internal class UserIdManager(
         } else {
             return mapOf()
         }
-    }
-
-    private fun generateUserId(): String {
-        val random = Random()
-        return TraceId.fromLongs(random.nextLong(), random.nextLong())
     }
 }

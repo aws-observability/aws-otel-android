@@ -110,6 +110,7 @@ class OpenTelemetryAgentTest {
         every { delegateBuilder.build() } returns openTelemetryAgent
 
         every { delegateBuilder.setResource(any()) } returns delegateBuilder
+        every { delegateBuilder.setSessionProvider(any()) } returns delegateBuilder
         every { delegateBuilder.addSpanExporterCustomizer(any()) } returns delegateBuilder
         every { delegateBuilder.addLogRecordExporterCustomizer(any()) } returns delegateBuilder
 
