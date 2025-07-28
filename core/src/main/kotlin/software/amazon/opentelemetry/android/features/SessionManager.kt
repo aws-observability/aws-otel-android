@@ -33,43 +33,61 @@ class SessionManager(
     private var session: Session = Session.NONE
     private val observers: MutableList<SessionObserver> = mutableListOf()
 
+    private val preObservedSessions: MutableList<Pair<Session, Session>> = mutableListOf()
+
     init {
         sessionStorage.save(session)
     }
 
     override fun addObserver(observer: SessionObserver) {
-        synchronized(observers) {
+        synchronized(this) {
             observers.add(observer)
+            preObservedSessions.forEach { observedSession ->
+                val (prevSession, newSession) = observedSession
+                observer.onSessionEnded(prevSession)
+                observer.onSessionStarted(newSession, prevSession)
+            }
+            preObservedSessions.clear()
         }
     }
 
     override fun getSessionId(): String {
-        synchronized(session) {
-            var newSession = session
+        var newSession = session
+        val sessionExpired = sessionHasExpired()
+        val sessionTimedOut = sessionIdTimeoutHandler.hasTimedOut()
 
-            if (sessionHasExpired() || sessionIdTimeoutHandler.hasTimedOut()) {
-                val newId = UniqueIdGenerator.generateId()
-                newSession = Session.DefaultSession(newId, clock.now())
-                sessionStorage.save(newSession)
-            }
-
-            sessionIdTimeoutHandler.refresh()
-
-            if (newSession != session) {
-                val prevSession = session
-                session = newSession
-                observers.forEach {
-                    it.onSessionEnded(prevSession)
-                    it.onSessionStarted(session, prevSession)
-                }
-            }
-
-            return session.getId()
+        if (sessionExpired || sessionTimedOut) {
+            val newId = UniqueIdGenerator.generateId()
+            newSession = Session.DefaultSession(newId, clock.now())
+            sessionStorage.save(newSession)
         }
+
+        sessionIdTimeoutHandler.refresh()
+
+        if (newSession != session) {
+            val prevSession = session
+            session = newSession
+
+            // Add pre-observed sessions if there is no observer
+            if (observers.isEmpty()) {
+                preObservedSessions.add(
+                    Pair(
+                        Session.DefaultSession(prevSession.getId(), prevSession.getStartTimestamp()),
+                        Session.DefaultSession(newSession.getId(), newSession.getStartTimestamp()),
+                    ),
+                )
+            }
+            observers.forEach {
+                it.onSessionEnded(prevSession)
+                it.onSessionStarted(session, prevSession)
+            }
+        }
+
+        return session.getId()
     }
 
     private fun sessionHasExpired(): Boolean {
         val elapsedTime = clock.now() - session.getStartTimestamp()
-        return elapsedTime >= maxSessionLifetime.nano
+        return elapsedTime >= maxSessionLifetime.toNanos()
     }
 }

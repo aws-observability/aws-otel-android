@@ -1,6 +1,5 @@
 [versions]
 opentelemetry-instrumentation-alpha = "2.17.1-alpha"
-#opentelemetry-instrumentation = "2.9.0" // alpha bom includes non-alpha bom
 opentelemetry-semconv = "1.34.0"
 opentelemetry = "1.49.0"
 opentelemetry-semconv-alpha = "1.34.0-alpha"
@@ -10,9 +9,9 @@ mockito = "5.18.0"
 junit = "5.13.3"
 byteBuddy = "1.17.6"
 spotless = "7.0.2"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 coroutines-version = "1.9.0"
-androidPlugin = "8.9.3"
+androidPlugin = "8.11.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
 owasp = "12.1.0"

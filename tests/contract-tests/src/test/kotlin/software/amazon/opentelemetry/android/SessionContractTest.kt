@@ -22,6 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 class SessionContractTest {
     companion object {
         const val SESSION_ID_ATTR = "session.id"
+        const val SESSION_SCOPE = "otel.session"
+        const val SESSION_START_EVENT_NAME = "session.start"
     }
 
     @Test
@@ -63,6 +65,14 @@ class SessionContractTest {
         )
         Assertions.assertTrue(
             sessionIdsFromLogs.count() > 1,
+        )
+    }
+
+    @Test
+    fun `Session start events should be generated`(data: ParsedOtlpData) {
+        val sessionLogs = data.logs.scopeLogs(SESSION_SCOPE).logRecords()
+        Assertions.assertTrue(
+            sessionLogs.count { it.eventName == SESSION_START_EVENT_NAME } > 0
         )
     }
 }

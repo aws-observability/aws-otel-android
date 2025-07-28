@@ -56,7 +56,7 @@ class OpenTelemetryAgent(
         body: String,
         attributes: Attributes,
     ) {
-        TODO("Not yet implemented")
+        delegate.emitEvent(eventName, body, attributes)
     }
 
     class Builder constructor(
