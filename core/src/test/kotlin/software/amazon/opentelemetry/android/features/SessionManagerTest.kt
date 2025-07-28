@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import software.amazon.opentelemetry.android.generator.UniqueIdGenerator
 import java.time.Duration
+import java.time.Instant
 
 @ExtendWith(MockKExtension::class)
 class SessionManagerTest {
@@ -49,7 +50,7 @@ class SessionManagerTest {
 
     private lateinit var sessionManager: SessionManager
     private val maxSessionLifetime = Duration.ofHours(4)
-    private val initialTimestamp = 1000L
+    private val initialTimestamp = Instant.now().nano.toLong()
     private val sessionSlot = slot<Session>()
 
     @BeforeEach
@@ -85,6 +86,8 @@ class SessionManagerTest {
     fun `test getSessionId creates new session on first call`() {
         val sessionId = sessionManager.getSessionId()
 
+        println(maxSessionLifetime.toNanos())
+
         assertEquals("test-session-id", sessionId)
         verify { sessionStorage.save(any()) }
         verify { sessionIdTimeoutHandler.refresh() }
@@ -105,7 +108,7 @@ class SessionManagerTest {
         val initialSessionId = sessionManager.getSessionId()
 
         // Move clock beyond max session lifetime
-        every { clock.now() } returns initialTimestamp + maxSessionLifetime.nano + 1000L
+        every { clock.now() } returns initialTimestamp + maxSessionLifetime.toNanos() + 1000L
 
         // Generate a new ID for the next session
         every { UniqueIdGenerator.generateId() } returns "new-session-id"

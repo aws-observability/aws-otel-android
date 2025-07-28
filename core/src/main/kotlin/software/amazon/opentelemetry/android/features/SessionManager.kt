@@ -87,6 +87,10 @@ class SessionManager(
     }
 
     private fun sessionHasExpired(): Boolean {
+        if (session == Session.NONE) {
+            1
+            return true
+        }
         val elapsedTime = clock.now() - session.getStartTimestamp()
         return elapsedTime >= maxSessionLifetime.toNanos()
     }

@@ -72,7 +72,7 @@ class SessionContractTest {
     fun `Session start events should be generated`(data: ParsedOtlpData) {
         val sessionLogs = data.logs.scopeLogs(SESSION_SCOPE).logRecords()
         Assertions.assertTrue(
-            sessionLogs.count { it.eventName == SESSION_START_EVENT_NAME } > 0
+            sessionLogs.count { it.eventName == SESSION_START_EVENT_NAME } > 0,
         )
     }
 }
