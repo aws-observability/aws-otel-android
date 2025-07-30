@@ -30,6 +30,7 @@ internal data class AwsConfig(
     @Required val region: String,
     @Required val rumAppMonitorId: String,
     val rumAlias: String? = null,
+    val cognitoIdentityPoolId: String? = null,
 )
 
 @Serializable
