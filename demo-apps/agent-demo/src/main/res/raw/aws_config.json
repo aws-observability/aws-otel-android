@@ -2,8 +2,7 @@
   "aws": {
     "region": "us-east-1",
     "rumAppMonitorId": "YOUR-RUM-APP-MONITOR-ID",
-    "rumAlias": "YOUR-RUM-ALIAS",
-    "cognitoIdentityPoolId": "us-east-1:a1b2c3d4-5678-90ab-cdef"
+    "rumAlias": "YOUR-RUM-ALIAS"
   },
   "exportOverride": {
     "logs": "http://10.0.2.2:4318/v1/logs",
