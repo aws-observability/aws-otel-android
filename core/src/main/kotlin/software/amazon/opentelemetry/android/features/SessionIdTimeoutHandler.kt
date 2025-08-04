@@ -17,11 +17,20 @@ package software.amazon.opentelemetry.android.features
 import io.opentelemetry.sdk.common.Clock
 import java.time.Duration
 
+/**
+ * This class takes in [sessionInactivityTimeout] and an OpenTelemetry SDK [clock] and will manage
+ * session state and timeout for use in the SessionManager class.
+ *
+ * Some notes:
+ *  - An application that is in the *foreground* is assumed to be always active.
+ *  - If an application is foregrounded after being in the background, we may expire the session
+ *      if enough time has passed, hence the TRANSITIONING_TO_FOREGROUND state
+ */
 class SessionIdTimeoutHandler(
     private val sessionInactivityTimeout: Duration,
     private val clock: Clock = Clock.getDefault(),
 ) {
-    private var timeoutNanos: Long = 0
+    private var timeoutStartNanos: Long = 0
     private var state = State.FOREGROUND
 
     fun onApplicationForegrounded() {
@@ -36,16 +45,18 @@ class SessionIdTimeoutHandler(
         if (state == State.FOREGROUND) {
             return false
         }
-        val elapsedTime = clock.nanoTime() - timeoutNanos
+        val elapsedTime = clock.nanoTime() - timeoutStartNanos
         return elapsedTime >= sessionInactivityTimeout.toNanos()
     }
 
     fun refresh() {
-        timeoutNanos = clock.nanoTime()
+        timeoutStartNanos = clock.nanoTime()
         if (state == State.TRANSITIONING_TO_FOREGROUND) {
             state = State.FOREGROUND
         }
     }
+
+    fun getTimeoutStartNanos(): Long = timeoutStartNanos
 
     private enum class State {
         FOREGROUND,

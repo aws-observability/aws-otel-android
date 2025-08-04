@@ -18,6 +18,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.opentelemetry.sdk.common.Clock
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -32,16 +33,19 @@ class SessionIdTimeoutHandlerTest {
 
     private val sessionInactivityTimeout = Duration.ofMinutes(30)
 
+    private val startTimeNanos = 1000L
+
     @BeforeEach
     fun setup() {
         // Start with a base time of 1000
-        every { clock.nanoTime() } returns 1000L
+        every { clock.nanoTime() } returns startTimeNanos
     }
 
     @Test
-    fun `test initial state is foreground and not timed out`() {
+    fun `test initial state is foreground and therefore not timed out`() {
         val sessionIdTimeoutHandler = SessionIdTimeoutHandler(sessionInactivityTimeout, clock)
         assertFalse(sessionIdTimeoutHandler.hasTimedOut())
+        assertEquals(0, sessionIdTimeoutHandler.getTimeoutStartNanos())
     }
 
     @Test
@@ -52,10 +56,13 @@ class SessionIdTimeoutHandlerTest {
         sessionIdTimeoutHandler.refresh()
 
         // Move time forward but less than timeout
-        every { clock.nanoTime() } returns 1000L + sessionInactivityTimeout.toNanos() / 2
+        every { clock.nanoTime() } returns startTimeNanos + sessionInactivityTimeout.toNanos() / 2
 
         // Should not time out
         assertFalse(sessionIdTimeoutHandler.hasTimedOut())
+
+        // Should be updated with the appropriate timeout
+        assertEquals(startTimeNanos, sessionIdTimeoutHandler.getTimeoutStartNanos())
     }
 
     @Test
@@ -67,7 +74,7 @@ class SessionIdTimeoutHandlerTest {
         sessionIdTimeoutHandler.refresh()
 
         // Move time forward beyond timeout
-        every { clock.nanoTime() } returns 1000L + sessionInactivityTimeout.toNanos() + 1000L
+        every { clock.nanoTime() } returns startTimeNanos + sessionInactivityTimeout.toNanos()
 
         // Should time out
         assertTrue(sessionIdTimeoutHandler.hasTimedOut())
@@ -82,7 +89,7 @@ class SessionIdTimeoutHandlerTest {
         sessionIdTimeoutHandler.refresh()
 
         // Move time forward but less than timeout
-        every { clock.nanoTime() } returns 1000L + sessionInactivityTimeout.toNanos() / 2
+        every { clock.nanoTime() } returns startTimeNanos + sessionInactivityTimeout.toNanos() / 2
 
         // Should not time out
         assertFalse(sessionIdTimeoutHandler.hasTimedOut())
@@ -99,7 +106,7 @@ class SessionIdTimeoutHandlerTest {
         sessionIdTimeoutHandler.onApplicationForegrounded()
 
         // Should be in transitioning state, which can time out
-        every { clock.nanoTime() } returns 1000L + sessionInactivityTimeout.toNanos() + 1000L
+        every { clock.nanoTime() } returns startTimeNanos + sessionInactivityTimeout.toNanos()
         assertTrue(sessionIdTimeoutHandler.hasTimedOut())
 
         // After refresh, should be in foreground state
@@ -115,7 +122,7 @@ class SessionIdTimeoutHandlerTest {
         sessionIdTimeoutHandler.refresh()
 
         // Move time forward beyond timeout
-        every { clock.nanoTime() } returns 1000L + sessionInactivityTimeout.toNanos() * 2
+        every { clock.nanoTime() } returns startTimeNanos + sessionInactivityTimeout.toNanos()
 
         // Should not time out in foreground state
         assertFalse(sessionIdTimeoutHandler.hasTimedOut())

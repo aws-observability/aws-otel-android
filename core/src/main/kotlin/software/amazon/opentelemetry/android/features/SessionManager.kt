@@ -23,31 +23,54 @@ import io.opentelemetry.sdk.common.Clock
 import software.amazon.opentelemetry.android.generator.UniqueIdGenerator
 import java.time.Duration
 
+/**
+ * This class extends the OpenTelemetry Android SessionProvider interface to provide us logic
+ * for managing sessions and attaching observers for session event instrumentation.
+ *
+ * This should look very similar to the upstream SessionManager implementation. Theirs, however, is
+ * internal. Thus our need to maintain our own version of this component
+ *
+ * We define a session as having expired when one of the two conditions pass:
+ *  1. More than [maxSessionLifetime] has passed (default of 4 hours)
+ *  2. The session has been 'inactive' (not generating telemetry) for some period of time (default of 5 minutes)
+ */
 class SessionManager(
     private val clock: Clock = Clock.getDefault(),
     private val sessionIdTimeoutHandler: SessionIdTimeoutHandler,
     private val sessionStorage: SessionStorage = SessionStorage.InMemory(),
     private val maxSessionLifetime: Duration = Duration.ofHours(4),
+    private val bufferedObservedSessionsMaxSize: Int = 128,
 ) : SessionProvider,
     SessionPublisher {
     private var session: Session = Session.NONE
     private val observers: MutableList<SessionObserver> = mutableListOf()
 
-    private val preObservedSessions: MutableList<Pair<Session, Session>> = mutableListOf()
+    // when observers get added after the SessionManager has reported its first session, observers
+    // can miss events. hence, we add a buffer to hold a max of N sessions to help ensure observers
+    // don't miss this data
+    private val bufferedObservedSessions: MutableList<Pair<Session, Session>> = mutableListOf()
 
     init {
         sessionStorage.save(session)
     }
 
     override fun addObserver(observer: SessionObserver) {
+        addObserver(observer, true)
+    }
+
+    fun addObserver(
+        observer: SessionObserver,
+        observeFromBuffer: Boolean,
+    ) {
         synchronized(this) {
             observers.add(observer)
-            preObservedSessions.forEach { observedSession ->
-                val (prevSession, newSession) = observedSession
-                observer.onSessionEnded(prevSession)
-                observer.onSessionStarted(newSession, prevSession)
+            if (observeFromBuffer) {
+                bufferedObservedSessions.forEach { observedSession ->
+                    val (prevSession, newSession) = observedSession
+                    observer.onSessionEnded(prevSession)
+                    observer.onSessionStarted(newSession, prevSession)
+                }
             }
-            preObservedSessions.clear()
         }
     }
 
@@ -68,15 +91,19 @@ class SessionManager(
             val prevSession = session
             session = newSession
 
-            // Add pre-observed sessions if there is no observer
-            if (observers.isEmpty()) {
-                preObservedSessions.add(
-                    Pair(
-                        Session.DefaultSession(prevSession.getId(), prevSession.getStartTimestamp()),
-                        Session.DefaultSession(newSession.getId(), newSession.getStartTimestamp()),
-                    ),
-                )
+            // Add buffered sessions
+            bufferedObservedSessions.add(
+                Pair(
+                    Session.DefaultSession(prevSession.getId(), prevSession.getStartTimestamp()),
+                    Session.DefaultSession(newSession.getId(), newSession.getStartTimestamp()),
+                ),
+            )
+
+            // Evict the first session from buffer when it becomes full
+            if (bufferedObservedSessions.size > bufferedObservedSessionsMaxSize) {
+                bufferedObservedSessions.removeFirst()
             }
+
             observers.forEach {
                 it.onSessionEnded(prevSession)
                 it.onSessionStarted(session, prevSession)
@@ -88,10 +115,11 @@ class SessionManager(
 
     private fun sessionHasExpired(): Boolean {
         if (session == Session.NONE) {
-            1
             return true
         }
         val elapsedTime = clock.now() - session.getStartTimestamp()
         return elapsedTime >= maxSessionLifetime.toNanos()
     }
+
+    fun getBufferedObservedSessions(): List<Pair<Session, Session>> = bufferedObservedSessions
 }

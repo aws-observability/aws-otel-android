@@ -86,8 +86,6 @@ class SessionManagerTest {
     fun `test getSessionId creates new session on first call`() {
         val sessionId = sessionManager.getSessionId()
 
-        println(maxSessionLifetime.toNanos())
-
         assertEquals("test-session-id", sessionId)
         verify { sessionStorage.save(any()) }
         verify { sessionIdTimeoutHandler.refresh() }
@@ -157,5 +155,52 @@ class SessionManagerTest {
         // Verify observers were notified
         verify(exactly = 1) { sessionObserver.onSessionEnded(any()) }
         verify(exactly = 1) { sessionObserver.onSessionStarted(any(), any()) }
+    }
+
+    @Test
+    fun `test observer buffer contains session changes`() {
+        // Get initial session ID (creates first session)
+        val id1 = sessionManager.getSessionId()
+
+        // Set timeout handler to indicate timeout to force new session
+        every { sessionIdTimeoutHandler.hasTimedOut() } returns true
+        every { UniqueIdGenerator.generateId() } returns "new-session-id"
+
+        // Create another session
+        val id2 = sessionManager.getSessionId()
+
+        val observedSessions = sessionManager.getBufferedObservedSessions()
+
+        // Verify the expected buffer contents
+        assertEquals(2, observedSessions.size)
+        assertEquals(id1, observedSessions.first().second.getId())
+        assertEquals(id2, observedSessions.last().second.getId())
+        assertEquals(id1, observedSessions.last().first.getId())
+    }
+
+    @Test
+    fun `test observers read buffered sessions`() {
+        // Get initial session ID (creates first session)
+        val id1 = sessionManager.getSessionId()
+
+        // Set timeout handler to indicate timeout to force new session
+        every { sessionIdTimeoutHandler.hasTimedOut() } returns true
+        every { UniqueIdGenerator.generateId() } returns "new-session-id"
+
+        // Create another session
+        val id2 = sessionManager.getSessionId()
+
+        val observedSessions = sessionManager.getBufferedObservedSessions()
+
+        // Verify the expected buffer contents
+        assertEquals(2, observedSessions.size)
+
+        sessionManager.addObserver(sessionObserver, true)
+
+        // Verify that the observer has observed the buffered sessions
+        verify {
+            sessionObserver.onSessionEnded(Session.DefaultSession(id1, 0))
+            sessionObserver.onSessionStarted(Session.DefaultSession(id2, 0), Session.DefaultSession(id1, 0))
+        }
     }
 }
