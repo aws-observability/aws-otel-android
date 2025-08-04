@@ -27,7 +27,7 @@ allprojects {
         gradlePluginPortal()
     }
     if (findProperty("final") != "true") {
-        version = "$version-SNAPSHOT"
+        version = "$version-beta"
     }
 }
 
