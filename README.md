@@ -32,8 +32,8 @@ dependencies {
     implementation("software.amazon.opentelemetry.android:agent:LATEST_VERSION")
 
     // For HTTP instrumentation with ByteBuddy
-    byteBuddy("io.opentelemetry.android:instrumentation-okhttp-3.0-agent:LATEST_VERSION")           // if you are using OkHttp-3.0
-    byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:LATEST_VERSION")    // if you are using URLConnection / HttpURLConnection / HttpsURLConnection
+    byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.12.0-alpha")           // if you are using OkHttp-3.0
+    byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:0.12.0-alpha") // if you are using URLConnection / HttpURLConnection / HttpsURLConnection
 }
 ```
 
@@ -132,6 +132,7 @@ The library consists of several modules designed for flexibility and modularity:
 | **UI Performance**     | Time-to-first-draw, slow rendering           | Automatic for Activities (manual Fragment instrumentation) |
 | **Custom Spans**       | Application-specific instrumentation         | Manual                                                     |
 | **Slow rendering**     | Reports when app interface is slow or frozen | Automatic                                                  |
+| **Sessions**           | Reports when user sessions start or end      | Automatic                                                  |
 
 ## Requirements
 
