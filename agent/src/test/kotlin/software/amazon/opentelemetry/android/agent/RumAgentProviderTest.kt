@@ -48,7 +48,7 @@ import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExpo
 import java.time.Duration
 
 @ExtendWith(MockKExtension::class)
-class AgentProviderTest {
+class RumAgentProviderTest {
     @MockK
     private lateinit var mockBuilder: OpenTelemetryAgent.Builder
 
@@ -67,11 +67,11 @@ class AgentProviderTest {
     @MockK
     private lateinit var mockAuthLogRecordExporterBuilder: AwsSigV4LogRecordExporterBuilder
 
-    private lateinit var agentProvider: AgentProvider
+    private lateinit var rumAgentProvider: RumAgentProvider
 
     @BeforeEach
     fun setUp() {
-        agentProvider = AgentProvider()
+        rumAgentProvider = RumAgentProvider()
         every { mockBuilder.build() } returns mockOpenTelemetryAgent
         every { mockBuilder.setAppMonitorConfig(any()) } returns mockBuilder
         every { mockBuilder.setSessionInactivityTimeout(any()) } returns mockBuilder
@@ -127,7 +127,7 @@ class AgentProviderTest {
         val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setAppMonitorConfig(capture(appMonitorConfigSlot)) }
@@ -144,7 +144,7 @@ class AgentProviderTest {
         val timeoutSlot = slot<Duration>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setSessionInactivityTimeout(capture(timeoutSlot)) }
@@ -164,7 +164,7 @@ class AgentProviderTest {
         val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
@@ -194,7 +194,7 @@ class AgentProviderTest {
         every { CognitoIdentityClient.invoke(any()) } returns mockk<CognitoIdentityClient>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
@@ -228,7 +228,7 @@ class AgentProviderTest {
         val telemetrySlot = slot<List<TelemetryConfig>>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
@@ -266,7 +266,7 @@ class AgentProviderTest {
         val telemetrySlot = slot<List<TelemetryConfig>>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
@@ -288,7 +288,7 @@ class AgentProviderTest {
         val config = createBasicConfig(telemetryConfigs = null)
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify(exactly = 0) { mockBuilder.setEnabledTelemetry(any()) }
@@ -314,7 +314,7 @@ class AgentProviderTest {
         val telemetrySlot = slot<List<TelemetryConfig>>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
@@ -328,7 +328,7 @@ class AgentProviderTest {
         val config = createBasicConfig()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.build() }
@@ -347,7 +347,7 @@ class AgentProviderTest {
         val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setAppMonitorConfig(capture(appMonitorConfigSlot)) }
@@ -362,7 +362,7 @@ class AgentProviderTest {
         val timeoutSlot = slot<Duration>()
 
         // When
-        agentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
         verify { mockBuilder.setSessionInactivityTimeout(capture(timeoutSlot)) }

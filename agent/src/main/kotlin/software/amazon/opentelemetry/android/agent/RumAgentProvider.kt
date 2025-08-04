@@ -31,7 +31,7 @@ import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4LogRecor
 import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporter
 import java.time.Duration
 
-internal class AgentProvider : ContentProvider() {
+internal class RumAgentProvider : ContentProvider() {
     /**
      * Run the ContentProvider onCreate hook, which should begin before the application start
      */
