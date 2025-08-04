@@ -31,80 +31,94 @@ import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4LogRecor
 import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporter
 import java.time.Duration
 
-internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
+internal class AgentProvider : ContentProvider() {
+    /**
+     * Run the ContentProvider onCreate hook, which should begin before the application start
+     */
     override fun onCreate(): Boolean {
-        // This will be called before Application.onCreate()
         if (context != null) {
-            val config = AwsRumAppMonitorConfigReader.readConfig(context!!)
-
-            val application = context!!.applicationContext as Application
-
-            if (config != null) {
-                // Default configuration - sends data to AWS RUM
-                val awsRumAppMonitorConfig =
-                    AwsRumAppMonitorConfig(
-                        config.aws.region,
-                        config.aws.rumAppMonitorId,
-                        config.aws.rumAlias,
-                    )
-
-                val builder =
-                    OpenTelemetryAgent
-                        .Builder(application)
-                        .setAppMonitorConfig(awsRumAppMonitorConfig)
-                        .setSessionInactivityTimeout(Duration.ofSeconds(config.sessionTimeout.toLong()))
-
-                // Check if Cognito Identity Pool ID is configured and required classes are available
-                if (config.aws.cognitoIdentityPoolId != null && isCognitoAuthAvailable()) {
-                    Log.i(AwsRumAppMonitorConfigReader.TAG, "Configuring SigV4 authentication with Cognito Identity Pool")
-                    configureCognitoAuth(builder, config)
-                } else {
-                    if (config.aws.cognitoIdentityPoolId != null && !isCognitoAuthAvailable()) {
-                        Log.w(
-                            AwsRumAppMonitorConfigReader.TAG,
-                            "Cognito Identity Pool ID configured but required dependencies not found. Add cognito-auth and kotlin-sdk-auth dependencies. Falling back to default exporters.",
-                        )
-                    }
-                    // Use default OTLP exporters without authentication
-                    configureDefaultExporters(builder, config)
+            try {
+                val application = context!!.applicationContext as Application
+                val config = AwsConfigReader.readConfig(context!!)
+                if (config != null) {
+                    initialize(config, OpenTelemetryAgent.Builder(application))
+                    return true
                 }
-
-                val telemetry = config.telemetry
-
-                if (telemetry != null) {
-                    val enabledTelemetries =
-                        listOfNotNull(
-                            TelemetryConfig.ACTIVITY.takeIf { telemetry.activity?.enabled == true },
-                            TelemetryConfig.ANR.takeIf { telemetry.anr?.enabled == true },
-                            TelemetryConfig.CRASH.takeIf { telemetry.crash?.enabled == true },
-                            TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment?.enabled == true },
-                            TelemetryConfig.NETWORK.takeIf { telemetry.network?.enabled == true },
-                            TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering?.enabled == true },
-                            TelemetryConfig.STARTUP.takeIf { telemetry.startup?.enabled == true },
-                            TelemetryConfig.HTTP_URLCONNECTION.takeIf {
-                                telemetry.httpUrlConnection?.enabled == true
-                            },
-                            TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3?.enabled == true },
-                            TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad?.enabled == true },
-                            TelemetryConfig.SESSION_EVENTS.takeIf { telemetry.sessionEvents?.enabled == true },
-                        )
-                    builder.setEnabledTelemetry(enabledTelemetries)
-                }
-
-                config.applicationAttributes?.let { attributes ->
-                    builder.setCustomApplicationAttributes(
-                        attributes.entries.associate {
-                            it.key to it.value.content
-                        },
-                    )
-                }
-
-                builder.build()
+                Log.e(AwsConfigReader.TAG, "No config file found; cannot initialize AgentProvider")
+                return false
+            } catch (e: Exception) {
+                Log.e(AwsConfigReader.TAG, "Unable to initialize AgentProvider", e)
+                return false
             }
-        } else {
-            Log.e(AwsRumAppMonitorConfigReader.TAG, "Context not available")
         }
-        return true
+        Log.e(AwsConfigReader.TAG, "Context is not available to ContentProvider; cannot initialize AgentProvider")
+        return false
+    }
+
+    /**
+     * Initialize the ADOT Android Agent (OpenTelemetryAgent)
+     */
+    fun initialize(
+        config: AgentConfig,
+        builder: OpenTelemetryAgent.Builder,
+    ) {
+        // Default configuration - sends data to AWS RUM
+        val awsRumAppMonitorConfig =
+            AwsRumAppMonitorConfig(
+                config.aws.region,
+                config.aws.rumAppMonitorId,
+                config.aws.rumAlias,
+            )
+
+        builder
+            .setAppMonitorConfig(awsRumAppMonitorConfig)
+            .setSessionInactivityTimeout(Duration.ofSeconds(config.sessionTimeout.toLong()))
+
+        // Check if Cognito Identity Pool ID is configured and required classes are available
+        if (config.aws.cognitoIdentityPoolId != null && isCognitoAuthAvailable()) {
+            Log.i(AwsConfigReader.TAG, "Configuring SigV4 authentication with Cognito Identity Pool")
+            configureCognitoAuth(builder, config)
+        } else {
+            if (config.aws.cognitoIdentityPoolId != null && !isCognitoAuthAvailable()) {
+                Log.w(
+                    AwsConfigReader.TAG,
+                    "Cognito Identity Pool ID configured but required dependencies not found. Add cognito-auth and kotlin-sdk-auth dependencies. Falling back to default exporters.",
+                )
+            }
+            // Use default OTLP exporters without authentication
+            configureDefaultExporters(builder, config)
+        }
+
+        val telemetry = config.telemetry
+
+        if (telemetry != null) {
+            val enabledTelemetries =
+                listOfNotNull(
+                    TelemetryConfig.ACTIVITY.takeIf { telemetry.activity?.enabled == true },
+                    TelemetryConfig.ANR.takeIf { telemetry.anr?.enabled == true },
+                    TelemetryConfig.CRASH.takeIf { telemetry.crash?.enabled == true },
+                    TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment?.enabled == true },
+                    TelemetryConfig.NETWORK.takeIf { telemetry.network?.enabled == true },
+                    TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering?.enabled == true },
+                    TelemetryConfig.STARTUP.takeIf { telemetry.startup?.enabled == true },
+                    TelemetryConfig.HTTP_URLCONNECTION.takeIf {
+                        telemetry.httpUrlConnection?.enabled == true
+                    },
+                    TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3?.enabled == true },
+                    TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad?.enabled == true },
+                )
+            builder.setEnabledTelemetry(enabledTelemetries)
+        }
+
+        config.applicationAttributes?.let { attributes ->
+            builder.setCustomApplicationAttributes(
+                attributes.entries.associate {
+                    it.key to it.value.content
+                },
+            )
+        }
+
+        builder.build()
     }
 
     /**
@@ -132,12 +146,12 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
             .addSpanExporterCustomizer { _ ->
                 OtlpHttpSpanExporter
                     .builder()
-                    .setEndpoint(AwsRumAppMonitorConfigReader.getTracesEndpoint(config))
+                    .setEndpoint(AwsConfigReader.getTracesEndpoint(config))
                     .build()
             }.addLogRecordExporterCustomizer { _ ->
                 OtlpHttpLogRecordExporter
                     .builder()
-                    .setEndpoint(AwsRumAppMonitorConfigReader.getLogsEndpoint(config))
+                    .setEndpoint(AwsConfigReader.getLogsEndpoint(config))
                     .build()
             }
     }
@@ -166,7 +180,7 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                     AwsSigV4SpanExporter
                         .builder()
                         .setRegion(config.aws.region)
-                        .setEndpoint(AwsRumAppMonitorConfigReader.getTracesEndpoint(config))
+                        .setEndpoint(AwsConfigReader.getTracesEndpoint(config))
                         .setServiceName("rum")
                         .setCredentialsProvider(cognitoCredentialsProvider)
                         .build()
@@ -174,14 +188,14 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                     AwsSigV4LogRecordExporter
                         .builder()
                         .setRegion(config.aws.region)
-                        .setEndpoint(AwsRumAppMonitorConfigReader.getLogsEndpoint(config))
+                        .setEndpoint(AwsConfigReader.getLogsEndpoint(config))
                         .setServiceName("rum")
                         .setCredentialsProvider(cognitoCredentialsProvider)
                         .build()
                 }
         } catch (e: Exception) {
             Log.e(
-                AwsRumAppMonitorConfigReader.TAG,
+                AwsConfigReader.TAG,
                 "Failed to configure Cognito authentication. Falling back to default exporters. Make sure aws-runtime:cognito-auth and aws-runtime:kotlin-sdk-auth dependencies are included.",
                 e,
             )
