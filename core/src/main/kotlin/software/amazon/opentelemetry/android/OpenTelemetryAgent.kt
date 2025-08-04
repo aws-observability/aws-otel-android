@@ -65,6 +65,7 @@ class OpenTelemetryAgent(
         private var tracerSampler: Sampler? = null
         private var enabledTelemetry: MutableList<TelemetryConfig>? = null
         private var enabledFeatures: MutableList<FeatureConfig>? = null
+        private var customApplicationAttributes: Map<String, String>? = null
 
         /**
          * Point the Agent to an AppMonitor resource in AWS Real User Monitoring.
@@ -151,6 +152,11 @@ class OpenTelemetryAgent(
             return this
         }
 
+        fun setCustomApplicationAttributes(attributes: Map<String, String>): Builder {
+            this.customApplicationAttributes = attributes
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -192,6 +198,10 @@ class OpenTelemetryAgent(
                         globalAttributesBuilder.put(key, value)
                     }
                 }
+            }
+
+            customApplicationAttributes?.forEach { (attribute, value) ->
+                globalAttributesBuilder.put(attribute, value)
             }
 
             val attributes = globalAttributesBuilder.build()

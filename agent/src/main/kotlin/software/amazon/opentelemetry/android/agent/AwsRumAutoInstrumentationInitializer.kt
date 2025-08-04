@@ -84,6 +84,14 @@ internal class AwsRumAutoInstrumentationInitializer : ContentProvider() {
                     builder.setEnabledTelemetry(enabledTelemetries)
                 }
 
+                config.applicationAttributes?.let { attributes ->
+                    builder.setCustomApplicationAttributes(
+                        attributes.entries.associate {
+                            it.key to it.value.content
+                        },
+                    )
+                }
+
                 builder.build()
             }
         } else {
