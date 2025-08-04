@@ -51,6 +51,8 @@ object ResourceProvider {
                 .put(DeviceIncubatingAttributes.DEVICE_MANUFACTURER, Build.MANUFACTURER)
                 .put(OsIncubatingAttributes.OS_NAME, ANDROID_OS_NAME)
                 .put(OsIncubatingAttributes.OS_TYPE, ANDROID_OS_TYPE)
+                .put(OsIncubatingAttributes.OS_VERSION, Build.VERSION.RELEASE)
+                .put(OsIncubatingAttributes.OS_BUILD_ID, Build.ID)
                 .put(OsIncubatingAttributes.OS_DESCRIPTION, getOSDescription())
                 .put(CloudIncubatingAttributes.CLOUD_PLATFORM, AWS_RUM_CLOUD_PLATFORM)
                 .put(CloudIncubatingAttributes.CLOUD_PROVIDER, AWS_CLOUD_PROVIDER)

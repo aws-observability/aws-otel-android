@@ -60,6 +60,8 @@ class ResourceProviderTest {
                         .put(DeviceIncubatingAttributes.DEVICE_MANUFACTURER, Build.MANUFACTURER)
                         .put(OsIncubatingAttributes.OS_NAME, "Android")
                         .put(OsIncubatingAttributes.OS_TYPE, "linux")
+                        .put(OsIncubatingAttributes.OS_VERSION, Build.VERSION.RELEASE)
+                        .put(OsIncubatingAttributes.OS_BUILD_ID, Build.ID)
                         .put(OsIncubatingAttributes.OS_DESCRIPTION, osDescription)
                         .put(CloudIncubatingAttributes.CLOUD_PLATFORM, "aws_rum")
                         .put(CloudIncubatingAttributes.CLOUD_PROVIDER, "aws")

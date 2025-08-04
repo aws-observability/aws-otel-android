@@ -5,7 +5,7 @@ plugins {
     id("signing")
 }
 
-version = project.version.toString().replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
+version = project.version.toString()
 
 val isARelease = System.getenv("CI") != null
 
