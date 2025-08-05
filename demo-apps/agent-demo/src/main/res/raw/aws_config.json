@@ -22,6 +22,7 @@
     "sessionEvents": { "enabled": true }
   },
   "sessionTimeout": 100,
+  "sessionSampleRate": 1.0,
   "applicationAttributes": {
     "application.version": "1.0.0",
     "demo": true

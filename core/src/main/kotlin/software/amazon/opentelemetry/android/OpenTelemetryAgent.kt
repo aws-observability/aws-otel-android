@@ -17,6 +17,7 @@ package software.amazon.opentelemetry.android
 import android.app.Application
 import io.opentelemetry.android.OpenTelemetryRum
 import io.opentelemetry.android.OpenTelemetryRumBuilder
+import io.opentelemetry.android.SessionIdRatioBasedSampler
 import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfig
 import io.opentelemetry.api.OpenTelemetry
@@ -73,6 +74,7 @@ class OpenTelemetryAgent(
         private val logRecordExporterCustomizers: MutableList<(LogRecordExporter) -> LogRecordExporter> = mutableListOf()
         private var sessionInactivityTimeout: Duration = Duration.ofMinutes(5)
         private var tracerSampler: Sampler? = null
+        private var sessionSampleRate: Double = 1.0
         private var enabledTelemetry: MutableList<TelemetryConfig>? = null
         private var enabledFeatures: MutableList<FeatureConfig>? = null
         private var customApplicationAttributes: Map<String, String>? = null
@@ -167,6 +169,11 @@ class OpenTelemetryAgent(
             return this
         }
 
+        fun setSessionSampleRate(rate: Double): Builder {
+            this.sessionSampleRate = rate
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -242,6 +249,14 @@ class OpenTelemetryAgent(
             if (tracerSampler != null) {
                 delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
                     tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
+                }
+            }
+
+            // Add a SessionIdRatioBasedSampler if we have a sessionSampleRate < 1.0
+            if (sessionSampleRate < 1.0) {
+                val sampler = SessionIdRatioBasedSampler(sessionSampleRate, sessionProvider)
+                delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
+                    tracerProviderBuilder.setSampler(sampler)
                 }
             }
 

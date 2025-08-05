@@ -62,6 +62,7 @@ class AwsConfigReaderTest {
             "uiLoad": { "enabled": true }
           },
           "sessionTimeout": 100,
+          "sessionSampleRate": 0.5,
           "applicationAttributes": {
             "application.version": "1.0.0",
             "demo": true
@@ -108,6 +109,7 @@ class AwsConfigReaderTest {
         assertEquals(100, result.sessionTimeout)
         assertEquals("testlogs", result.exportOverride!!.logs)
         assertEquals("testtraces", result.exportOverride!!.traces)
+        assertEquals(0.5, result.sessionSampleRate, 0.001)
     }
 
     @Test

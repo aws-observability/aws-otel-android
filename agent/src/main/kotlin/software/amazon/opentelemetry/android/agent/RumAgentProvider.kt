@@ -73,6 +73,7 @@ internal class RumAgentProvider : ContentProvider() {
         builder
             .setAppMonitorConfig(awsRumAppMonitorConfig)
             .setSessionInactivityTimeout(Duration.ofSeconds(config.sessionTimeout.toLong()))
+            .setSessionSampleRate(config.sessionSampleRate)
 
         // Check if Cognito Identity Pool ID is configured and required classes are available
         if (config.aws.cognitoIdentityPoolId != null && isCognitoAuthAvailable()) {
