@@ -8,6 +8,10 @@ plugins {
 
 android {
     namespace = "software.amazon.opentelemetry.android.auth.cognito"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-proguard-rules.pro")
+    }
 }
 
 dependencies {

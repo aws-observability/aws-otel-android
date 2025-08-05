@@ -26,6 +26,10 @@
         "rumAlias": {
           "type": "string",
           "description": "Adds an alias to all requests. This is compared against the rum:alias service context in app monitors with resource based policies attached"
+        },
+        "cognitoIdentityPoolId": {
+          "type": "string",
+          "description": "AWS Cognito Identity Pool ID for authentication (example: \"us-east-1:a1b2c3d4-5678-90ab-cdef-EXAMPLE11111\")"
         }
       },
       "required": ["region", "rumAppMonitorId"]

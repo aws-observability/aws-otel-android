@@ -30,6 +30,7 @@ internal data class AwsConfig(
     @Required val region: String,
     @Required val rumAppMonitorId: String,
     val rumAlias: String? = null,
+    val cognitoIdentityPoolId: String? = null,
 )
 
 @Serializable
@@ -69,7 +70,7 @@ data class TelemetryOption(
 )
 
 @SuppressLint("DiscouragedApi") // Necessary for library modules
-internal object AwsRumAppMonitorConfigReader {
+internal object AwsConfigReader {
     private const val CONFIG_STRING_KEY = "aws_config"
     val TAG = "AWS Otel Android"
 

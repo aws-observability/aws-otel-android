@@ -55,6 +55,8 @@ android {
 
 dependencies {
     implementation(project(":agent"))
+    implementation(project(":aws-runtime:cognito-auth"))
+    implementation(project(":aws-runtime:kotlin-sdk-auth"))
 
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.4.69")

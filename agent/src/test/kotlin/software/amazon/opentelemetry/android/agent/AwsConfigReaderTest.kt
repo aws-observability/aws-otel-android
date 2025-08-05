@@ -30,7 +30,7 @@ import org.mockito.MockitoAnnotations
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-class AwsRumAppMonitorConfigReaderTest {
+class AwsConfigReaderTest {
     @Mock
     private lateinit var mockContext: Context
 
@@ -90,7 +90,7 @@ class AwsRumAppMonitorConfigReaderTest {
             .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
 
         // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+        val result = AwsConfigReader.readConfig(mockContext)
 
         // Then
         assertNotNull(result)
@@ -119,7 +119,7 @@ class AwsRumAppMonitorConfigReaderTest {
             .thenReturn(0)
 
         // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+        val result = AwsConfigReader.readConfig(mockContext)
 
         // Then
         assertNull(result)
@@ -143,13 +143,13 @@ class AwsRumAppMonitorConfigReaderTest {
             .thenReturn(ByteArrayInputStream(invalidJson.toByteArray(StandardCharsets.UTF_8)))
 
         // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+        val result = AwsConfigReader.readConfig(mockContext)
 
         // Then
         assertNull(result)
         io.mockk.verify {
             Log.e(
-                AwsRumAppMonitorConfigReader.TAG,
+                AwsConfigReader.TAG,
                 "Missing fields in config: [aws]",
             )
         }
@@ -175,14 +175,14 @@ class AwsRumAppMonitorConfigReaderTest {
             .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
 
         // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+        val result = AwsConfigReader.readConfig(mockContext)
 
         // Then
         assertNotNull(result)
         assertNotNull(result?.aws)
         assertEquals(
-            AwsRumAppMonitorConfigReader.buildRumEndpoint(result!!.aws.region),
-            AwsRumAppMonitorConfigReader.getTracesEndpoint(result),
+            AwsConfigReader.buildRumEndpoint(result!!.aws.region),
+            AwsConfigReader.getTracesEndpoint(result),
         )
     }
 
@@ -206,7 +206,7 @@ class AwsRumAppMonitorConfigReaderTest {
             .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
 
         // When
-        val result = AwsRumAppMonitorConfigReader.readConfig(mockContext)
+        val result = AwsConfigReader.readConfig(mockContext)
 
         // Then
         assertNotNull(result)

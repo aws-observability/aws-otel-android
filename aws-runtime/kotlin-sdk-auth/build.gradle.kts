@@ -8,6 +8,10 @@ plugins {
 
 android {
     namespace = "software.amazon.opentelemetry.android.auth.kotlin"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-proguard-rules.pro")
+    }
 }
 
 dependencies {
