@@ -1,17 +1,17 @@
 [versions]
-opentelemetry-instrumentation-alpha = "2.14.0-alpha"
-#opentelemetry-instrumentation = "2.9.0" // alpha bom includes non-alpha bom
-opentelemetry-semconv = "1.32.0"
-opentelemetry = "1.48.0"
-opentelemetry-semconv-alpha = "1.32.0-alpha"
-opentelemetry-contrib = "1.45.0-alpha"
-mockito = "5.17.0"
-junit = "5.12.1"
-byteBuddy = "1.17.5"
+opentelemetry-instrumentation-alpha = "2.17.1-alpha"
+opentelemetry-semconv = "1.34.0"
+opentelemetry = "1.49.0"
+opentelemetry-semconv-alpha = "1.34.0-alpha"
+opentelemetry-contrib = "1.47.0-alpha"
+opentelemetry-android = "0.12.0-alpha"
+mockito = "5.18.0"
+junit = "5.13.3"
+byteBuddy = "1.17.6"
 spotless = "7.0.2"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 coroutines-version = "1.9.0"
-androidPlugin = "8.9.1"
+androidPlugin = "8.11.1"
 junitKtx = "1.2.1"
 autoService = "1.1.1"
 owasp = "12.1.0"
@@ -30,14 +30,14 @@ androidx-lifecycle-process = "androidx.lifecycle:lifecycle-process:2.8.7"
 androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 findbugs-jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
-opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version = "0.10.0-alpha" }
-opentelemetry-android-common = { module = "io.opentelemetry.android:common", version = "0.10.0-alpha" }
-opentelemetry-android-session = { module = "io.opentelemetry.android:session", version = "0.10.0-alpha" }
-opentelemetry-android-instrumentation = {module = "io.opentelemetry.android.instrumentation:android-instrumentation", version = "0.10.0-alpha"}
-opentelemetry-android-httpurlconnection = {module = "io.opentelemetry.android:instrumentation-httpurlconnection-library", version.ref = "http-instrumentation"}
-opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.android:instrumentation-httpurlconnection-agent", version.ref="http-instrumentation"}
-opentelemetry-android-okhttp3 = {module = "io.opentelemetry.android:instrumentation-okhttp-3.0-library", version.ref = "http-instrumentation"}
-opentelemetry-android-okhttp3-agent = {module = "io.opentelemetry.android:instrumentation-okhttp-3.0-agent", version.ref = "http-instrumentation"}
+opentelemetry-android = { module = "io.opentelemetry.android:android-agent", version.ref = "opentelemetry-android" }
+opentelemetry-android-common = { module = "io.opentelemetry.android:common", version.ref = "opentelemetry-android" }
+opentelemetry-android-session = { module = "io.opentelemetry.android:session", version.ref = "opentelemetry-android" }
+opentelemetry-android-httpurlconnection = {module = "io.opentelemetry.android.instrumentation:httpurlconnection-library", version.ref = "opentelemetry-android"}
+opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.android.instrumentation:httpurlconnection-agent", version.ref = "opentelemetry-android"}
+opentelemetry-android-okhttp3 = {module = "io.opentelemetry.android.instrumentation:okhttp3-library", version.ref = "opentelemetry-android"}
+opentelemetry-android-okhttp3-agent = {module = "io.opentelemetry.android.instrumentation:okhttp3-agent", version.ref = "opentelemetry-android"}
+opentelemetry-android-sessions-instrumentation = {module = "io.opentelemetry.android.instrumentation:sessions", version.ref = "opentelemetry-android"}
 opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
 opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }

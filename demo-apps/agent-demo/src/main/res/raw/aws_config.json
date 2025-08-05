@@ -18,7 +18,8 @@
     "startup": { "enabled": true },
     "httpUrlConnection": { "enabled": true },
     "okHttp3": { "enabled": true },
-    "uiLoad": { "enabled": true }
+    "uiLoad": { "enabled": true },
+    "sessionEvents": { "enabled": true }
   },
   "sessionTimeout": 100,
   "applicationAttributes": {

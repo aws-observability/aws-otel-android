@@ -25,6 +25,8 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
 import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
+import software.amazon.opentelemetry.android.features.SessionIdTimeoutHandler
+import software.amazon.opentelemetry.android.features.SessionManager
 import java.time.Duration
 
 /**
@@ -48,6 +50,14 @@ class OpenTelemetryAgent(
     override fun getOpenTelemetry(): OpenTelemetry = delegate.openTelemetry
 
     override fun getRumSessionId(): String = delegate.rumSessionId
+
+    override fun emitEvent(
+        eventName: String,
+        body: String,
+        attributes: Attributes,
+    ) {
+        delegate.emitEvent(eventName, body, attributes)
+    }
 
     class Builder constructor(
         private val application: Application,
@@ -164,10 +174,17 @@ class OpenTelemetryAgent(
 
             val resource = ResourceProvider.createDefault(application, awsRumAppMonitorConfig!!, applicationName)
 
+            val sessionProvider =
+                SessionManager(
+                    sessionIdTimeoutHandler =
+                        SessionIdTimeoutHandler(
+                            sessionInactivityTimeout = sessionInactivityTimeout,
+                        ),
+                )
+
             val otelRumConfig =
                 OtelRumConfig()
                     .setDiskBufferingConfig(diskBufferingConfig)
-                    .setSessionTimeout(sessionInactivityTimeout)
                     .disableInstrumentationDiscovery()
 
             val telemetry =
@@ -212,6 +229,7 @@ class OpenTelemetryAgent(
             val delegateBuilder =
                 OpenTelemetryRumBuilder
                     .create(application, otelRumConfig)
+                    .setSessionProvider(sessionProvider)
                     .setResource(resource)
 
             spanExporterCustomizers.forEach { customizer ->

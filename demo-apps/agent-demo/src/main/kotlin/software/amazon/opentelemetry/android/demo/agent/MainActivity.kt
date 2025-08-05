@@ -24,8 +24,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import software.amazon.opentelemetry.android.api.AwsRum
+import software.amazon.opentelemetry.android.demo.agent.SecondActivity.Companion.HTTP_200_URL
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivityMainBinding
+import java.io.BufferedInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,6 +67,37 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         binding.buttonPerformAction.setOnClickListener {
             navigateToSecondActivity()
+        }
+        binding.simpleHttpCall.setOnClickListener {
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    val url = URL("https://www.android.com/")
+                    val urlConnection = url.openConnection() as HttpURLConnection
+                    try {
+                        val `in`: InputStream =
+                            BufferedInputStream(urlConnection.inputStream)
+                        val response = `in`.bufferedReader().use { it.readText() }
+                        response // Return the response
+                    } finally {
+                        urlConnection.disconnect() // Show the actual response
+                    }
+                }
+            }
+        }
+        binding.okHttpCall.setOnClickListener {
+            lifecycleScope.launch {
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("https://www.android.com/")
+                    .build()
+
+                val result = withContext(Dispatchers.IO) {
+                    client.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                        response.body?.string() ?: ""
+                    }
+                }
+            }
         }
     }
 

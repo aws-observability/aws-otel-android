@@ -43,4 +43,5 @@ data class LogRecord(
     @Required val attributes: List<Attribute>,
     val traceId: String = "",
     val spanId: String = "",
+    val eventName: String = "",
 )

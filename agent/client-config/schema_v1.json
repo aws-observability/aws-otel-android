@@ -99,6 +99,11 @@
           "type": "object",
           "description": "Configure UI load time monitoring",
           "properties": { "enabled": { "type": "boolean" } }
+        },
+        "session_events": {
+          "type": "object",
+          "description": "Configure session event instrumentation",
+          "properties": { "enabled": { "type": "boolean" } }
         }
       }
     },

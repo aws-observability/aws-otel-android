@@ -27,7 +27,6 @@ import software.amazon.opentelemetry.android.scopeLogs
 class CrashContractTests {
     companion object {
         val STACK_TRACE_EXCEPTION_ATTRIBUTE = "exception.stacktrace"
-        val EVENT_NAME_ATTRIBUTE = "event.name"
         val CRASH_SCOPE = "io.opentelemetry.crash"
         val EXCEPTION_MESSAGE_ATTR = "exception.message"
         val EXCEPTION_TYPE_ATTR = "exception.type"
@@ -41,10 +40,9 @@ class CrashContractTests {
 
         val logRecords = scopeLogs.logRecords()
 
-        Assertions.assertEquals(
-            logRecords.attributes(EVENT_NAME_ATTRIBUTE).value.stringValue,
-            "device.crash",
-        )
+        Assertions.assertTrue {
+            logRecords.all { it.eventName == "device.crash" }
+        }
 
         Assertions.assertEquals(
             logRecords.attributes(EXCEPTION_MESSAGE_ATTR).value.stringValue,

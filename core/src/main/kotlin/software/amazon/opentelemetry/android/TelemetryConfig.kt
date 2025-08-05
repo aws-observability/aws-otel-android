@@ -20,6 +20,7 @@ import io.opentelemetry.android.instrumentation.anr.AnrInstrumentation
 import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
 import io.opentelemetry.android.instrumentation.fragment.FragmentLifecycleInstrumentation
 import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
+import io.opentelemetry.android.instrumentation.sessions.SessionInstrumentation
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstrumentation
 import io.opentelemetry.android.instrumentation.startup.StartupInstrumentation
 import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
@@ -87,6 +88,11 @@ enum class TelemetryConfig(
      * Enables telemetry for UI load monitoring
      */
     UI_LOADING("ui_loading", ActivityLoadInstrumentation()),
+
+    /**
+     * Session events
+     */
+    SESSION_EVENTS("session_events", SessionInstrumentation()),
     ;
 
     companion object {
@@ -102,6 +108,7 @@ enum class TelemetryConfig(
                 HTTP_URLCONNECTION,
                 OKHTTP_3,
                 UI_LOADING,
+                SESSION_EVENTS,
             )
 
         fun mapConfigFlag(flag: String): TelemetryConfig? = values().find { it.configFlag == flag }

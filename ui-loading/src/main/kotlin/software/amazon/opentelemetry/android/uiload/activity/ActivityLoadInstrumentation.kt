@@ -21,7 +21,9 @@ import io.opentelemetry.api.trace.Tracer
 import software.amazon.opentelemetry.android.uiload.utils.CommonUtils.getVersionSDKInt
 import software.amazon.opentelemetry.android.uiload.utils.FirstDrawListener
 
-class ActivityLoadInstrumentation : AndroidInstrumentation {
+class ActivityLoadInstrumentation(
+    override val name: String = "uiLoading",
+) : AndroidInstrumentation {
     companion object {
         const val INSTRUMENTATION_SCOPE: String = "software.amazon.opentelemetry.ui-loading"
     }
