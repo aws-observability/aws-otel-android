@@ -61,6 +61,7 @@ internal data class AgentConfig(
     val exportOverride: ExportOverrideConfig? = null,
     val telemetry: TelemetryConfigs? = null,
     val sessionTimeout: Int = 300,
+    val sessionSampleRate: Double = 1.0,
     val applicationAttributes: Map<String, JsonPrimitive>? = null,
 )
 

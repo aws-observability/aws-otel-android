@@ -117,6 +117,13 @@
       "minimum": 0,
       "default": 300
     },
+    "sessionSampleRate": {
+      "type": "number",
+      "description": "The proportion of sessions that will be recorded by the agent, specified as a unit interval. When this field is 0, no sessions will be recorded. When this field is 1, all sessions will be recorded.",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 1
+    },
     "applicationAttributes": {
       "type": "object",
       "description": "Custom OpenTelemetry attributes injected into every Span and LogRecorded vended by your app. You can use this to include custom metadata with your telemetry.",

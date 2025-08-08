@@ -78,6 +78,7 @@ class RumAgentProviderTest {
         every { mockBuilder.setEnabledTelemetry(any()) } returns mockBuilder
         every { mockBuilder.addSpanExporterCustomizer(any()) } returns mockBuilder
         every { mockBuilder.addLogRecordExporterCustomizer(any()) } returns mockBuilder
+        every { mockBuilder.setSessionSampleRate(any()) } returns mockBuilder
 
         mockkObject(AwsConfigReader)
 
@@ -124,17 +125,23 @@ class RumAgentProviderTest {
     fun `initialize should configure basic AwsRumAppMonitorConfig`() {
         // Given
         val config = createBasicConfig()
-        val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
 
         // When
         rumAgentProvider.initialize(config, mockBuilder)
 
         // Then
+        val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
         verify { mockBuilder.setAppMonitorConfig(capture(appMonitorConfigSlot)) }
         val capturedConfig = appMonitorConfigSlot.captured
         assert(capturedConfig.region == "us-east-1")
         assert(capturedConfig.appMonitorId == "test-app-monitor-id")
         assert(capturedConfig.alias == "test-alias")
+
+        val sessionInactivityTimeout = slot<Duration>()
+        verify { mockBuilder.setSessionInactivityTimeout(capture(sessionInactivityTimeout)) }
+        assert(sessionInactivityTimeout.captured == Duration.ofSeconds(config.sessionTimeout.toLong()))
+
+        verify { mockBuilder.setSessionSampleRate(config.sessionSampleRate) }
     }
 
     @Test
