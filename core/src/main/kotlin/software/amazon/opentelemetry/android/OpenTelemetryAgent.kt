@@ -15,6 +15,7 @@
 package software.amazon.opentelemetry.android
 
 import android.app.Application
+import android.util.Log
 import io.opentelemetry.android.OpenTelemetryRum
 import io.opentelemetry.android.OpenTelemetryRumBuilder
 import io.opentelemetry.android.SessionIdRatioBasedSampler
@@ -46,6 +47,8 @@ class OpenTelemetryAgent(
         }
 
         fun getOpenTelemetryAgent(): OpenTelemetryAgent? = openTelemetryAgent
+
+        const val TAG = "OpenTelemetryAgent"
     }
 
     override fun getOpenTelemetry(): OpenTelemetry = delegate.openTelemetry
@@ -170,6 +173,10 @@ class OpenTelemetryAgent(
         }
 
         fun setSessionSampleRate(rate: Double): Builder {
+            if (rate < 0.0 || rate > 1.0) {
+                Log.w(TAG, "Discarding invalid session sample rate: $rate")
+                return this
+            }
             this.sessionSampleRate = rate
             return this
         }
