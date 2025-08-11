@@ -29,6 +29,7 @@ import io.opentelemetry.sdk.trace.samplers.Sampler
 import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
 import software.amazon.opentelemetry.android.features.SessionIdTimeoutHandler
 import software.amazon.opentelemetry.android.features.SessionManager
+import software.amazon.opentelemetry.android.processor.CpuAttributesSpanProcessor
 import java.time.Duration
 
 /**
@@ -253,10 +254,9 @@ class OpenTelemetryAgent(
                 delegateBuilder.addLogRecordExporterCustomizer(customizer)
             }
 
-            if (tracerSampler != null) {
-                delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
-                    tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
-                }
+            delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
+                tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
+                tracerProviderBuilder.addSpanProcessor(CpuAttributesSpanProcessor())
             }
 
             // Add a SessionIdRatioBasedSampler if we have a sessionSampleRate < 1.0
