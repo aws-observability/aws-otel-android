@@ -16,6 +16,7 @@ package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.View
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -24,6 +25,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
+import io.opentelemetry.api.trace.Span
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -50,18 +52,18 @@ class ActivityLoadCallbackTest {
     @Test
     fun `test TimeToFirstDraw span starts when Activity onCreate() is invoked and ends when the callback is invoked`() {
         val bundle = mock<Bundle>(Bundle::class.java)
-        val drawCallbackSlot = slot<() -> Unit>()
+        val drawCallbackSlot = slot<(View) -> Unit>()
         every { firstDrawListener.registerFirstDraw(activity, capture(drawCallbackSlot)) } just runs
-        every { tracers.startSpan(activity, "TimeToFirstDraw") } just return
-        every { tracers.endSpan(activity) } just runs
+        every { tracers.startSpan(activity, "TimeToFirstDraw") } returns mockk<Span>()
+        every { tracers.endSpan(activity, any()) } just runs
 
         activityLoadCallback.onActivityPreCreated(activity, bundle)
         verify { tracers.startSpan(activity, "TimeToFirstDraw") }
 
         verify { firstDrawListener.registerFirstDraw(activity, any()) }
 
-        drawCallbackSlot.captured.invoke()
-        verify { tracers.endSpan(activity) }
+        drawCallbackSlot.captured.invoke(mockk<View>())
+        verify { tracers.endSpan(activity, any()) }
     }
 
     @Test
@@ -70,8 +72,8 @@ class ActivityLoadCallbackTest {
         val activity2 = mockk<Activity>()
 
         every { firstDrawListener.registerFirstDraw(any(), any()) } just runs
-        every { tracers.startSpan(any(), any()) } just return
-        every { tracers.endSpan(any()) } just runs
+        every { tracers.startSpan(any(), any()) } returns mockk<Span>()
+        every { tracers.endSpan(any(), any()) } just runs
 
         activityLoadCallback.onActivityPreCreated(activity1, null)
         activityLoadCallback.onActivityPreCreated(activity2, null)

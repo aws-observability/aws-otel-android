@@ -31,7 +31,7 @@ import software.amazon.opentelemetry.android.uiload.utils.CommonUtils.getVersion
 class FirstDrawListener {
     fun registerFirstDraw(
         activity: Activity,
-        drawDoneCallback: () -> Unit,
+        drawDoneCallback: (View) -> Unit,
     ) {
         val window = activity.window
         window.onDecorViewReady {
@@ -85,7 +85,7 @@ class FirstDrawListener {
      */
     private class NextDrawListener(
         val view: View,
-        val drawDoneCallback: () -> Unit,
+        val drawDoneCallback: (View) -> Unit,
     ) : ViewTreeObserver.OnDrawListener {
         val handler = Handler(Looper.getMainLooper())
         var invoked = false
@@ -93,7 +93,7 @@ class FirstDrawListener {
         override fun onDraw() {
             if (!invoked) {
                 invoked = true
-                drawDoneCallback()
+                drawDoneCallback(view)
                 handler.post {
                     if (view.viewTreeObserver.isAlive) {
                         view.viewTreeObserver.removeOnDrawListener(this)

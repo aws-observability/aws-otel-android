@@ -30,7 +30,7 @@ class ActivityLoadCallback(
         tracers.startSpan(activity, "TimeToFirstDraw")
         firstDrawListener.registerFirstDraw(
             activity,
-        ) { tracers.endSpan(activity) }
+        ) { view -> tracers.endSpan(activity, view) }
     }
 
     override fun onActivityCreated(

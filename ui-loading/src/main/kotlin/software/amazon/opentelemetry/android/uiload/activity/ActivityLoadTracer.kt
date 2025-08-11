@@ -15,17 +15,21 @@
 package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Activity
+import android.view.View
 import io.opentelemetry.android.common.RumConstants
 import io.opentelemetry.android.instrumentation.common.ScreenNameExtractor
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
+import software.amazon.opentelemetry.android.uiload.utils.getComplexity
 
 class ActivityLoadTracer(
     private val tracer: Tracer,
 ) {
     companion object {
         val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activity.name")
+        const val SCREEN_VIEW_NODES = "screen.view.nodes"
+        const val SCREEN_VIEW_DEPTH = "screen.view.depth"
     }
 
     private val tracersByActivity: MutableMap<Activity, PerActivityLoadingTracer> =
@@ -53,9 +57,16 @@ class ActivityLoadTracer(
         return span
     }
 
-    fun endSpan(activity: Activity) {
-        if (getTracer(activity).span != null) {
-            getTracer(activity).span!!.end()
+    fun endSpan(
+        activity: Activity,
+        view: View,
+    ) {
+        val existingSpan = getTracer(activity).span
+        if (existingSpan != null) {
+            val (count, depth) = view.getComplexity()
+            existingSpan.setAttribute(SCREEN_VIEW_NODES, count.toLong())
+            existingSpan.setAttribute(SCREEN_VIEW_DEPTH, depth.toLong())
+            existingSpan.end()
         }
         getTracer(activity).span = null
     }
