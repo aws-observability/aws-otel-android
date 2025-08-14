@@ -77,5 +77,5 @@ class MyFragment : Fragment() {
 
 ## Android Version Support
 
-- **API 29++**: Uses `onActivityPreCreated` for precise timing
+- **API 29+**: Uses `onActivityPreCreated` for precise timing
 - **API 26-28**: Uses `onActivityCreated` with compatibility handling
