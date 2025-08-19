@@ -39,7 +39,7 @@ Create `res/raw/aws_config.json`:
     // OPTIONAL fields:
     "cognitoIdentityPoolId": "<cognito-identity-pool-id>" // for enhanced auth with Cognito, if your use case necessitates its use
   },
-  
+
   // optional attributes that will be appended to all OpenTelemetry application spans and events
   "applicationAttributes": {
     "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
