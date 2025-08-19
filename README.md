@@ -46,12 +46,8 @@ Create `res/raw/aws_config.json`:
 ```jsonc
 {
   "aws": {
-    // REQUIRED fields:
     "region": "us-east-1", // specify the AWS region your app monitor has been created in
     "rumAppMonitorId": "<your-app-monitor-id>",
-
-    // OPTIONAL fields:
-    "cognitoIdentityPoolId": "<cognito-identity-pool-id>" // for enhanced auth with Cognito
   }
 }
 ```
