@@ -25,7 +25,7 @@ import io.opentelemetry.sdk.trace.internal.ExtendedSpanProcessor
  * statistics into span attributes. We establish 'cpu utilization average' to be:
  *
  *      cpuUtilizationAvg = 100 * (cpuTimeMs / spanDurationMs) / number of CPU cores
- *          * cpuTimeSec is the time in milliseconds that the app process has taken in active CPU
+ *          * cpuTimeMs is the time in milliseconds that the app process has taken in active CPU
  *            time
  *          * spanDurationMs is the total running time in milliseconds that the span has been active for
  *
