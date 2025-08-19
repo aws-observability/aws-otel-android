@@ -48,6 +48,11 @@ Create `res/raw/aws_config.json`:
   "aws": {
     "region": "us-east-1", // specify the AWS region your app monitor has been created in
     "rumAppMonitorId": "<your-app-monitor-id>",
+  },
+  
+  // optional attributes that will be appended to all OpenTelemetry application spans and events
+  "applicationAttributes": {
+    "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
   }
 }
 ```
