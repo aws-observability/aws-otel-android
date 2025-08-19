@@ -54,7 +54,9 @@ data class Span(
     val attributes: List<Attribute>,
     val droppedAttributesCount: Int? = null,
     val events: List<SpanEvent>? = null,
-)
+) {
+    fun hasDuration(): Boolean = startTimeUnixNano != endTimeUnixNano
+}
 
 @Serializable
 @JsonIgnoreUnknownKeys
