@@ -2,6 +2,24 @@
 
 The UI Loading module provides automatic instrumentation for measuring UI performance metrics, specifically Time-to-First-Draw (TTFD) for Activities and Fragments.
 
+For more reading:
+- https://developer.android.com/topic/performance/rendering/optimizing-view-hierarchies
+- https://dev.to/pyricau/android-vitals-first-draw-time-m1d
+
+## Telemetry
+
+This instrumentation produces the following telemetry:
+
+### Activity TimeToFirstDraw
+
+* Type: Span
+* Name: `TimeToFirstDraw`
+* Description: The time measurement from Activity onCreate() to the first draw of the window [DecorView](https://developer.android.com/reference/android/view/Window#getDecorView())
+* Attributes:
+    * `screen.name`: name of the screen
+    * `screen.view.nodes`: a recursive count of all View nodes under the window DecorView. This gives a measure of the amount of work being done in the *layout-and-measure* stage of the UI pipeline. A high count correlates with longer TTFD. System-defined layers are included in this count.
+    * `screen.view.depth`: the depth of the deepest-nested View under the window DecorView. This gives a measure of your UI complexity; more work must be done for a deeply-nested View heirarchy. A high count correlates with longer TTFD. System-defined layers (usually 4-6) are included when calculating the depth.
+
 ## What it does
 
 - **Time-to-First-Draw**: Measures when UI elements are first rendered

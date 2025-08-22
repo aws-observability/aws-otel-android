@@ -15,11 +15,13 @@
 package software.amazon.opentelemetry.android.uiload.activity
 
 import android.app.Activity
-import io.mockk.MockKAnnotations
+import android.view.View
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import io.opentelemetry.android.common.RumConstants
@@ -31,7 +33,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import software.amazon.opentelemetry.android.uiload.utils.getComplexity
 
+@ExtendWith(MockKExtension::class)
 class ActivityLoadTracerTest {
     @MockK
     private lateinit var activity: Activity
@@ -45,16 +50,22 @@ class ActivityLoadTracerTest {
     @MockK
     private lateinit var span: Span
 
+    @MockK
+    private lateinit var view: View
+
     private lateinit var activityLoadTracer: ActivityLoadTracer
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init(this)
         every { tracer.spanBuilder(any()) } returns spanBuilder
         every { spanBuilder.setAttribute(any<AttributeKey<String>>(), any()) } returns spanBuilder
         every { spanBuilder.startSpan() } returns span
         every { span.setAttribute(any<AttributeKey<String>>(), any()) } returns span
         every { span.end() } just runs
+        every { span.setAttribute(any<String>(), any<Long>()) } returns span
+
+        mockkStatic(View::getComplexity)
+        every { view.getComplexity() } returns Pair(5, 1)
 
         activityLoadTracer = ActivityLoadTracer(tracer)
     }
@@ -83,9 +94,13 @@ class ActivityLoadTracerTest {
     @Test
     fun `test endSpan ends and clears span`() {
         activityLoadTracer.startSpan(activity, "TestSpan")
-        activityLoadTracer.endSpan(activity)
+        activityLoadTracer.endSpan(activity, view)
 
-        verify { span.end() }
+        verify {
+            span.setAttribute(ActivityLoadTracer.SCREEN_VIEW_NODES, 5L)
+            span.setAttribute(ActivityLoadTracer.SCREEN_VIEW_DEPTH, 1L)
+            span.end()
+        }
 
         val newSpan = activityLoadTracer.startSpan(activity, "TestSpan")
         verify(exactly = 2) { spanBuilder.startSpan() }
@@ -93,7 +108,7 @@ class ActivityLoadTracerTest {
 
     @Test
     fun `test endSpan handles null`() {
-        activityLoadTracer.endSpan(activity)
+        activityLoadTracer.endSpan(activity, view)
         verify(exactly = 0) { span.end() }
     }
 
