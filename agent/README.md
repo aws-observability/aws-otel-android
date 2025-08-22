@@ -3,7 +3,7 @@
 The ADOT Android Agent provides (nearly) zero-code instrumentation for Android applications, automatically collecting telemetry data and exporting it to AWS CloudWatch RUM without requiring manual SDK initialization.
 
 In short, all you need to do is:
-1. Create an `aws_config.json` file to point your telemetry to your CloudWatch Real User Monitoring [AppMonitor](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-rum-appmonitor.html).
+1. Create an `aws_config.json` file to point your telemetry to your CloudWatch Real User Monitoring [app monitor](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-rum-appmonitor.html).
 2. Include the `agent` dependency in your Android application
 3. (Optional) Include extra ByteBuddy dependencies for additional automated instrumentation
 
@@ -13,27 +13,36 @@ The agent automatically instruments your Android application to collect all supp
 
 ## Quick Start
 
-### 1. Add Dependency
+### 1. Add Dependencies
 
 ```kotlin
 dependencies {
-    implementation("software.amazon.opentelemetry.android:agent:LATEST_VERSION")
+    implementation("software.amazon.opentelemetry.android:agent:${LATEST_VERSION}")
+
+    // For HTTP instrumentation with ByteBuddy
+    byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.12.0-alpha")           // if you are using OkHttp-3.0
+    byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:0.12.0-alpha") // if you are using URLConnection / HttpURLConnection / HttpsURLConnection
 }
 ```
 
-### 2. Create Configuration
+### 2. Create a configuration file
 
 Create `res/raw/aws_config.json`:
 
-```json
+```jsonc
 {
-  "rum": {
-    "region": "us-east-1",
-    "appMonitorId": "your-app-monitor-id",
-    "alias": "your-app-alias"
+  "aws": {
+    // REQUIRED fields:
+    "region": "us-east-1", // specify the AWS region your app monitor has been created in
+    "rumAppMonitorId": "<your-app-monitor-id>",
+
+    // OPTIONAL fields:
+    "cognitoIdentityPoolId": "<cognito-identity-pool-id>" // for enhanced auth with Cognito, if your use case necessitates its use
   },
-  "application": {
-    "applicationVersion": "1.0.0"
+
+  // optional attributes that will be appended to all OpenTelemetry application spans and events
+  "applicationAttributes": {
+    "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
   }
 }
 ```
@@ -56,48 +65,31 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 
 ## Configuration Options
 
-### Required Fields
+| Option                                    | Type         | Required | Description                                                                                         | Default | Example                                          |
+|-------------------------------------------|--------------|----------|-----------------------------------------------------------------------------------------------------|---------|--------------------------------------------------|
+| aws.region                                | string       | **Yes**  | AWS region to export telemetry to                                                                   | N/A     | "us-east-1"                                      |
+| aws.rumAppMonitorId                       | string       | **Yes**  | AWS RUM Application Monitor ID                                                                      | N/A     | "00000000-0000-0000-0000-000000000000"           |
+| aws.rumAlias                              | string       | No       | Alias for requests, used with resource-based policies                                               | N/A     | "my-app-alias"                                   |
+| aws.cognitoIdentityPoolId                 | string       | No       | AWS Cognito Identity Pool ID for authentication                                                     | N/A     | "us-east-1:a1b2c3d4-5678-90ab-cdef-EXAMPLE11111" |
+| exportOverride.logs                       | string (URI) | No       | Override export destination for logs. If not specified, will use AWS RUM endpoint for your region   | N/A     | "https://custom-endpoint.com/logs"               |
+| exportOverride.traces                     | string (URI) | No       | Override export destination for traces. If not specified, will use AWS RUM endpoint for your region | N/A     | "https://custom-endpoint.com/traces"             |
+| telemetry.activity.enabled                | boolean      | No       | Enable/disable activity lifecycle monitoring                                                        | true    | true                                             |
+| telemetry.anr.enabled                     | boolean      | No       | Enable/disable ANR detection                                                                        | true    | true                                             |
+| telemetry.crash.enabled                   | boolean      | No       | Enable/disable crash reporting                                                                      | true    | true                                             |
+| telemetry.fragment.enabled                | boolean      | No       | Enable/disable fragment lifecycle monitoring                                                        | true    | true                                             |
+| telemetry.network.enabled                 | boolean      | No       | Enable/disable network state monitoring                                                             | true    | true                                             |
+| telemetry.slow_rendering.enabled          | boolean      | No       | Enable/disable slow UI rendering detection                                                          | true    | true                                             |
+| telemetry.startup.enabled                 | boolean      | No       | Enable/disable application startup monitoring                                                       | true    | true                                             |
+| telemetry.http_urlconnection.enabled      | boolean      | No       | Enable/disable HttpURLConnection monitoring                                                         | true    | true                                             |
+| telemetry.okhttp_3.0.enabled              | boolean      | No       | Enable/disable OkHttp 3.0 monitoring                                                                | true    | true                                             |
+| telemetry.ui_load.enabled                 | boolean      | No       | Enable/disable UI load time monitoring                                                              | true    | true                                             |
+| telemetry.session_events.enabled          | boolean      | No       | Enable/disable session event instrumentation                                                        | true    | true                                             |
+| sessionTimeout                            | integer      | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                              |
+| sessionSampleRate                         | number       | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                              |
+| applicationAttributes                     | object       | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                          |
+| applicationAttributes.application.version | string       | No       | A special application attribute you can add to filter on deployed app versions in RUM console       | N/A     | "1.0.0"                                          |
 
-- `region`: AWS region where your RUM App Monitor is located
-- `appMonitorId`: Your RUM App Monitor ID (UUID format)
-
-### Optional Fields
-
-- `alias`: Human-readable name for your app
-- `sessionInactivityTimeout`: Session timeout in seconds (default: 300)
-- `enabledTelemetry`: Array of telemetry types to collect
-- `addonFeatures`: Additional features like user ID tracking
-
-### Example with All Options
-
-```json
-{
-  "rum": {
-    "region": "us-east-1",
-    "appMonitorId": "12345678-1234-1234-1234-123456789012",
-    "alias": "MyMobileApp",
-    "sessionInactivityTimeout": 600,
-    "enabledTelemetry": [
-      "activity",
-      "fragment",
-      "network",
-      "crash",
-      "anr",
-      "ui_loading"
-    ],
-    "addonFeatures": [
-      "attribute:user.id"
-    ],
-    "overrideEndpoint": {
-      "traces": "https://custom-endpoint.com/v1/traces",
-      "logs": "https://custom-endpoint.com/v1/logs"
-    }
-  },
-  "application": {
-    "applicationVersion": "2.1.0"
-  }
-}
-```
+For the full JSON schema, please refer to [client-config/schema_v1.json](client-config/schema_v1.json)
 
 ## Telemetry Types
 
@@ -111,55 +103,18 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | `ui_loading`     | UI loading performance               |
 | `slow_rendering` | Slow rendering detection             |
 | `startup`        | App startup performance              |
-
-## Architecture
-
-```
-┌─────────────────────────────────────────┐
-│           Your Android App              │
-├─────────────────────────────────────────┤
-│  AwsRumAutoInstrumentationInitializer   │ ← ContentProvider (auto-runs)
-│  ├── AwsRumAppMonitorConfigReader       │ ← Reads aws_config.json
-│  └── OpenTelemetryAgent.Builder         │ ← Configures OpenTelemetry
-├─────────────────────────────────────────┤
-│         OpenTelemetry Android           │ ← Upstream instrumentation
-│  ├── Activity Instrumentation          │
-│  ├── Network Instrumentation           │
-│  ├── Crash Instrumentation             │
-│  └── ANR Instrumentation               │
-├─────────────────────────────────────────┤
-│            OTLP Exporters               │ ← Export to AWS
-│  ├── Span Exporter → RUM Spans         │
-│  └── Log Exporter → RUM Logs           │
-└─────────────────────────────────────────┘
-```
-
-## Advantages over Manual Setup
-
-- **Zero Code**: No need to modify your Application class
-- **Automatic Configuration**: Reads settings from JSON file
-- **Error Handling**: Built-in validation and error handling
-- **AWS Optimized**: Pre-configured for AWS RUM endpoints
-- **Easy Updates**: Configuration changes don't require code changes
-
-## When to Use Manual Setup Instead
-
-Consider using the [core module](../core/) for manual setup if you need:
-
-- Dynamic configuration at runtime
-- Custom authentication mechanisms
-- Advanced OpenTelemetry customization
-- Integration with existing telemetry systems
-- Conditional instrumentation based on app state
+| `http_urlconnection` | HTTP telemetry for HttpUrlConnection client |
+| `okhttp_3.0`     | HTTP telemetry for OkHttp 3.0 client |
 
 ## Troubleshooting
 
 ### No Telemetry Generated
 
 1. Verify `aws_config.json` exists in `res/raw/`
-2. Check that required fields (`region`, `appMonitorId`) are present
+2. Check that required fields (`aws.region`, `aws.rumAppMonitorId`) are present
 3. Ensure your RUM App Monitor exists and is active
-4. Check device network connectivity
+4. Check your auth, if enabled, is correct and writing to the endpoint (either default RUM, or an overriden endpoint)
+5. Check device network connectivity
 
 ### Configuration Errors
 
@@ -173,11 +128,3 @@ Common errors:
 - Missing required fields
 - Invalid JSON syntax
 - Invalid App Monitor ID format
-
-### Performance Impact
-
-The agent is designed for minimal impact:
-- Initializes asynchronously
-- Uses efficient instrumentation
-- Batches telemetry exports
-- Respects Android's background limitations

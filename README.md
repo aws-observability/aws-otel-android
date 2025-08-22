@@ -8,10 +8,10 @@ This repo contains the AWS Distro for OpenTelemetry (ADOT) on Android. It is a b
 1. OpenTelemetry Java SDK (https://github.com/open-telemetry/opentelemetry-java)
 2. OpenTelemetry Android automated instrumentation (https://github.com/open-telemetry/opentelemetry-android)
    - This includes instrumentation for telemetry like ANRs, Crashes, Activity lifecycle, etc
-4. UI component loading instrumentation (for "Time to first draw" telemetry)
+4. Additional automated instrumentation not currently part of upstream OpenTelemetry Android, like the "Time to first draw" telemetry
 5. AWS-specific exporter and auth configuration that works out of the box when exporting telemetry to AWS CloudWatch Real User Monitoring (RUM)
 
-The distro is preconfigured for seamless integration with AWS RUM.
+The distro is preconfigured for seamless integration with [AWS CloudWatch RUM](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM.html).
 
 **Key Benefits:**
 - **Zero-code instrumentation** for most common Android telemetry
@@ -24,12 +24,12 @@ The distro is preconfigured for seamless integration with AWS RUM.
 
 ### 1. Add Dependencies
 
-Add to your app's `build.gradle.kts`:
+Add to your app's `build.gradle`. For a Kotlin DSL example:
 
 ```kotlin
 dependencies {
     // For automatic instrumentation (recommended; see below for programmatic configuration)
-    implementation("software.amazon.opentelemetry.android:agent:LATEST_VERSION")
+    implementation("software.amazon.opentelemetry.android:agent:${LATEST_VERSION}")
 
     // For HTTP instrumentation with ByteBuddy
     byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.12.0-alpha")           // if you are using OkHttp-3.0
@@ -43,20 +43,21 @@ dependencies {
 
 Create `res/raw/aws_config.json`:
 
-```json
+```jsonc
 {
-  "rum": {
-    "region": "us-east-1", // specify the AWS region you wish to monitor
-    "appMonitorId": "<your-app-monitor-id>",
-    "alias": "<your-app-alias>",
+  "aws": {
+    "region": "us-east-1", // specify the AWS region your app monitor has been created in
+    "rumAppMonitorId": "<your-app-monitor-id>",
   },
-  "application": {
-    "applicationVersion": "1.0.0"
+
+  // optional attributes that will be appended to all OpenTelemetry application spans and events
+  "applicationAttributes": {
+    "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
   }
 }
 ```
 
-That's it! The agent will automatically initialize and start collecting telemetry.
+That's it! That's the minimum you need to automatically initialize the Android agent and start collecting telemetry into your RUM app monitor.
 
 #### Option B: Programmatic Configuration
 
