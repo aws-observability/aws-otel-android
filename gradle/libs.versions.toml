@@ -18,7 +18,7 @@ owasp = "12.1.0"
 aws-sdk-kotlin = "1.4.87"
 aws-smithy-kotlin = "1.4.16"
 http-instrumentation = "0.10.0-alpha"
-okhttp = "4.12.0"
+okhttp = "5.1.0"
 
 [libraries]
 opentelemetry-platform-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-instrumentation-alpha" }
