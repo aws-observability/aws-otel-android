@@ -59,9 +59,9 @@ dependencies {
     implementation(project(":aws-runtime:kotlin-sdk-auth"))
 
     // AWS SDK for Kotlin dependencies
-    implementation("aws.sdk.kotlin:s3:1.4.69")
-    implementation("aws.sdk.kotlin:cognitoidentity:1.4.87")
-    implementation("aws.sdk.kotlin:aws-core:1.4.69")
+    implementation("aws.sdk.kotlin:s3:1.5.64")
+    implementation("aws.sdk.kotlin:cognitoidentity:1.5.64")
+    implementation("aws.sdk.kotlin:aws-core:1.5.64")
     
     // OpenTelemetry dependencies
     compileOnly(libs.opentelemetry.api)
@@ -82,15 +82,4 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test:rules:1.6.1")
     coreLibraryDesugaring(libs.desugarJdkLibs)
-}
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            if (requested.group == "com.squareup.okhttp3" && requested.name == "okhttp-jvm") {
-                useTarget("com.squareup.okhttp3:okhttp:${requested.version}")
-                because("choosing okhttp over okhttp-jvm")
-            }
-        }
-    }
 }
