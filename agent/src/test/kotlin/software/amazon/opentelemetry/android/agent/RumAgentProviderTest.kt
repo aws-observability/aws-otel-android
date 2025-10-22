@@ -96,8 +96,10 @@ class RumAgentProviderTest {
         mockkStatic(OtlpHttpLogRecordExporter::class)
         every { OtlpHttpLogRecordExporter.builder() } returns mockDefaultLogRecordExporterBuilder
         every { mockDefaultSpanExporterBuilder.setEndpoint(any()) } returns mockDefaultSpanExporterBuilder
+        every { mockDefaultSpanExporterBuilder.setCompression(any()) } returns mockDefaultSpanExporterBuilder
         every { mockDefaultSpanExporterBuilder.build() } returns mockk()
         every { mockDefaultLogRecordExporterBuilder.setEndpoint(any()) } returns mockDefaultLogRecordExporterBuilder
+        every { mockDefaultLogRecordExporterBuilder.setCompression(any()) } returns mockDefaultLogRecordExporterBuilder
         every { mockDefaultLogRecordExporterBuilder.build() } returns mockk()
 
         mockkObject(AwsSigV4SpanExporter)
@@ -374,6 +376,55 @@ class RumAgentProviderTest {
         // Then
         verify { mockBuilder.setSessionInactivityTimeout(capture(timeoutSlot)) }
         assert(timeoutSlot.captured == Duration.ofSeconds(300))
+    }
+
+    @Test
+    fun `initialize should use configured compression for exporters`() {
+        // Given
+        val exportOverride = ExportOverrideConfig(compression = "gzip")
+        val config = createBasicConfig(exportOverride = exportOverride, cognitoIdentityPoolId = null)
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
+
+        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
+        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
+
+        // When
+        rumAgentProvider.initialize(config, mockBuilder)
+
+        // Then
+        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
+        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
+
+        spanCustomizerSlot.captured.invoke(mockk())
+        logCustomizerSlot.captured.invoke(mockk())
+
+        verify { mockDefaultSpanExporterBuilder.setCompression("gzip") }
+        verify { mockDefaultLogRecordExporterBuilder.setCompression("gzip") }
+    }
+
+    @Test
+    fun `initialize should use default compression when not configured`() {
+        // Given
+        val config = createBasicConfig(cognitoIdentityPoolId = null)
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
+
+        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
+        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
+
+        // When
+        rumAgentProvider.initialize(config, mockBuilder)
+
+        // Then
+        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
+        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
+
+        spanCustomizerSlot.captured.invoke(mockk())
+        logCustomizerSlot.captured.invoke(mockk())
+
+        verify { mockDefaultSpanExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
+        verify { mockDefaultLogRecordExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
     }
 
     private fun createBasicConfig(

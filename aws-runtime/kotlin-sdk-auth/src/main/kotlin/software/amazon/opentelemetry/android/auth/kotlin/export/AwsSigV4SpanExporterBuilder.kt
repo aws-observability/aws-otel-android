@@ -22,6 +22,7 @@ class AwsSigV4SpanExporterBuilder {
     private lateinit var region: String
     private lateinit var serviceName: String
     private lateinit var credentialsProvider: CredentialsProvider
+    private lateinit var compression: String
     private var parentExporter: SpanExporter? = null
 
     fun setEndpoint(endpoint: String): AwsSigV4SpanExporterBuilder {
@@ -49,5 +50,11 @@ class AwsSigV4SpanExporterBuilder {
         return this
     }
 
-    fun build(): AwsSigV4SpanExporter = AwsSigV4SpanExporter(endpoint, region, serviceName, credentialsProvider, parentExporter)
+    fun setCompression(compressionMethod: String): AwsSigV4SpanExporterBuilder {
+        this.compression = compressionMethod
+        return this
+    }
+
+    fun build(): AwsSigV4SpanExporter =
+        AwsSigV4SpanExporter(endpoint, region, serviceName, credentialsProvider, compression, parentExporter)
 }

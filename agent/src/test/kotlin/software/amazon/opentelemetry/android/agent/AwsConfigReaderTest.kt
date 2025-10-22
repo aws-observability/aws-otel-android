@@ -218,4 +218,33 @@ class AwsConfigReaderTest {
             result?.sessionTimeout,
         )
     }
+
+    @Test
+    fun `test should read compression from exportOverride config`() {
+        val validJson =
+            """
+            {
+                "aws": {
+                    "region": "us-east-1",
+                    "rumAppMonitorId": "testing"
+                },
+                "exportOverride": {
+                    "compression": "gzip"
+                }
+            }
+            """.trimIndent()
+        `when`(mockResources.getIdentifier("aws_config", "string", "test.package"))
+            .thenReturn(0)
+        `when`(mockResources.getIdentifier("aws_config", "raw", "test.package"))
+            .thenReturn(456)
+        `when`(mockResources.openRawResource(456))
+            .thenReturn(ByteArrayInputStream(validJson.toByteArray(StandardCharsets.UTF_8)))
+
+        // When
+        val result = AwsConfigReader.readConfig(mockContext)
+
+        // Then
+        assertNotNull(result)
+        assertEquals("gzip", result?.exportOverride?.compression)
+    }
 }

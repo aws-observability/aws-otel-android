@@ -37,6 +37,7 @@ class AwsSigV4LogRecordExporter(
     private val region: String,
     private val serviceName: String,
     private val credentialsProvider: CredentialsProvider,
+    private val compression: String,
     defaultParentExporter: LogRecordExporter? = null,
 ) : LogRecordExporter {
     companion object {
@@ -62,6 +63,7 @@ class AwsSigV4LogRecordExporter(
             .setMemoryMode(MemoryMode.IMMUTABLE_DATA)
             .setEndpoint(endpoint)
             .setHeaders(AwsSigV4AuthHeaderSupplier())
+            .setCompression(compression)
             .build()
 
     inner class AwsSigV4AuthHeaderSupplier : Supplier<Map<String, String>> {

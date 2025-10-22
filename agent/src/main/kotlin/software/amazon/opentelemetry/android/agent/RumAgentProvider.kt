@@ -32,6 +32,10 @@ import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExpo
 import java.time.Duration
 
 internal class RumAgentProvider : ContentProvider() {
+    companion object {
+        const val DEFAULT_COMPRESSION = "none"
+    }
+
     /**
      * Run the ContentProvider onCreate hook, which should begin before the application start
      */
@@ -148,11 +152,13 @@ internal class RumAgentProvider : ContentProvider() {
                 OtlpHttpSpanExporter
                     .builder()
                     .setEndpoint(AwsConfigReader.getTracesEndpoint(config))
+                    .setCompression(config.exportOverride?.compression ?: DEFAULT_COMPRESSION)
                     .build()
             }.addLogRecordExporterCustomizer { _ ->
                 OtlpHttpLogRecordExporter
                     .builder()
                     .setEndpoint(AwsConfigReader.getLogsEndpoint(config))
+                    .setCompression(config.exportOverride?.compression ?: DEFAULT_COMPRESSION)
                     .build()
             }
     }
