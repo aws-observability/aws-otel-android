@@ -17,7 +17,7 @@ package software.amazon.opentelemetry.android.uiload.activity
 import android.app.Activity
 import android.view.View
 import io.opentelemetry.android.common.RumConstants
-import io.opentelemetry.android.instrumentation.common.ScreenNameExtractor
+import io.opentelemetry.android.instrumentation.common.DefaultScreenNameExtractor
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
@@ -51,7 +51,7 @@ class ActivityLoadTracer(
         val span = spanBuilder.startSpan()
         span.setAttribute<String?>(
             RumConstants.SCREEN_NAME_KEY,
-            ScreenNameExtractor.DEFAULT.extract(activity),
+            DefaultScreenNameExtractor.extract(activity),
         )
         getTracer(activity).span = span
         return span

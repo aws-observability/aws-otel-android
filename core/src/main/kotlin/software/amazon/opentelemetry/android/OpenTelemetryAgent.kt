@@ -64,6 +64,8 @@ class OpenTelemetryAgent(
         delegate.emitEvent(eventName, body, attributes)
     }
 
+    override fun shutdown() { }
+
     class Builder constructor(
         private val application: Application,
     ) {
