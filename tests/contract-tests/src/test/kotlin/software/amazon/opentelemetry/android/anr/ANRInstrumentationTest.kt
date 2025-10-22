@@ -21,32 +21,34 @@ import software.amazon.opentelemetry.android.OtlpResolver
 import software.amazon.opentelemetry.android.ParsedOtlpData
 import software.amazon.opentelemetry.android.getValue
 import software.amazon.opentelemetry.android.has
-import software.amazon.opentelemetry.android.scopeSpans
-import software.amazon.opentelemetry.android.spans
+import software.amazon.opentelemetry.android.logRecords
+import software.amazon.opentelemetry.android.scopeLogs
 
 @ExtendWith(OtlpResolver::class)
 class ANRInstrumentationTest {
     companion object {
+        const val ANR_SCOPE = "io.opentelemetry.anr"
+        const val ANR_EVENT_NAME = "device.anr"
         const val EXCEPTION_STACK_TRACE_ATTR = "exception.stacktrace"
-        const val SCREEN_NAME_ATTR = "screen.name"
     }
 
     @Test
     fun `ANR span is created`(data: ParsedOtlpData) {
-        val scopeSpans = data.traces.scopeSpans("io.opentelemetry.anr")
-        val spans = scopeSpans.spans("ANR")
+        val scopeLogs = data.logs.scopeLogs(ANR_SCOPE)
+        val logRecords = scopeLogs.logRecords()
+        val anrLogs = logRecords.filter { it.eventName == ANR_EVENT_NAME }
 
-        Assertions.assertTrue(spans.isNotEmpty(), "Spans collection should not be empty")
+        Assertions.assertTrue(anrLogs.isNotEmpty(), "Logs collection should not be empty")
 
         Assertions.assertTrue(
-            spans.all { span ->
-                span.attributes.has(EXCEPTION_STACK_TRACE_ATTR)
+            anrLogs.all { log ->
+                log.attributes.has(EXCEPTION_STACK_TRACE_ATTR)
             },
         )
 
         Assertions.assertTrue(
-            spans.any { span ->
-                span.attributes
+            anrLogs.any { log ->
+                log.attributes
                     .getValue(EXCEPTION_STACK_TRACE_ATTR)
                     .stringValue!!
                     .contains("onFinish")
