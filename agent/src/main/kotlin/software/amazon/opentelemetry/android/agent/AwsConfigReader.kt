@@ -37,6 +37,7 @@ internal data class AwsConfig(
 internal data class ExportOverrideConfig(
     val traces: String? = null,
     val logs: String? = null,
+    val compression: String = "none",
 )
 
 @Serializable

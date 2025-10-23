@@ -44,6 +44,7 @@ class AwsSigV4SpanExporterTest : AuthTestBase() {
                 .setRegion("us-east-1")
                 .setCredentialsProvider(credentialsProvider)
                 .setServiceName("rum")
+                .setCompression("gzip")
                 .setParentExporter(mockParentExporter)
                 .build()
 

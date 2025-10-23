@@ -22,6 +22,7 @@ class AwsSigV4LogRecordExporterBuilder {
     private lateinit var region: String
     private lateinit var serviceName: String
     private lateinit var credentialsProvider: CredentialsProvider
+    private lateinit var compression: String
     private var parentExporter: LogRecordExporter? = null
 
     fun setEndpoint(endpoint: String): AwsSigV4LogRecordExporterBuilder {
@@ -49,5 +50,11 @@ class AwsSigV4LogRecordExporterBuilder {
         return this
     }
 
-    fun build(): AwsSigV4LogRecordExporter = AwsSigV4LogRecordExporter(endpoint, region, serviceName, credentialsProvider, parentExporter)
+    fun setCompression(compressionMethod: String): AwsSigV4LogRecordExporterBuilder {
+        this.compression = compressionMethod
+        return this
+    }
+
+    fun build(): AwsSigV4LogRecordExporter =
+        AwsSigV4LogRecordExporter(endpoint, region, serviceName, credentialsProvider, compression, parentExporter)
 }

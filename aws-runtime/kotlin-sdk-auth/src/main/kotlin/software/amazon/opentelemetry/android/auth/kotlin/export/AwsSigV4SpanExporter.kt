@@ -37,6 +37,7 @@ class AwsSigV4SpanExporter(
     private val region: String,
     private val serviceName: String,
     private val credentialsProvider: CredentialsProvider,
+    private val compression: String,
     defaultParentExporter: SpanExporter? = null,
 ) : SpanExporter {
     companion object {
@@ -62,6 +63,7 @@ class AwsSigV4SpanExporter(
             .setMemoryMode(MemoryMode.IMMUTABLE_DATA)
             .setEndpoint(endpoint)
             .setHeaders(AwsSigV4AuthHeaderSupplier())
+            .setCompression(compression)
             .build()
 
     /**

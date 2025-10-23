@@ -47,6 +47,15 @@
           "type": "string",
           "format": "uri",
           "description": "Override the export destination for otel Traces"
+        },
+        "compression": {
+          "type": "string",
+          "enum": [
+            "none",
+            "gzip"
+          ],
+          "description": "The method used to compress exported payloads",
+          "default": "none"
         }
       }
     },
