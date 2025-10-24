@@ -34,6 +34,7 @@ data class Value(
     val stringValue: String? = null,
     val doubleValue: Double? = null,
     val intValue: String? = null,
+    val arrayValue: List<Value>? = null,
 )
 
 @Serializable

@@ -23,6 +23,8 @@ import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
+import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
@@ -84,6 +86,8 @@ class OpenTelemetryAgent(
         private var enabledTelemetry: MutableList<TelemetryConfig>? = null
         private var enabledFeatures: MutableList<FeatureConfig>? = null
         private var customApplicationAttributes: Map<String, String>? = null
+        private var capturedRequestHeaders: List<String>? = null
+        private var capturedResponseHeaders: List<String>? = null
 
         /**
          * Point the Agent to an AppMonitor resource in AWS Real User Monitoring.
@@ -184,6 +188,16 @@ class OpenTelemetryAgent(
             return this
         }
 
+        fun setCapturedRequestHeaders(headers: List<String>): Builder {
+            this.capturedRequestHeaders = headers
+            return this
+        }
+
+        fun setCapturedResponseHeaders(headers: List<String>): Builder {
+            this.capturedResponseHeaders = headers
+            return this
+        }
+
         fun build(): OpenTelemetryAgent {
             if (awsRumAppMonitorConfig == null) {
                 throw IllegalStateException("Cannot build OpenTelemetryAgent without an AwsRumAppMonitorConfig")
@@ -220,6 +234,22 @@ class OpenTelemetryAgent(
 
             if (telemetry.find { it.configFlag == TelemetryConfig.SDK_INITIALIZATION_EVENTS.configFlag } == null) {
                 otelRumConfig.disableSdkInitializationEvents()
+            }
+
+            // Set captured request/response headers
+            val responseHeaders = capturedResponseHeaders?.toMutableList()
+            val requestHeaders = capturedRequestHeaders?.toMutableList()
+            if (responseHeaders != null || requestHeaders != null) {
+                telemetry.forEach { telemetry ->
+                    if (telemetry.instrumentation is HttpUrlInstrumentation) {
+                        telemetry.instrumentation.capturedRequestHeaders = requestHeaders ?: mutableListOf()
+                        telemetry.instrumentation.capturedResponseHeaders = responseHeaders ?: mutableListOf()
+                    }
+                    if (telemetry.instrumentation is OkHttpInstrumentation) {
+                        telemetry.instrumentation.capturedRequestHeaders = requestHeaders ?: mutableListOf()
+                        telemetry.instrumentation.capturedResponseHeaders = responseHeaders ?: mutableListOf()
+                    }
+                }
             }
 
             // Special attributes from AttributesProvidingFeatures

@@ -122,6 +122,16 @@ fun Span.getAttributes(keyName: String): Attribute =
         .filter { it.key == keyName }
         .first()
 
+fun Span.hasAttribute(keyName: String): Boolean =
+    this
+        .attributes
+        .find { it.key == keyName } != null
+
+fun Span.lacksAttribute(keyName: String): Boolean =
+    this
+        .attributes
+        .find { it.key == keyName } == null
+
 @JvmName("spanToAttributes")
 fun List<Span>.attributes(keyName: String): Attribute =
     this

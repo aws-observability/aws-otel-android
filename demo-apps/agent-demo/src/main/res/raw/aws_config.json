@@ -16,8 +16,11 @@
     "network": { "enabled": true },
     "slowRendering": { "enabled": true },
     "startup": { "enabled": true },
-    "httpUrlConnection": { "enabled": true },
-    "okHttp3": { "enabled": true },
+    "http": {
+      "enabled": true,
+      "capturedRequestHeaders": ["request-header"],
+      "capturedResponseHeaders": ["response-header"]
+    },
     "uiLoad": { "enabled": true },
     "sessionEvents": { "enabled": true }
   },

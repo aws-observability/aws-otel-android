@@ -98,15 +98,22 @@
           "description": "Configure application startup monitoring",
           "properties": { "enabled": { "type": "boolean" } }
         },
-        "http_urlconnection": {
+        "http": {
           "type": "object",
-          "description": "Configure HttpURLConnection monitoring",
-          "properties": { "enabled": { "type": "boolean" } }
-        },
-        "okhttp_3.0": {
-          "type": "object",
-          "description": "Configure OkHttp 3.0 monitoring",
-          "properties": { "enabled": { "type": "boolean" } }
+          "description": "Configure HTTP request monitoring through HttpURLConnection and OkHttp3",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "capturedRequestHeaders": {
+              "type": "array",
+              "description": "The HTTP request headers that will be captured under the `http.request.header.<name>` attributes",
+              "items": { "type": "string" }
+            },
+            "capturedResponseHeaders": {
+              "type": "array",
+              "description": "The HTTP response headers that will be captured under the `http.response.header.<name>` attributes",
+              "items": { "type": "string" }
+            }
+          }
         },
         "ui_load": {
           "type": "object",

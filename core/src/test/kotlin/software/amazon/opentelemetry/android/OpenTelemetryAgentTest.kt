@@ -116,6 +116,8 @@ class OpenTelemetryAgentTest {
 
         val spanExporterCustomizer: (SpanExporter) -> SpanExporter = { spanExporter }
         val logExporterCustomizer: (LogRecordExporter) -> LogRecordExporter = { logRecordExporter }
+        val requestHeaders = listOf("Authorization", "X-Custom-Header")
+        val responseHeaders = listOf("Content-Type", "X-Response-Header")
 
         OpenTelemetryAgent
             .Builder(application)
@@ -134,7 +136,9 @@ class OpenTelemetryAgentTest {
                 mapOf(
                     "app.test" to "123",
                 ),
-            ).build()
+            ).setCapturedRequestHeaders(requestHeaders)
+            .setCapturedResponseHeaders(responseHeaders)
+            .build()
 
         // Validate the expected delegate builder
         verify(exactly = 1) {
@@ -160,6 +164,22 @@ class OpenTelemetryAgentTest {
             )
             delegateBuilder.addInstrumentation(TelemetryConfig.ACTIVITY.instrumentation!!)
             delegateBuilder.addInstrumentation(TelemetryConfig.ANR.instrumentation!!)
+        }
+
+        // Verify captured headers are set on HTTP instrumentations
+        verify(atLeast = 1) {
+            delegateBuilder.addInstrumentation(
+                withArg {
+                    if (it is io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation) {
+                        Assertions.assertEquals(requestHeaders, it.capturedRequestHeaders)
+                        Assertions.assertEquals(responseHeaders, it.capturedResponseHeaders)
+                    }
+                    if (it is io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation) {
+                        Assertions.assertEquals(requestHeaders, it.capturedRequestHeaders)
+                        Assertions.assertEquals(responseHeaders, it.capturedResponseHeaders)
+                    }
+                },
+            )
         }
 
         val attributes = otelRumConfig.captured.globalAttributesSupplier.get()
