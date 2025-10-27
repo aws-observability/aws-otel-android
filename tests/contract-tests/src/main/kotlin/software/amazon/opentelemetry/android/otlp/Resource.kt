@@ -39,7 +39,7 @@ data class Value(
 
 @Serializable
 data class ArrayValue(
-    val values: List<Value>
+    val values: List<Value>,
 )
 
 @Serializable

@@ -180,6 +180,7 @@ class HttpInstrumentationTest {
                 span
                     .getAttributes("http.request.header.${EXPECTED_REQUEST_HEADER}")
                     .value.arrayValue!!
+                    .values
                     .first()
                     .stringValue ==
                     EXPECTED_HEADER_VALUE
@@ -190,6 +191,7 @@ class HttpInstrumentationTest {
                 span
                     .getAttributes("http.response.header.${EXPECTED_RESPONSE_HEADER}")
                     .value.arrayValue!!
+                    .values
                     .first()
                     .stringValue ==
                     EXPECTED_HEADER_VALUE
