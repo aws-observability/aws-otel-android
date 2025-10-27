@@ -34,7 +34,12 @@ data class Value(
     val stringValue: String? = null,
     val doubleValue: Double? = null,
     val intValue: String? = null,
-    val arrayValue: List<Value>? = null,
+    val arrayValue: ArrayValue? = null,
+)
+
+@Serializable
+data class ArrayValue(
+    val values: List<Value>
 )
 
 @Serializable
