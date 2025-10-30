@@ -17,5 +17,7 @@ package software.amazon.opentelemetry.android.uiload.utils
 import android.os.Build
 
 object CommonUtils {
+    const val FIRST_DRAW_SPAN = "app.screen.time_to_first_draw"
+
     fun getVersionSDKInt(): Int = Build.VERSION.SDK_INT
 }

@@ -54,11 +54,11 @@ class ActivityLoadCallbackTest {
         val bundle = mock<Bundle>(Bundle::class.java)
         val drawCallbackSlot = slot<(View) -> Unit>()
         every { firstDrawListener.registerFirstDraw(activity, capture(drawCallbackSlot)) } just runs
-        every { tracers.startSpan(activity, "TimeToFirstDraw") } returns mockk<Span>()
+        every { tracers.startSpan(activity, "app.screen.time_to_first_draw") } returns mockk<Span>()
         every { tracers.endSpan(activity, any()) } just runs
 
         activityLoadCallback.onActivityPreCreated(activity, bundle)
-        verify { tracers.startSpan(activity, "TimeToFirstDraw") }
+        verify { tracers.startSpan(activity, "app.screen.time_to_first_draw") }
 
         verify { firstDrawListener.registerFirstDraw(activity, any()) }
 
@@ -78,8 +78,8 @@ class ActivityLoadCallbackTest {
         activityLoadCallback.onActivityPreCreated(activity1, null)
         activityLoadCallback.onActivityPreCreated(activity2, null)
 
-        verify(exactly = 1) { tracers.startSpan(activity1, "TimeToFirstDraw") }
-        verify(exactly = 1) { tracers.startSpan(activity2, "TimeToFirstDraw") }
+        verify(exactly = 1) { tracers.startSpan(activity1, "app.screen.time_to_first_draw") }
+        verify(exactly = 1) { tracers.startSpan(activity2, "app.screen.time_to_first_draw") }
         verify(exactly = 1) { firstDrawListener.registerFirstDraw(activity1, any()) }
         verify(exactly = 1) { firstDrawListener.registerFirstDraw(activity2, any()) }
     }

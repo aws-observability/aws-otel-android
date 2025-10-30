@@ -28,7 +28,7 @@ import software.amazon.opentelemetry.android.spans
 class UILoadContractTest {
     companion object {
         const val SCOPE_NAME = "software.amazon.opentelemetry.ui-loading"
-        const val SPAN_NAME = "TimeToFirstDraw"
+        const val SPAN_NAME = "app.screen.time_to_first_draw"
     }
 
     @Test
