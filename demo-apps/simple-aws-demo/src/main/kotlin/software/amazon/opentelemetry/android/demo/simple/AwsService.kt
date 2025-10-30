@@ -15,40 +15,28 @@
 package software.amazon.opentelemetry.android.demo.simple
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
-import aws.sdk.kotlin.services.cognitoidentity.CognitoIdentityClient
-import aws.sdk.kotlin.services.cognitoidentity.model.GetCredentialsForIdentityRequest
-import aws.sdk.kotlin.services.cognitoidentity.model.GetIdRequest
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.Bucket
 import aws.sdk.kotlin.services.s3.model.ListBucketsRequest
 import aws.smithy.kotlin.runtime.auth.awscredentials.CredentialsProvider
-import software.amazon.opentelemetry.android.auth.CognitoCachedCredentialsProvider
 
 /**
  * Service class to handle AWS API calls
  */
 class AwsService(
-    private val cognitoPoolId: String,
     private val awsRegion: String
 ) {
 
-    private val cognitoClient = CognitoIdentityClient {
-        this.region = awsRegion
-    }
-
-    val cognitoCredentialsProvider = CognitoCachedCredentialsProvider(
-        cognitoPoolId = cognitoPoolId,
-        cognitoClient = cognitoClient,
-    )
-
     /**
      * List S3 buckets
+     * Note: This requires proper AWS credentials to be configured
      */
     suspend fun listS3Buckets(): List<Bucket> {
-        // Create S3 client
+        // Create S3 client with default credentials provider
         val s3Client = S3Client {
             region = awsRegion
-            credentialsProvider = cognitoCredentialsProvider
+            // Note: You'll need to configure proper credentials
+            // This could be through cognito or some other custom credentials provider
         }
         
         // List buckets
@@ -57,11 +45,4 @@ class AwsService(
         // Return the buckets
         return response.buckets ?: emptyList()
     }
-
-    suspend fun getCognitoIdentityId(): String {
-        return cognitoClient.getId(GetIdRequest {
-            this.identityPoolId = cognitoPoolId
-        }).identityId!!
-    }
-
 }

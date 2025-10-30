@@ -45,12 +45,6 @@ class SecondActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySecondBinding
     private val TAG = "SecondActivity"
 
-    // Replace these with your actual AWS credentials and configuration
-    private val cognitoPoolId = "us-east-1:<ID>" // Replace with your Cognito Identity Pool ID
-    private val awsRegion = "us-east-1" // Replace with your AWS region
-
-    private lateinit var awsService: AwsService
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySecondBinding.inflate(layoutInflater)
@@ -78,7 +72,6 @@ class SecondActivity : AppCompatActivity() {
             screenName = this.javaClass.simpleName
         ) {
             parent ->
-                awsService = AwsService(cognitoPoolId, awsRegion)
                 AwsRum.executeSpan(
                     name = "custom-child-span",
                     screenName = this.javaClass.simpleName,
@@ -90,10 +83,6 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        binding.listS3BucketsButton.setOnClickListener { listS3Buckets() }
-
-        binding.getCognitoIdentityButton.setOnClickListener { getCognitoIdentity() }
-
         binding.buttonReturn.setOnClickListener {
             Log.d(TAG, "Returning to MainActivity")
             finish()
@@ -137,52 +126,6 @@ class SecondActivity : AppCompatActivity() {
 
     private fun crashApplicationTest() {
         throw CustomException("Testing Exception")
-    }
-
-    private fun listS3Buckets() {
-        lifecycleScope.launch {
-            try {
-                binding.resultTextView.text = "Loading S3 buckets..."
-                val result =
-                        withContext(Dispatchers.IO) {
-                            val buckets = awsService.listS3Buckets()
-
-                            // Build a string with bucket information
-                            val sb = StringBuilder("S3 Buckets:\n\n")
-                            buckets.forEach { bucket ->
-                                sb.append("- ${bucket.name} (Created: ${bucket.creationDate})\n")
-                            }
-                            sb.toString()
-                        }
-
-                binding.resultTextView.text = result
-            } catch (e: Exception) {
-                Log.e(TAG, "Error listing S3 buckets", e)
-                binding.resultTextView.text = "Error listing S3 buckets: ${e.message}"
-                Toast.makeText(this@SecondActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                        .show()
-            }
-        }
-    }
-
-    private fun getCognitoIdentity() {
-        lifecycleScope.launch {
-            try {
-                binding.resultTextView.text = "Fetching Cognito identity..."
-                val result =
-                        withContext(Dispatchers.IO) {
-                            val identityId = awsService.getCognitoIdentityId()
-                            "Cognito Identity ID: $identityId"
-                        }
-
-                binding.resultTextView.text = result
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting Cognito identity", e)
-                binding.resultTextView.text = "Error getting Cognito identity: ${e.message}"
-                Toast.makeText(this@SecondActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                        .show()
-            }
-        }
     }
 
     private fun makeHttpCall() {

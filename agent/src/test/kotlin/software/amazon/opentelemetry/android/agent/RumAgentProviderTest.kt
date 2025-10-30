@@ -16,7 +16,6 @@ package software.amazon.opentelemetry.android.agent
 
 import android.os.Looper
 import android.util.Log
-import aws.sdk.kotlin.services.cognitoidentity.CognitoIdentityClient
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -41,10 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
 import software.amazon.opentelemetry.android.TelemetryConfig
-import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4LogRecordExporter
-import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4LogRecordExporterBuilder
-import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporter
-import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporterBuilder
 import java.time.Duration
 
 @ExtendWith(MockKExtension::class)
@@ -60,12 +55,6 @@ class RumAgentProviderTest {
 
     @MockK
     private lateinit var mockDefaultLogRecordExporterBuilder: OtlpHttpLogRecordExporterBuilder
-
-    @MockK
-    private lateinit var mockAuthSpanExporterBuilder: AwsSigV4SpanExporterBuilder
-
-    @MockK
-    private lateinit var mockAuthLogRecordExporterBuilder: AwsSigV4LogRecordExporterBuilder
 
     private lateinit var rumAgentProvider: RumAgentProvider
 
@@ -101,21 +90,6 @@ class RumAgentProviderTest {
         every { mockDefaultLogRecordExporterBuilder.setEndpoint(any()) } returns mockDefaultLogRecordExporterBuilder
         every { mockDefaultLogRecordExporterBuilder.setCompression(any()) } returns mockDefaultLogRecordExporterBuilder
         every { mockDefaultLogRecordExporterBuilder.build() } returns mockk()
-
-        mockkObject(AwsSigV4SpanExporter)
-        every { AwsSigV4SpanExporter.builder() } returns mockAuthSpanExporterBuilder
-        mockkObject(AwsSigV4LogRecordExporter)
-        every { AwsSigV4LogRecordExporter.builder() } returns mockAuthLogRecordExporterBuilder
-        every { mockAuthSpanExporterBuilder.setRegion(any()) } returns mockAuthSpanExporterBuilder
-        every { mockAuthSpanExporterBuilder.setEndpoint(any()) } returns mockAuthSpanExporterBuilder
-        every { mockAuthSpanExporterBuilder.setServiceName(any()) } returns mockAuthSpanExporterBuilder
-        every { mockAuthSpanExporterBuilder.setCredentialsProvider(any()) } returns mockAuthSpanExporterBuilder
-        every { mockAuthSpanExporterBuilder.build() } returns mockk()
-        every { mockAuthLogRecordExporterBuilder.setRegion(any()) } returns mockAuthLogRecordExporterBuilder
-        every { mockAuthLogRecordExporterBuilder.setEndpoint(any()) } returns mockAuthLogRecordExporterBuilder
-        every { mockAuthLogRecordExporterBuilder.setServiceName(any()) } returns mockAuthLogRecordExporterBuilder
-        every { mockAuthLogRecordExporterBuilder.setCredentialsProvider(any()) } returns mockAuthLogRecordExporterBuilder
-        every { mockAuthLogRecordExporterBuilder.build() } returns mockk()
     }
 
     @AfterEach
@@ -161,9 +135,9 @@ class RumAgentProviderTest {
     }
 
     @Test
-    fun `initialize should configure default exporters when cognito not configured`() {
+    fun `initialize should configure default exporters when no special auth configured`() {
         // Given
-        val config = createBasicConfig(cognitoIdentityPoolId = null)
+        val config = createBasicConfig()
         val tracesEndpoint = "https://traces.endpoint.com"
         val logsEndpoint = "https://logs.endpoint.com"
         every { AwsConfigReader.getTracesEndpoint(config) } returns tracesEndpoint
@@ -185,36 +159,6 @@ class RumAgentProviderTest {
 
         Assertions.assertTrue(spanExporter is OtlpHttpSpanExporter)
         Assertions.assertTrue(logExporter is OtlpHttpLogRecordExporter)
-    }
-
-    @Test
-    fun `initialize should configure default exporters when cognito IS configured`() {
-        // Given
-        val config = createBasicConfig(cognitoIdentityPoolId = "test-cognito-123")
-        val tracesEndpoint = "https://traces.endpoint.com"
-        val logsEndpoint = "https://logs.endpoint.com"
-        every { AwsConfigReader.getTracesEndpoint(config) } returns tracesEndpoint
-        every { AwsConfigReader.getLogsEndpoint(config) } returns logsEndpoint
-
-        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
-        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
-
-        mockkObject(CognitoIdentityClient)
-        every { CognitoIdentityClient.invoke(any()) } returns mockk<CognitoIdentityClient>()
-
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
-
-        // Then
-        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
-        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
-
-        // Validate that the customizers create the correct exporter types
-        val spanExporter = spanCustomizerSlot.captured.invoke(mockk())
-        val logExporter = logCustomizerSlot.captured.invoke(mockk())
-
-        Assertions.assertTrue(spanExporter is AwsSigV4SpanExporter)
-        Assertions.assertTrue(logExporter is AwsSigV4LogRecordExporter)
     }
 
     @Test
@@ -382,7 +326,7 @@ class RumAgentProviderTest {
     fun `initialize should use configured compression for exporters`() {
         // Given
         val exportOverride = ExportOverrideConfig(compression = "gzip")
-        val config = createBasicConfig(exportOverride = exportOverride, cognitoIdentityPoolId = null)
+        val config = createBasicConfig(exportOverride = exportOverride)
         every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
         every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
@@ -406,7 +350,7 @@ class RumAgentProviderTest {
     @Test
     fun `initialize should use default compression when not configured`() {
         // Given
-        val config = createBasicConfig(cognitoIdentityPoolId = null)
+        val config = createBasicConfig()
         every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
         every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
@@ -431,7 +375,6 @@ class RumAgentProviderTest {
         region: String = "us-east-1",
         rumAppMonitorId: String = "test-app-monitor-id",
         rumAlias: String? = "test-alias",
-        cognitoIdentityPoolId: String? = null,
         sessionTimeout: Int = 300,
         telemetryConfigs: TelemetryConfigs? = null,
         exportOverride: ExportOverrideConfig? = null,
@@ -442,7 +385,6 @@ class RumAgentProviderTest {
                 region = region,
                 rumAppMonitorId = rumAppMonitorId,
                 rumAlias = rumAlias,
-                cognitoIdentityPoolId = cognitoIdentityPoolId,
             )
         return AgentConfig(
             aws = awsConfig,

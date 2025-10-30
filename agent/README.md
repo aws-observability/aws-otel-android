@@ -35,9 +35,6 @@ Create `res/raw/aws_config.json`:
     // REQUIRED fields:
     "region": "us-east-1", // specify the AWS region your app monitor has been created in
     "rumAppMonitorId": "<your-app-monitor-id>",
-
-    // OPTIONAL fields:
-    "cognitoIdentityPoolId": "<cognito-identity-pool-id>" // for enhanced auth with Cognito, if your use case necessitates its use
   },
 
   // optional attributes that will be appended to all OpenTelemetry application spans and events
@@ -70,7 +67,6 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | aws.region                                | string       | **Yes**  | AWS region to export telemetry to                                                                   | N/A     | "us-east-1"                                      |
 | aws.rumAppMonitorId                       | string       | **Yes**  | AWS RUM Application Monitor ID                                                                      | N/A     | "00000000-0000-0000-0000-000000000000"           |
 | aws.rumAlias                              | string       | No       | Alias for requests, used with resource-based policies                                               | N/A     | "my-app-alias"                                   |
-| aws.cognitoIdentityPoolId                 | string       | No       | AWS Cognito Identity Pool ID for authentication                                                     | N/A     | "us-east-1:a1b2c3d4-5678-90ab-cdef-EXAMPLE11111" |
 | exportOverride.logs                       | string (URI) | No       | Override export destination for logs. If not specified, will use AWS RUM endpoint for your region   | N/A     | "https://custom-endpoint.com/logs"               |
 | exportOverride.traces                     | string (URI) | No       | Override export destination for traces. If not specified, will use AWS RUM endpoint for your region | N/A     | "https://custom-endpoint.com/traces"             |
 | exportOverride.compression                | string       | No       | The method used to compress exported payloads. Must be "gzip" or "none"                             | "none"  | "gzip" or "none"                                 |
