@@ -40,6 +40,13 @@ internal data class ExportOverrideConfig(
 )
 
 @Serializable
+internal data class HttpTelemetryOption(
+    val enabled: Boolean,
+    val capturedRequestHeaders: List<String>? = null,
+    val capturedResponseHeaders: List<String>? = null,
+)
+
+@Serializable
 internal data class TelemetryConfigs(
     val activity: TelemetryOption? = null,
     val anr: TelemetryOption? = null,
@@ -48,8 +55,7 @@ internal data class TelemetryConfigs(
     val network: TelemetryOption? = null,
     val slowRendering: TelemetryOption? = null,
     val startup: TelemetryOption? = null,
-    val httpUrlConnection: TelemetryOption? = null,
-    val okHttp3: TelemetryOption? = null,
+    val http: HttpTelemetryOption? = null,
     val uiLoad: TelemetryOption? = null,
     val sessionEvents: TelemetryOption? = null,
 )

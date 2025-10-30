@@ -90,13 +90,19 @@ internal class RumAgentProvider : ContentProvider() {
                     TelemetryConfig.NETWORK.takeIf { telemetry.network?.enabled == true },
                     TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering?.enabled == true },
                     TelemetryConfig.STARTUP.takeIf { telemetry.startup?.enabled == true },
-                    TelemetryConfig.HTTP_URLCONNECTION.takeIf {
-                        telemetry.httpUrlConnection?.enabled == true
-                    },
-                    TelemetryConfig.OKHTTP_3.takeIf { telemetry.okHttp3?.enabled == true },
+                    TelemetryConfig.HTTP_URLCONNECTION.takeIf { telemetry.http?.enabled == true },
+                    TelemetryConfig.OKHTTP_3.takeIf { telemetry.http?.enabled == true },
                     TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad?.enabled == true },
                 )
             builder.setEnabledTelemetry(enabledTelemetries)
+            if (telemetry.http?.enabled == true) {
+                if (telemetry.http.capturedResponseHeaders != null) {
+                    builder.setCapturedResponseHeaders(telemetry.http.capturedResponseHeaders)
+                }
+                if (telemetry.http.capturedRequestHeaders != null) {
+                    builder.setCapturedRequestHeaders(telemetry.http.capturedRequestHeaders)
+                }
+            }
         }
 
         config.applicationAttributes?.let { attributes ->

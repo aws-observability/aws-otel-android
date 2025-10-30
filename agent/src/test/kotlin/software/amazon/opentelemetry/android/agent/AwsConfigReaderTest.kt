@@ -57,8 +57,7 @@ class AwsConfigReaderTest {
             "network": { "enabled": true },
             "slowRendering": { "enabled": true },
             "startup": { "enabled": true },
-            "httpUrlConnection": { "enabled": true },
-            "okHttp3": { "enabled": true },
+            "http": { "enabled": true },
             "uiLoad": { "enabled": true }
           },
           "sessionTimeout": 100,

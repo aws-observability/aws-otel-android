@@ -173,8 +173,7 @@ class RumAgentProviderTest {
                 network = TelemetryOption(enabled = true),
                 slowRendering = TelemetryOption(enabled = true),
                 startup = TelemetryOption(enabled = true),
-                httpUrlConnection = TelemetryOption(enabled = true),
-                okHttp3 = TelemetryOption(enabled = true),
+                http = HttpTelemetryOption(enabled = true),
                 uiLoad = TelemetryOption(enabled = true),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
@@ -211,8 +210,7 @@ class RumAgentProviderTest {
                 network = TelemetryOption(enabled = true),
                 slowRendering = null, // not configured
                 startup = null, // not configured
-                httpUrlConnection = TelemetryOption(enabled = false),
-                okHttp3 = TelemetryOption(enabled = true),
+                http = HttpTelemetryOption(enabled = false),
                 uiLoad = TelemetryOption(enabled = false),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
@@ -224,11 +222,10 @@ class RumAgentProviderTest {
         // Then
         verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
         val enabledTelemetries = telemetrySlot.captured
-        assert(enabledTelemetries.size == 4)
+        assert(enabledTelemetries.size == 3)
         assert(enabledTelemetries.contains(TelemetryConfig.ACTIVITY))
         assert(enabledTelemetries.contains(TelemetryConfig.CRASH))
         assert(enabledTelemetries.contains(TelemetryConfig.NETWORK))
-        assert(enabledTelemetries.contains(TelemetryConfig.OKHTTP_3))
         assert(!enabledTelemetries.contains(TelemetryConfig.ANR))
         assert(!enabledTelemetries.contains(TelemetryConfig.FRAGMENT))
         assert(!enabledTelemetries.contains(TelemetryConfig.HTTP_URLCONNECTION))
@@ -259,8 +256,7 @@ class RumAgentProviderTest {
                 network = TelemetryOption(enabled = false),
                 slowRendering = TelemetryOption(enabled = false),
                 startup = TelemetryOption(enabled = false),
-                httpUrlConnection = TelemetryOption(enabled = false),
-                okHttp3 = TelemetryOption(enabled = false),
+                http = HttpTelemetryOption(enabled = false),
                 uiLoad = TelemetryOption(enabled = false),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)

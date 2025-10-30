@@ -22,6 +22,7 @@ import software.amazon.opentelemetry.android.ParsedOtlpData
 import software.amazon.opentelemetry.android.allAttributes
 import software.amazon.opentelemetry.android.attributes
 import software.amazon.opentelemetry.android.getAttributes
+import software.amazon.opentelemetry.android.lacksAttribute
 import software.amazon.opentelemetry.android.otlp.Span
 import software.amazon.opentelemetry.android.scopeSpans
 import software.amazon.opentelemetry.android.spans
@@ -40,6 +41,13 @@ class HttpInstrumentationTest {
         const val HTTP_200_URL = "http://10.0.2.2:8181/200"
         const val HTTP_404_URL = "http://10.0.2.2:8181/404"
         const val HTTP_500_URL = "http://10.0.2.2:8181/500"
+
+        const val EXPECTED_REQUEST_HEADER = "request-header"
+        const val IGNORED_REQUEST_HEADER = "ignored-request-header"
+        const val EXPECTED_RESPONSE_HEADER = "response-header"
+        const val IGNORED_RESPONSE_HEADER = "ignored-response-header"
+
+        const val EXPECTED_HEADER_VALUE = "you should see me in telemetry" // same for both headers
     }
 
     @Test
@@ -156,6 +164,48 @@ class HttpInstrumentationTest {
                 .all { attribute ->
                     attribute.value.intValue == "404"
                 },
+        )
+    }
+
+    @Test
+    fun `HTTP spans should all have the expected request and response headers AND no ignored headers`(data: ParsedOtlpData) {
+        val okHttpScope = data.traces.scopeSpans(HTTP3_SCOPE)
+        val okHttpSpans = okHttpScope.spans("GET")
+        val urlConnectionScope = data.traces.scopeSpans(HTTP_URL_CONNECTION_SCOPE)
+        val urlConnectionSpans = urlConnectionScope.spans("GET")
+
+        val allSpans = okHttpSpans.union(urlConnectionSpans)
+        Assertions.assertTrue(
+            allSpans.all { span ->
+                span
+                    .getAttributes("http.request.header.${EXPECTED_REQUEST_HEADER}")
+                    .value.arrayValue!!
+                    .values
+                    .first()
+                    .stringValue ==
+                    EXPECTED_HEADER_VALUE
+            },
+        )
+        Assertions.assertTrue(
+            allSpans.all { span ->
+                span
+                    .getAttributes("http.response.header.${EXPECTED_RESPONSE_HEADER}")
+                    .value.arrayValue!!
+                    .values
+                    .first()
+                    .stringValue ==
+                    EXPECTED_HEADER_VALUE
+            },
+        )
+        Assertions.assertTrue(
+            allSpans.all { span ->
+                span.lacksAttribute("http.request.header.${IGNORED_REQUEST_HEADER}")
+            },
+        )
+        Assertions.assertTrue(
+            allSpans.all { span ->
+                span.lacksAttribute("http.response.header.${IGNORED_RESPONSE_HEADER}")
+            },
         )
     }
 }

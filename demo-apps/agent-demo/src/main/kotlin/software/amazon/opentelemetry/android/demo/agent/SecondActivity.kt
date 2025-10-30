@@ -40,6 +40,9 @@ class SecondActivity : AppCompatActivity() {
         const val HTTP_200_URL = "http://10.0.2.2:8181/200"
         const val HTTP_404_URL = "http://10.0.2.2:8181/404"
         const val HTTP_500_URL = "http://10.0.2.2:8181/500"
+
+        val VISIBLE_REQUEST_HEADER = Pair("request-header", "you should see me in telemetry")
+        val IGNORED_REQUEST_HEADER = Pair("ignored-request-header", "you should not see me in telemetry")
     }
 
     private lateinit var binding: ActivitySecondBinding
@@ -137,6 +140,8 @@ class SecondActivity : AppCompatActivity() {
                         withContext(Dispatchers.IO) {
                             val url = URL(HTTP_200_URL)
                             val urlConnection = url.openConnection() as HttpURLConnection
+                            urlConnection.setRequestProperty(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                            urlConnection.setRequestProperty(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                             try {
                                 val `in`: InputStream =
                                         BufferedInputStream(urlConnection.inputStream)
@@ -164,6 +169,8 @@ class SecondActivity : AppCompatActivity() {
                 val client = OkHttpClient()
                 val request = Request.Builder()
                     .url(HTTP_200_URL)
+                    .header(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                    .header(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -190,6 +197,8 @@ class SecondActivity : AppCompatActivity() {
                 val client = OkHttpClient()
                 val request = Request.Builder()
                     .url(HTTP_404_URL)
+                    .header(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                    .header(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -215,6 +224,8 @@ class SecondActivity : AppCompatActivity() {
                 val client = OkHttpClient()
                 val request = Request.Builder()
                     .url(HTTP_500_URL)
+                    .header(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                    .header(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                     .build()
 
                 val result = withContext(Dispatchers.IO) {
@@ -240,6 +251,8 @@ class SecondActivity : AppCompatActivity() {
                 val result = withContext(Dispatchers.IO) {
                     val url = URL(HTTP_404_URL)
                     val urlConnection = url.openConnection() as HttpURLConnection
+                    urlConnection.setRequestProperty(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                    urlConnection.setRequestProperty(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                     try {
                         val responseCode = urlConnection.responseCode
                         val responseMessage = urlConnection.responseMessage
@@ -266,6 +279,8 @@ class SecondActivity : AppCompatActivity() {
                 val result = withContext(Dispatchers.IO) {
                     val url = URL(HTTP_500_URL)
                     val urlConnection = url.openConnection() as HttpURLConnection
+                    urlConnection.setRequestProperty(VISIBLE_REQUEST_HEADER.first, VISIBLE_REQUEST_HEADER.second)
+                    urlConnection.setRequestProperty(IGNORED_REQUEST_HEADER.first, IGNORED_REQUEST_HEADER.second)
                     try {
                         val responseCode = urlConnection.responseCode
                         val responseMessage = urlConnection.responseMessage

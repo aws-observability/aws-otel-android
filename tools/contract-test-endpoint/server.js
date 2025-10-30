@@ -6,6 +6,10 @@ const connections = new Set();
 const server = http.createServer((req, res) => {
   console.log(`Received request: ${req.method} ${req.url}`);
   
+  // Add custom response headers to all responses
+  res.setHeader('response-header', 'you should see me in telemetry');
+  res.setHeader('ignored-response-header', 'you should not see me in telemetry');
+  
   // Parse the path to determine which response to send
   const path = req.url.toLowerCase();
   
