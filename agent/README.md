@@ -65,47 +65,47 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 
 ## Configuration Options
 
-| Option                                    | Type         | Required | Description                                                                                         | Default | Example                                          |
-|-------------------------------------------|--------------|----------|-----------------------------------------------------------------------------------------------------|---------|--------------------------------------------------|
-| aws.region                                | string       | **Yes**  | AWS region to export telemetry to                                                                   | N/A     | "us-east-1"                                      |
-| aws.rumAppMonitorId                       | string       | **Yes**  | AWS RUM Application Monitor ID                                                                      | N/A     | "00000000-0000-0000-0000-000000000000"           |
-| aws.rumAlias                              | string       | No       | Alias for requests, used with resource-based policies                                               | N/A     | "my-app-alias"                                   |
-| aws.cognitoIdentityPoolId                 | string       | No       | AWS Cognito Identity Pool ID for authentication                                                     | N/A     | "us-east-1:a1b2c3d4-5678-90ab-cdef-EXAMPLE11111" |
-| exportOverride.logs                       | string (URI) | No       | Override export destination for logs. If not specified, will use AWS RUM endpoint for your region   | N/A     | "https://custom-endpoint.com/logs"               |
-| exportOverride.traces                     | string (URI) | No       | Override export destination for traces. If not specified, will use AWS RUM endpoint for your region | N/A     | "https://custom-endpoint.com/traces"             |
-| exportOverride.compression                | string       | No       | The method used to compress exported payloads. Must be "gzip" or "none"                             | "none"  | "gzip" or "none"                                 |
-| telemetry.activity.enabled                | boolean      | No       | Enable/disable activity lifecycle monitoring                                                        | true    | true                                             |
-| telemetry.anr.enabled                     | boolean      | No       | Enable/disable ANR detection                                                                        | true    | true                                             |
-| telemetry.crash.enabled                   | boolean      | No       | Enable/disable crash reporting                                                                      | true    | true                                             |
-| telemetry.fragment.enabled                | boolean      | No       | Enable/disable fragment lifecycle monitoring                                                        | true    | true                                             |
-| telemetry.network.enabled                 | boolean      | No       | Enable/disable network state monitoring                                                             | true    | true                                             |
-| telemetry.slow_rendering.enabled          | boolean      | No       | Enable/disable slow UI rendering detection                                                          | true    | true                                             |
-| telemetry.startup.enabled                 | boolean      | No       | Enable/disable application startup monitoring                                                       | true    | true                                             |
-| telemetry.http_urlconnection.enabled      | boolean      | No       | Enable/disable HttpURLConnection monitoring                                                         | true    | true                                             |
-| telemetry.okhttp_3.0.enabled              | boolean      | No       | Enable/disable OkHttp 3.0 monitoring                                                                | true    | true                                             |
-| telemetry.ui_load.enabled                 | boolean      | No       | Enable/disable UI load time monitoring                                                              | true    | true                                             |
-| telemetry.session_events.enabled          | boolean      | No       | Enable/disable session event instrumentation                                                        | true    | true                                             |
-| sessionTimeout                            | integer      | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                              |
-| sessionSampleRate                         | number       | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                              |
-| applicationAttributes                     | object       | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                          |
-| applicationAttributes.application.version | string       | No       | A special application attribute you can add to filter on deployed app versions in RUM console       | N/A     | "1.0.0"                                          |
+| Option                                    | Type           | Required | Description                                                                                         | Default | Example                                          |
+|-------------------------------------------|----------------|----------|-----------------------------------------------------------------------------------------------------|---------|--------------------------------------------------|
+| aws.region                                | string         | **Yes**  | AWS region to export telemetry to                                                                   | N/A     | "us-east-1"                                      |
+| aws.rumAppMonitorId                       | string         | **Yes**  | AWS RUM Application Monitor ID                                                                      | N/A     | "00000000-0000-0000-0000-000000000000"           |
+| aws.rumAlias                              | string         | No       | Alias for requests, used with resource-based policies                                               | N/A     | "my-app-alias"                                   |
+| aws.cognitoIdentityPoolId                 | string         | No       | AWS Cognito Identity Pool ID for authentication                                                     | N/A     | "us-east-1:a1b2c3d4-5678-90ab-cdef-EXAMPLE11111" |
+| exportOverride.logs                       | string (URI)   | No       | Override export destination for logs. If not specified, will use AWS RUM endpoint for your region   | N/A     | "https://custom-endpoint.com/logs"               |
+| exportOverride.traces                     | string (URI)   | No       | Override export destination for traces. If not specified, will use AWS RUM endpoint for your region | N/A     | "https://custom-endpoint.com/traces"             |
+| exportOverride.compression                | string         | No       | The method used to compress exported payloads. Must be "gzip" or "none"                             | "none"  | "gzip" or "none"                                 |
+| telemetry.activity.enabled                | boolean        | No       | Enable/disable activity lifecycle monitoring                                                        | true    | true                                             |
+| telemetry.anr.enabled                     | boolean        | No       | Enable/disable ANR detection                                                                        | true    | true                                             |
+| telemetry.crash.enabled                   | boolean        | No       | Enable/disable crash reporting                                                                      | true    | true                                             |
+| telemetry.fragment.enabled                | boolean        | No       | Enable/disable fragment lifecycle monitoring                                                        | true    | true                                             |
+| telemetry.network.enabled                 | boolean        | No       | Enable/disable network state monitoring                                                             | true    | true                                             |
+| telemetry.slow_rendering.enabled          | boolean        | No       | Enable/disable slow UI rendering detection                                                          | true    | true                                             |
+| telemetry.startup.enabled                 | boolean        | No       | Enable/disable application startup monitoring                                                       | true    | true                                             |
+| telemetry.http.enabled                    | boolean        | No       | Enable/disable HttpURLConnection and OkHttp monitoring                                              | true    | true                                             |
+| telemetry.http.capturedRequestHeaders     | array <string> | No       | The HTTP request headers that will be captured                                                      | N/A     | ["your-request-header"]                          |
+| telemetry.http.capturedResponseHeaders    | array <string> | No       | The HTTP response headers that will be captured                                                     | N/A     | ["your-response-header"]                         |
+| telemetry.ui_load.enabled                 | boolean        | No       | Enable/disable UI load time monitoring                                                              | true    | true                                             |
+| telemetry.session_events.enabled          | boolean        | No       | Enable/disable session event instrumentation                                                        | true    | true                                             |
+| sessionTimeout                            | integer        | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                              |
+| sessionSampleRate                         | number         | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                              |
+| applicationAttributes                     | object         | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                          |
+| applicationAttributes.application.version | string         | No       | A special application attribute you can add to filter on deployed app versions in RUM console       | N/A     | "1.0.0"                                          |
 
 For the full JSON schema, please refer to [client-config/schema_v1.json](client-config/schema_v1.json)
 
 ## Telemetry Types
 
-| Type             | Description                          |
-|------------------|--------------------------------------|
-| `activity`       | Activity lifecycle events            |
-| `fragment`       | Fragment lifecycle events            |
-| `network`        | HTTP request monitoring              |
-| `crash`          | Crash detection and reporting        |
-| `anr`            | Application Not Responding detection |
-| `ui_loading`     | UI loading performance               |
-| `slow_rendering` | Slow rendering detection             |
-| `startup`        | App startup performance              |
-| `http_urlconnection` | HTTP telemetry for HttpUrlConnection client |
-| `okhttp_3.0`     | HTTP telemetry for OkHttp 3.0 client |
+| Type             | Description                                              |
+|------------------|----------------------------------------------------------|
+| `activity`       | Activity lifecycle events                                |
+| `fragment`       | Fragment lifecycle events                                |
+| `network`        | HTTP request monitoring                                  |
+| `crash`          | Crash detection and reporting                            |
+| `anr`            | Application Not Responding detection                     |
+| `ui_loading`     | UI loading performance                                   |
+| `slow_rendering` | Slow rendering detection                                 |
+| `startup`        | App startup performance                                  |
+| `http`           | HTTP telemetry for HttpURLConnection and OkHttp3 clients |
 
 ## Troubleshooting
 
