@@ -136,6 +136,10 @@
       "maximum": 1,
       "default": 1
     },
+    "applicationVersion": {
+      "type": "string",
+      "description": "If specified, will annotate your telemetry with this value as a service.version resource attribute. You can use this to partition telemetry across your app version types"
+    },
     "applicationAttributes": {
       "type": "object",
       "description": "Custom OpenTelemetry attributes injected into every Span and LogRecorded vended by your app. You can use this to include custom metadata with your telemetry.",

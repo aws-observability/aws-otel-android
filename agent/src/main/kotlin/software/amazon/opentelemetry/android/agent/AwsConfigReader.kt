@@ -69,6 +69,7 @@ internal data class AgentConfig(
     val sessionTimeout: Int = 300,
     val sessionSampleRate: Double = 1.0,
     val applicationAttributes: Map<String, JsonPrimitive>? = null,
+    val applicationVersion: String? = null,
 )
 
 @Serializable

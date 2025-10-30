@@ -37,9 +37,12 @@ Create `res/raw/aws_config.json`:
     "rumAppMonitorId": "<your-app-monitor-id>",
   },
 
+  // optionally configure your application's version, allowing you to filter telemetry on the RUM console based on your running app's version
+  "applicationVersion": "1.0.0",
+
   // optional attributes that will be appended to all OpenTelemetry application spans and events
   "applicationAttributes": {
-    "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
+    "custom.attribute": "123"
   }
 }
 ```
@@ -84,8 +87,8 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | telemetry.session_events.enabled          | boolean        | No       | Enable/disable session event instrumentation                                                        | true    | true                                             |
 | sessionTimeout                            | integer        | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                              |
 | sessionSampleRate                         | number         | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                              |
+| applicationVErsion                        | string         | No       | A special resource attribute you can add to filter on deployed app versions in RUM console          | N/A     | "1.0.0"                                          |
 | applicationAttributes                     | object         | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                          |
-| applicationAttributes.application.version | string         | No       | A special application attribute you can add to filter on deployed app versions in RUM console       | N/A     | "1.0.0"                                          |
 
 For the full JSON schema, please refer to [client-config/schema_v1.json](client-config/schema_v1.json)
 

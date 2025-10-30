@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
 import software.amazon.opentelemetry.android.api.internal.AwsRumSpanApiImpl
 import software.amazon.opentelemetry.android.api.internal.Constants
 import java.util.concurrent.TimeUnit
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit
 @ExtendWith(MockKExtension::class)
 class AwsRumSpanApiImplTest {
     @MockK
-    private lateinit var mockOpenTelemetryAgent: OpenTelemetryAgent
+    private lateinit var mockOpenTelemetryClient: OpenTelemetryRumClient
 
     @MockK
     private lateinit var mockOpenTelemetry: OpenTelemetry
@@ -60,7 +60,7 @@ class AwsRumSpanApiImplTest {
 
     @BeforeEach
     fun setup() {
-        every { mockOpenTelemetryAgent.getOpenTelemetry() } returns mockOpenTelemetry
+        every { mockOpenTelemetryClient.openTelemetry } returns mockOpenTelemetry
         every { mockOpenTelemetry.getTracer(any()) } returns mockTracer
         every { mockTracer.spanBuilder(any()) } returns mockSpanBuilder
         every { mockSpanBuilder.startSpan() } returns mockSpan
@@ -69,7 +69,7 @@ class AwsRumSpanApiImplTest {
         every { mockSpanBuilder.setStartTimestamp(any(), any()) } returns mockSpanBuilder
         every { mockSpan.storeInContext(any()) } returns mockk()
 
-        awsRumSpanApiImpl = AwsRumSpanApiImpl(mockOpenTelemetryAgent)
+        awsRumSpanApiImpl = AwsRumSpanApiImpl(mockOpenTelemetryClient)
     }
 
     @Test

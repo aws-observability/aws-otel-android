@@ -19,16 +19,17 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val config = AwsRumAppMonitorConfig(
-            region = "us-east-1",
-            appMonitorId = "your-app-monitor-id",
-            alias = "your-app-alias"
-        )
-
-        OpenTelemetryAgent.Builder(this)
-            .setAppMonitorConfig(config)
-            .setApplicationVersion("1.0.0")
-            .build()
+        OpenTelemetryRumClient {
+            androidApplication = this@MyApplication
+            awsRum {
+                region = "us-east-1"
+                appMonitorId = "<your-app-monitor-id>"
+                alias = "<your-resource-based-policy-alias>"
+            }
+            sessionInactivityTimeout = Duration.ofMinutes(1)
+            applicationAttributes = mapOf("app.test" to "123")
+            applicationVersion = "1.0"
+        }
     }
 }
 ```
@@ -38,43 +39,40 @@ class MyApplication : Application() {
 ### Custom Sampling
 
 ```kotlin
-OpenTelemetryAgent.Builder(this)
-    .setAppMonitorConfig(config)
-    .setTracerSampler(Sampler.create(0.1)) // Sample 10% of traces
-    .build()
+OpenTelemetryRumClient {
+    // ... <all prior configuration>
+
+    tracerSampler = Sampler.create(0.1) // sample 10% of traces
+}
 ```
 
 ### Disk Buffering
 
 ```kotlin
-val diskBufferingConfig = DiskBufferingConfig(
-    enabled = true,
-    maxCacheSize = 10_000_000 // 10MB
-)
+OpenTelemetryRumClient {
+    // ... <all prior configuration>
 
-OpenTelemetryAgent.Builder(this)
-    .setAppMonitorConfig(config)
-    .setDiskBufferingConfig(diskBufferingConfig)
-    .build()
+    diskBuffering {
+        enabled = true
+        maxCacheSize = 10_000_000
+    }
+}
 ```
 
 ### Custom Exporters
 
 ```kotlin
-OpenTelemetryAgent.Builder(this)
-    .setAppMonitorConfig(config)
-    .addSpanExporterCustomizer { defaultExporter ->
-        // Replace or wrap the default span exporter
-        OtlpHttpSpanExporter.builder()
-            .setEndpoint("https://custom-endpoint.com/v1/traces")
-            .setHeaders(mapOf("Authorization" to "Bearer token"))
-            .build()
-    }
-    .addLogRecordExporterCustomizer { defaultExporter ->
-        // Replace or wrap the default log exporter
-        OtlpHttpLogRecordExporter.builder()
-            .setEndpoint("https://custom-endpoint.com/v1/logs")
-            .build()
-    }
-    .build()
+
+OpenTelemetryRumClient {
+    // ... <all prior configuration>
+
+    spanExporter = OtlpHttpSpanExporter.builder()
+        .setEndpoint("https://custom-endpoint.com/v1/traces")
+        .setHeaders(mapOf("Authorization" to "Bearer token"))
+        .build()
+
+    logRecordExporter = OtlpHttpLogRecordExporter.builder()
+        .setEndpoint("https://custom-endpoint.com/v1/logs")
+        .build()
+}
 ```

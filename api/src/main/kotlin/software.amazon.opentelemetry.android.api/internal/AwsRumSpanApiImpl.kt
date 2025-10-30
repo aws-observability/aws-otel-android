@@ -20,19 +20,19 @@ import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.api.trace.Tracer
 import io.opentelemetry.context.Context
-import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
 import software.amazon.opentelemetry.android.api.internal.Constants.FRAGMENT_NAME_KEY
 import software.amazon.opentelemetry.android.api.internal.Constants.SpanName.TIME_TO_FIRST_DRAW
 import java.util.concurrent.TimeUnit
 
 internal class AwsRumSpanApiImpl(
-    private val openTelemetryAgent: OpenTelemetryAgent = getDefaultAgent(),
+    private val openTelemetryClient: OpenTelemetryRumClient = getDefaultAgent(),
 ) : AwsRumSpanApi {
     companion object {
-        private fun getDefaultAgent() = OpenTelemetryAgent.getOpenTelemetryAgent()!!
+        private fun getDefaultAgent() = OpenTelemetryRumClient.getInstance()!!
     }
 
-    override fun getTracer(instrumentationScope: String): Tracer = openTelemetryAgent.getOpenTelemetry().getTracer(instrumentationScope)
+    override fun getTracer(instrumentationScope: String): Tracer = openTelemetryClient.openTelemetry.getTracer(instrumentationScope)
 
     override fun startSpan(
         name: String,
