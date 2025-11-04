@@ -119,7 +119,7 @@ The library consists of several modules designed for flexibility and modularity:
 | **[core](core/README.md)**               | Main OpenTelemetry client and configuration | Manual setup, full control         |
 | **[api](api/README.md)**                 | Public API for custom instrumentation       | Adding custom spans and metrics    |
 | **[ui-loading](ui-loading/README.md)**   | UI performance monitoring                   | Time-to-first-draw tracking        |
-| **[aws-runtime](aws-runtime/README.md)** | AWS authentication and exporters            | Cognito auth, SigV4 signing        |
+| **[aws-runtime](aws-runtime/README.md)** | AWS authentication and exporters            | SigV4 signing                      |
 
 ## Supported Instrumentation
 

@@ -48,11 +48,9 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":aws-runtime:kotlin-sdk-auth"))
-    implementation(project(":aws-runtime:cognito-auth"))
     
     // AWS SDK for Kotlin dependencies
     implementation("aws.sdk.kotlin:s3:1.5.64")
-    implementation("aws.sdk.kotlin:cognitoidentity:1.5.64")
     implementation("aws.sdk.kotlin:aws-core:1.5.64")
     
     // OpenTelemetry dependencies

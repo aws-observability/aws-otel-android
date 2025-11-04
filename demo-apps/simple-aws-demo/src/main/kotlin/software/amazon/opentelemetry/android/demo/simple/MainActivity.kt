@@ -46,10 +46,6 @@ class MainActivity : AppCompatActivity() {
         binding.listS3BucketsButton.setOnClickListener {
             listS3Buckets()
         }
-
-        binding.getCognitoIdentityButton.setOnClickListener {
-            getCognitoIdentity()
-        }
     }
 
     private fun listS3Buckets() {
@@ -75,22 +71,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun getCognitoIdentity() {
-        lifecycleScope.launch {
-            try {
-                binding.resultTextView.text = "Fetching Cognito identity..."
-                val result = withContext(Dispatchers.IO) {
-                    val identityId = awsService.getCognitoIdentityId()
-                    "Cognito Identity ID: $identityId"
-                }
-                
-                binding.resultTextView.text = result
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting Cognito identity", e)
-                binding.resultTextView.text = "Error getting Cognito identity: ${e.message}"
-                Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 }
+

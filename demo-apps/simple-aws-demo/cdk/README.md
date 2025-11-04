@@ -4,8 +4,7 @@ This CDK project creates the necessary AWS infrastructure for the AWS OpenTeleme
 
 ## Infrastructure Components
 
-- **Cognito Identity Pool**: Provides authentication and authorization for the Android app
-- **IAM Roles**: Defines permissions for authenticated and unauthenticated users with access to:
+- **IAM Roles**: Defines permissions for users with access to:
   - S3 operations
   - CloudWatch RUM PutRumEvents
   - CloudWatchAgentServerPolicy (for OTLP endpoints, X-Ray, and CloudWatch)
@@ -27,9 +26,8 @@ This CDK project creates the necessary AWS infrastructure for the AWS OpenTeleme
    - AWS CDK (https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html)
 2. Run `./demo-cdk.sh synth` then `./demo-cdk.sh deploy` with valid environment credentials.
 3. Note the outputs from the deployment:
-   - IdentityPoolId: Use this in your Android app's MainActivity.kt
    - AppMonitorId: Use this in your Android app's SimpleAwsDemoApplication.kt
-   - Region: Use this in both files
+   - Region: Use this in your app
    - DemoBucketName: Optional, for additional S3 operations
 
 ### Update Your Android App
@@ -42,12 +40,6 @@ After deploying the infrastructure, update the following files in your Android a
        region = "YOUR_REGION_FROM_OUTPUT",
        appMonitorId = "YOUR_APP_MONITOR_ID_FROM_OUTPUT"
    )
-   ```
-
-2. `MainActivity.kt`:
-   ```kotlin
-   private val cognitoPoolId = "YOUR_IDENTITY_POOL_ID_FROM_OUTPUT"
-   private val awsRegion = Regions.YOUR_REGION_FROM_OUTPUT
    ```
 
 ## Cleanup

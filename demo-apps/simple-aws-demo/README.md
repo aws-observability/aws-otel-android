@@ -8,7 +8,6 @@ This is a simple demo application that demonstrates how to use the AWS OpenTelem
 
 - Integration with AWS OpenTelemetry Android SDK
 - AWS S3 bucket listing
-- AWS Cognito identity retrieval
 - Automatic tracing of AWS API calls
 
 ## Infrastructure Setup
@@ -26,7 +25,6 @@ This demo includes a CDK project that creates all the necessary AWS infrastructu
    ```
 
 3. Note the outputs from the deployment, which you'll need to update in your Android app:
-   - IdentityPoolId
    - AppMonitorId
    - Region
 
@@ -40,12 +38,6 @@ For more details, see the [CDK README](./cdk/README.md).
        region = "YOUR_REGION_FROM_CDK_OUTPUT",
        appMonitorId = "YOUR_APP_MONITOR_ID_FROM_CDK_OUTPUT"
    )
-   ```
-
-2. Replace the placeholder values in `MainActivity.kt` with your actual AWS credentials:
-   ```kotlin
-   private val cognitoPoolId = "YOUR_IDENTITY_POOL_ID_FROM_CDK_OUTPUT"
-   private val awsRegion = Regions.YOUR_REGION_FROM_CDK_OUTPUT
    ```
 
 ## Local OpenTelemetry Collector Setup
@@ -96,7 +88,6 @@ For local development and testing, you can use the included OpenTelemetry Collec
 
 1. The application initializes the AWS OpenTelemetry Agent in the `SimpleAwsDemoApplication` class.
 2. When you click on the "List S3 Buckets" button, the app makes an AWS S3 API call to list your buckets.
-3. When you click on the "Get Cognito Identity" button, the app retrieves your Cognito identity ID.
 
 ## Requirements
 

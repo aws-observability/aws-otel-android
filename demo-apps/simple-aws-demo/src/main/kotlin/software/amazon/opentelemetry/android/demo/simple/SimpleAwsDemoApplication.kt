@@ -15,15 +15,12 @@
 package software.amazon.opentelemetry.android.demo.simple
 
 import android.app.Application
-import kotlinx.coroutines.runBlocking
 import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
 import software.amazon.opentelemetry.android.OpenTelemetryAgent
-import software.amazon.opentelemetry.android.auth.kotlin.export.AwsSigV4SpanExporter
 
 class SimpleAwsDemoApplication : Application() {
 
-    // Replace these with your actual AWS credentials and configuration
-    private val cognitoPoolId = "us-east-1:<id>" // Replace with your Cognito Identity Pool ID
+    // Replace these with your actual AWS configuration
     private val awsRegion = "us-east-1" // Replace with your AWS region
 
     lateinit var awsService: AwsService
@@ -31,7 +28,7 @@ class SimpleAwsDemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        awsService = AwsService(cognitoPoolId, awsRegion)
+        awsService = AwsService(awsRegion)
 
         // Initialize AWS OpenTelemetry Agent
         val appMonitorConfig = AwsRumAppMonitorConfig(
@@ -39,17 +36,9 @@ class SimpleAwsDemoApplication : Application() {
             appMonitorId = "YOUR_APP_MONITOR_ID_FROM_CDK_OUTPUT"
         )
 
-        // Default configuration - sends data to X-Ray only (for now)
+        // Default configuration - sends data to RUM
         val otelAgent = OpenTelemetryAgent.Builder(this)
             .setAppMonitorConfig(appMonitorConfig)
-            .addSpanExporterCustomizer {
-                AwsSigV4SpanExporter.builder()
-                    .setRegion(awsRegion)
-                    .setEndpoint("https://xray.us-east-1.amazonaws.com/v1/traces")
-                    .setServiceName("xray")
-                    .setCredentialsProvider(awsService.cognitoCredentialsProvider)
-                    .build()
-            }
             .build()
 
         // For local development with OpenTelemetry Collector
