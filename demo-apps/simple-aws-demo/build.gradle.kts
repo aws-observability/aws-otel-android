@@ -50,8 +50,8 @@ dependencies {
     implementation(project(":aws-runtime:kotlin-sdk-auth"))
     
     // AWS SDK for Kotlin dependencies
-    implementation("aws.sdk.kotlin:s3:1.5.64")
-    implementation("aws.sdk.kotlin:aws-core:1.5.64")
+    implementation("aws.sdk.kotlin:s3:1.5.74")
+    implementation("aws.sdk.kotlin:aws-core:1.5.74")
     
     // OpenTelemetry dependencies
     implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.31.0")
