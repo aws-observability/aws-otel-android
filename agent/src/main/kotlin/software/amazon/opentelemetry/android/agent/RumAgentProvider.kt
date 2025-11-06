@@ -114,6 +114,8 @@ internal class RumAgentProvider : ContentProvider() {
                         it.key to it.value.content
                     }
             }
+            serviceVersion = config.serviceVersion
+            serviceName = config.serviceName
         }
     }
 

@@ -119,7 +119,8 @@ class OpenTelemetryRumClientConfig {
     var telemetry: List<TelemetryConfig>? = null
     var features: List<FeatureConfig>? = null
     var applicationAttributes: Map<String, String> = emptyMap()
-    var applicationVersion: String? = null
+    var serviceVersion: String? = null
+    var serviceName: String? = null
     var capturedRequestHeaders: List<String>? = null
     var capturedResponseHeaders: List<String>? = null
 
@@ -149,7 +150,7 @@ class OpenTelemetryRumClientConfig {
             awsRumConfig?.build()
                 ?: throw IllegalStateException("AWS RUM configuration is required. Use awsRum { } block.")
 
-        val resource = ResourceProvider.createDefault(androidApplication, rumConfig, appVersion = applicationVersion)
+        val resource = ResourceProvider.createDefault(androidApplication, rumConfig, appVersion = serviceVersion, appName = serviceName)
 
         val sessionProvider =
             SessionManager(

@@ -304,7 +304,6 @@ class RumAgentProviderTest {
     fun `initialize should set application attributes when provided`() {
         val attributes =
             mapOf(
-                "application.version" to JsonPrimitive("1.0.0"),
                 "custom.attribute" to JsonPrimitive("value"),
             )
         val config = createBasicConfig(applicationAttributes = attributes)
@@ -313,7 +312,7 @@ class RumAgentProviderTest {
 
         rumAgentProvider.initialize(config, mockApplication)
 
-        assertEquals(mapOf("application.version" to "1.0.0", "custom.attribute" to "value"), capturedConfig.applicationAttributes)
+        assertEquals(mapOf("custom.attribute" to "value"), capturedConfig.applicationAttributes)
     }
 
     @Test

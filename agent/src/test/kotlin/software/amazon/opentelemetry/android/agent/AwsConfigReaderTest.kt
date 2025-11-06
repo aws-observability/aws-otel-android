@@ -62,9 +62,9 @@ class AwsConfigReaderTest {
           },
           "sessionTimeout": 100,
           "sessionSampleRate": 0.5,
-          "applicationVersino": "1.0",
+          "serviceVersion": "1.0",
+          "serviceName": "blah",
           "applicationAttributes": {
-            "application.version": "1.0.0",
             "demo": true
           }
         }
