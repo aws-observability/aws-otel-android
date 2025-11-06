@@ -136,9 +136,13 @@
       "maximum": 1,
       "default": 1
     },
-    "applicationVersion": {
+    "serviceVersion": {
       "type": "string",
       "description": "If specified, will annotate your telemetry with this value as a service.version resource attribute. You can use this to partition telemetry across your app version types"
+    },
+    "serviceName": {
+      "type": "string",
+      "description": "Allows you to specify a customized service.name resource attribute for your telemetry. If not provided, the SDK will auto-discover the best value for it",
     },
     "applicationAttributes": {
       "type": "object",
