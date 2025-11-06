@@ -87,7 +87,7 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | telemetry.session_events.enabled       | boolean        | No       | Enable/disable session event instrumentation                                                        | true    | true                                   |
 | sessionTimeout                         | integer        | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                    |
 | sessionSampleRate                      | number         | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                    |
-| serviceVersion                         | string         | No       | A special resource attribute you can add to filter on deployed app versions in RUM console          | N/A     | "1.0.0"                                |
+| serviceVersion                         | string         | No       | A special resource attribute you can add to filter on deployed app versions in RUM console          | N/A     | "1.0"                                |
 | serviceName                            | string         | No       | Your application's name; if not provided, SDK will discover a best fit value                        | N/A     | "MyApplication"                        |
 | applicationAttributes                  | object         | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                |
 
