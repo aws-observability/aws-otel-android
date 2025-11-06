@@ -86,7 +86,7 @@ class MyApplication : Application() {
          }
          sessionInactivityTimeout = Duration.ofMinutes(1)
          applicationAttributes = mapOf("app.test" to "123")
-         applicationVersion = "1.0"
+         serviceVersion = "1.0"
       }
    }
 }
