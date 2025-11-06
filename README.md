@@ -51,7 +51,7 @@ Create `res/raw/aws_config.json`:
   },
 
   // optionally configure your application's version, allowing you to filter telemetry on the RUM console based on your running app's version
-  "applicationVersion": "1.0.0",
+  "serviceVersion": "1.0",
 
   // optional attributes that will be appended to all OpenTelemetry application spans and events
   "applicationAttributes": {
