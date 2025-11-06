@@ -49,7 +49,7 @@ Create `res/raw/aws_config.json`:
     "region": "us-east-1", // specify the AWS region your app monitor has been created in
     "rumAppMonitorId": "<your-app-monitor-id>",
   },
-  
+
   // optionally configure your application's version, allowing you to filter telemetry on the RUM console based on your running app's version
   "applicationVersion": "1.0.0",
 
