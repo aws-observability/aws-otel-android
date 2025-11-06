@@ -13,7 +13,6 @@ This application contains two activities: a main activity with a button that nav
 
 - Simple UI with a button to navigate between activities
 - Demonstrates automatic instrumentation without manual code changes
-- Follows the same configuration pattern as the simple-aws-demo app
 - Shows activity transitions for telemetry tracking
 
 ## Setup

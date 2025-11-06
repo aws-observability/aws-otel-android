@@ -150,7 +150,6 @@ The library consists of several modules designed for flexibility and modularity:
 
 Explore our comprehensive [demo applications](demo-apps/):
 
-- **[Simple AWS Demo](demo-apps/simple-aws-demo/)** - Basic CloudWatch RUM integration
 - **[Agent Demo](demo-apps/agent-demo/)** - Zero-configuration auto-instrumentation
 - **[Crash Demo](demo-apps/crash-demo/)** - Crash reporting demonstration
 - **[ANR Demo](demo-apps/anr-demo/)** - ANR detection example
