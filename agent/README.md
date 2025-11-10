@@ -72,7 +72,7 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | aws.rumAlias                           | string         | No       | Alias for requests, used with resource-based policies                                               | N/A     | "my-app-alias"                         |
 | exportOverride.logs                    | string (URI)   | No       | Override export destination for logs. If not specified, will use AWS RUM endpoint for your region   | N/A     | "https://custom-endpoint.com/logs"     |
 | exportOverride.traces                  | string (URI)   | No       | Override export destination for traces. If not specified, will use AWS RUM endpoint for your region | N/A     | "https://custom-endpoint.com/traces"   |
-| exportOverride.compression             | string         | No       | The method used to compress exported payloads. Must be "gzip" or "none"                             | "none"  | "gzip" or "none"                       |
+| exportOverride.compression             | string         | No       | The method used to compress exported payloads. Must be "gzip" or "none"                             | "gzip"  | "gzip" or "none"                       |
 | telemetry.activity.enabled             | boolean        | No       | Enable/disable activity lifecycle monitoring                                                        | true    | true                                   |
 | telemetry.anr.enabled                  | boolean        | No       | Enable/disable ANR detection                                                                        | true    | true                                   |
 | telemetry.crash.enabled                | boolean        | No       | Enable/disable crash reporting                                                                      | true    | true                                   |
@@ -87,7 +87,7 @@ The agent uses Android's `ContentProvider` initialization mechanism to automatic
 | telemetry.session_events.enabled       | boolean        | No       | Enable/disable session event instrumentation                                                        | true    | true                                   |
 | sessionTimeout                         | integer        | No       | Max session inactivity duration in seconds                                                          | 300     | 600                                    |
 | sessionSampleRate                      | number         | No       | Proportion of sessions to record, from 0.0 to 1.0                                                   | 1       | 0.5                                    |
-| serviceVersion                         | string         | No       | A special resource attribute you can add to filter on deployed app versions in RUM console          | N/A     | "1.0"                                |
+| serviceVersion                         | string         | No       | A special resource attribute you can add to filter on deployed app versions in RUM console          | "-"     | "1.0"                                  |
 | serviceName                            | string         | No       | Your application's name; if not provided, SDK will discover a best fit value                        | N/A     | "MyApplication"                        |
 | applicationAttributes                  | object         | No       | Custom application attributes added to all spans and logs                                           | N/A     | {"environment": "prod"}                |
 

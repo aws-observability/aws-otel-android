@@ -57,7 +57,7 @@ class OpenTelemetryRumClient internal constructor(
         operator fun invoke(block: OpenTelemetryRumClientConfig.() -> Unit): OpenTelemetryRumClient =
             OpenTelemetryRumClientConfig().apply(block).build()
 
-        const val DEFAULT_COMPRESSION = "none"
+        const val DEFAULT_COMPRESSION = "gzip"
     }
 
     val openTelemetry: OpenTelemetry get() = delegate.openTelemetry

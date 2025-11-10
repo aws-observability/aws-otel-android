@@ -28,7 +28,7 @@ import java.time.Duration
 
 internal class RumAgentProvider : ContentProvider() {
     companion object {
-        const val DEFAULT_COMPRESSION = "none"
+        const val DEFAULT_COMPRESSION = "gzip"
     }
 
     /**
