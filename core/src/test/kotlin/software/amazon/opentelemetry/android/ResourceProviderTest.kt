@@ -54,6 +54,7 @@ class ResourceProviderTest {
                     Resource
                         .builder()
                         .put(ServiceAttributes.SERVICE_NAME, appName)
+                        .put(ServiceAttributes.SERVICE_VERSION, "-")
                         .put(RumConstants.RUM_SDK_VERSION, rumSdkVersion)
                         .put(DeviceIncubatingAttributes.DEVICE_MODEL_NAME, Build.MODEL)
                         .put(DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER, Build.MODEL)

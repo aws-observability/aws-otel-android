@@ -186,7 +186,8 @@ class OpenTelemetryRumClientTest {
             telemetry = listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR)
             features = listOf(FeatureConfig.USER_ID)
             applicationAttributes = mapOf("app.test" to "123")
-            applicationVersion = "1.0"
+            serviceVersion = "1.0"
+            serviceName = "testAppName"
         }
 
         // Validate the expected delegate builder
@@ -194,6 +195,7 @@ class OpenTelemetryRumClientTest {
             delegateBuilder.setResource(
                 withArg {
                     assertEquals("testAppName", it.getAttribute(ServiceAttributes.SERVICE_NAME))
+                    assertEquals("1.0", it.getAttribute(ServiceAttributes.SERVICE_VERSION))
                     assertEquals(
                         "us-east-1",
                         it.getAttribute(AttributeKey.stringKey(CloudIncubatingAttributes.CLOUD_REGION.key)),
