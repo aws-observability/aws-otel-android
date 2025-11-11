@@ -62,8 +62,9 @@ class AwsConfigReaderTest {
           },
           "sessionTimeout": 100,
           "sessionSampleRate": 0.5,
+          "serviceVersion": "1.0",
+          "serviceName": "blah",
           "applicationAttributes": {
-            "application.version": "1.0.0",
             "demo": true
           }
         }
@@ -109,6 +110,7 @@ class AwsConfigReaderTest {
         assertEquals("testlogs", result.exportOverride!!.logs)
         assertEquals("testtraces", result.exportOverride!!.traces)
         assertEquals(0.5, result.sessionSampleRate, 0.001)
+        assertEquals("1.0", result.serviceVersion)
     }
 
     @Test

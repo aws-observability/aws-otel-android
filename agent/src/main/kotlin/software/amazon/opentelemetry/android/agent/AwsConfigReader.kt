@@ -36,7 +36,7 @@ internal data class AwsConfig(
 internal data class ExportOverrideConfig(
     val traces: String? = null,
     val logs: String? = null,
-    val compression: String = "none",
+    val compression: String = "gzip",
 )
 
 @Serializable
@@ -69,6 +69,8 @@ internal data class AgentConfig(
     val sessionTimeout: Int = 300,
     val sessionSampleRate: Double = 1.0,
     val applicationAttributes: Map<String, JsonPrimitive>? = null,
+    val serviceVersion: String? = null,
+    val serviceName: String? = null,
 )
 
 @Serializable

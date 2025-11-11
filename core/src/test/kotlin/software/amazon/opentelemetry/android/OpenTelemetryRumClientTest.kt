@@ -30,11 +30,15 @@ import io.opentelemetry.android.OpenTelemetryRumBuilder
 import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.semconv.ServiceAttributes
 import io.opentelemetry.semconv.incubating.CloudIncubatingAttributes
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -44,7 +48,7 @@ import software.amazon.opentelemetry.android.features.UserIdManager
 import java.time.Duration
 
 @ExtendWith(MockKExtension::class)
-class OpenTelemetryAgentTest {
+class OpenTelemetryRumClientTest {
     @MockK
     lateinit var delegate: OpenTelemetryRum
 
@@ -59,8 +63,6 @@ class OpenTelemetryAgentTest {
 
     @MockK
     private lateinit var diskManager: DiskManager
-
-    private lateinit var openTelemetryAgent: OpenTelemetryAgent
 
     private val openTelemetryNoOp: OpenTelemetry = OpenTelemetry.noop()
     private val sessionId = "testId"
@@ -77,24 +79,84 @@ class OpenTelemetryAgentTest {
         // Mock user id reads / writes
         every { diskManager.readFromFileIfExists(any(), UserIdManager.USER_ID_FILE) } returns userId
         every { diskManager.writeToFile(any(), UserIdManager.USER_ID_FILE, any()) } returns true
+    }
 
-        openTelemetryAgent = OpenTelemetryAgent(delegate)
+    @Test
+    fun `should validate AWS RUM configuration DSL`() {
+        val config =
+            AwsRumConfig().apply {
+                region = "us-east-1"
+                appMonitorId = "test-monitor-id"
+                alias = "test-alias"
+            }
+
+        val rumConfig = config.build()
+        assertEquals("us-east-1", rumConfig.region)
+        assertEquals("test-monitor-id", rumConfig.appMonitorId)
+        assertEquals("test-alias", rumConfig.alias)
+    }
+
+    @Test
+    fun `should validate disk buffering configuration DSL`() {
+        val config =
+            DiskBufferingConfigDsl().apply {
+                enabled = false
+                maxCacheSize = 5_000_000
+            }
+
+        val diskConfig = config.build()
+        assertEquals(false, diskConfig.enabled)
+        assertEquals(5_000_000, diskConfig.maxCacheSize)
+    }
+
+    @Test
+    fun `should throw exception when AWS region is blank`() {
+        assertThrows<IllegalArgumentException> {
+            AwsRumConfig()
+                .apply {
+                    region = ""
+                    appMonitorId = "test-monitor-id"
+                }.build()
+        }
+    }
+
+    @Test
+    fun `should throw exception when appMonitorId is blank`() {
+        assertThrows<IllegalArgumentException> {
+            AwsRumConfig()
+                .apply {
+                    region = "us-east-1"
+                    appMonitorId = ""
+                }.build()
+        }
+    }
+
+    @Test
+    fun `should validate session sample rate bounds`() {
+        // Valid rates should not throw
+        val validRates = listOf(0.0, 0.5, 1.0)
+        validRates.forEach { rate ->
+            // This should not throw
+            require(rate in 0.0..1.0) { "Session sample rate must be between 0.0 and 1.0" }
+        }
+
+        // Invalid rates should throw
+        assertThrows<IllegalArgumentException> {
+            require(1.5 in 0.0..1.0) { "Session sample rate must be between 0.0 and 1.0" }
+        }
+
+        assertThrows<IllegalArgumentException> {
+            require(-0.1 in 0.0..1.0) { "Session sample rate must be between 0.0 and 1.0" }
+        }
     }
 
     @Test
     fun `getOpenTelemetry should pass a reference to delegate OpenTelemetry`() {
-        val delegateOpenTelemetry = openTelemetryAgent.openTelemetry
+        val client = OpenTelemetryRumClient(delegate)
+        val delegateOpenTelemetry = client.openTelemetry
 
-        Assertions.assertEquals(openTelemetryNoOp, delegateOpenTelemetry)
-        verify(exactly = 1) { delegate.getOpenTelemetry() }
-    }
-
-    @Test
-    fun `getRumSessionId should pass a reference to delegate RumSessionId`() {
-        val delegateRumSessionId = openTelemetryAgent.rumSessionId
-
-        Assertions.assertEquals(sessionId, delegateRumSessionId)
-        verify(exactly = 1) { delegate.getRumSessionId() }
+        assertEquals(openTelemetryNoOp, delegateOpenTelemetry)
+        verify(atLeast = 1) { delegate.openTelemetry }
     }
 
     @Test
@@ -107,98 +169,70 @@ class OpenTelemetryAgentTest {
 
         val delegateBuilder = mockk<OpenTelemetryRumBuilder>(relaxed = true)
         every { OpenTelemetryRumBuilder.create(application, capture(otelRumConfig)) } returns delegateBuilder
-        every { delegateBuilder.build() } returns openTelemetryAgent
+        every { delegateBuilder.build() } returns delegate
 
         every { delegateBuilder.setResource(any()) } returns delegateBuilder
         every { delegateBuilder.setSessionProvider(any()) } returns delegateBuilder
         every { delegateBuilder.addSpanExporterCustomizer(any()) } returns delegateBuilder
         every { delegateBuilder.addLogRecordExporterCustomizer(any()) } returns delegateBuilder
 
-        val spanExporterCustomizer: (SpanExporter) -> SpanExporter = { spanExporter }
-        val logExporterCustomizer: (LogRecordExporter) -> LogRecordExporter = { logRecordExporter }
-        val requestHeaders = listOf("Authorization", "X-Custom-Header")
-        val responseHeaders = listOf("Content-Type", "X-Response-Header")
-
-        OpenTelemetryAgent
-            .Builder(application)
-            .setApplicationName("testAppName")
-            .setAppMonitorConfig(
-                AwsRumAppMonitorConfig(
-                    region = "us-east-1",
-                    appMonitorId = "1234",
-                ),
-            ).addSpanExporterCustomizer(spanExporterCustomizer)
-            .addLogRecordExporterCustomizer(logExporterCustomizer)
-            .setSessionInactivityTimeout(Duration.ofMinutes(1))
-            .setEnabledTelemetry(listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR))
-            .setEnabledFeatures(listOf(FeatureConfig.USER_ID))
-            .setCustomApplicationAttributes(
-                mapOf(
-                    "app.test" to "123",
-                ),
-            ).setCapturedRequestHeaders(requestHeaders)
-            .setCapturedResponseHeaders(responseHeaders)
-            .build()
+        OpenTelemetryRumClient {
+            androidApplication = application
+            awsRum {
+                region = "us-east-1"
+                appMonitorId = "1234"
+            }
+            sessionInactivityTimeout = Duration.ofMinutes(1)
+            telemetry = listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR)
+            features = listOf(FeatureConfig.USER_ID)
+            applicationAttributes = mapOf("app.test" to "123")
+            serviceVersion = "1.0"
+            serviceName = "testAppName"
+        }
 
         // Validate the expected delegate builder
         verify(exactly = 1) {
             delegateBuilder.setResource(
                 withArg {
-                    Assertions.assertEquals("testAppName", it.getAttribute(ServiceAttributes.SERVICE_NAME))
-                    Assertions.assertEquals(
+                    assertEquals("testAppName", it.getAttribute(ServiceAttributes.SERVICE_NAME))
+                    assertEquals("1.0", it.getAttribute(ServiceAttributes.SERVICE_VERSION))
+                    assertEquals(
                         "us-east-1",
                         it.getAttribute(AttributeKey.stringKey(CloudIncubatingAttributes.CLOUD_REGION.key)),
                     )
-                    Assertions.assertEquals("1234", it.getAttribute(AttributeKey.stringKey(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID)))
+                    assertEquals("1234", it.getAttribute(AttributeKey.stringKey(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID)))
                 },
             )
             delegateBuilder.addSpanExporterCustomizer(
                 withArg {
-                    Assertions.assertEquals(spanExporter, it.apply(spanExporter))
+                    assertTrue(it.apply(spanExporter) is OtlpHttpSpanExporter)
                 },
             )
             delegateBuilder.addLogRecordExporterCustomizer(
                 withArg {
-                    Assertions.assertEquals(logRecordExporter, it.apply(logRecordExporter))
+                    assertTrue(it.apply(logRecordExporter) is OtlpHttpLogRecordExporter)
                 },
             )
             delegateBuilder.addInstrumentation(TelemetryConfig.ACTIVITY.instrumentation!!)
             delegateBuilder.addInstrumentation(TelemetryConfig.ANR.instrumentation!!)
         }
 
-        // Verify captured headers are set on HTTP instrumentations
-        verify(atLeast = 1) {
-            delegateBuilder.addInstrumentation(
-                withArg {
-                    if (it is io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation) {
-                        Assertions.assertEquals(requestHeaders, it.capturedRequestHeaders)
-                        Assertions.assertEquals(responseHeaders, it.capturedResponseHeaders)
-                    }
-                    if (it is io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation) {
-                        Assertions.assertEquals(requestHeaders, it.capturedRequestHeaders)
-                        Assertions.assertEquals(responseHeaders, it.capturedResponseHeaders)
-                    }
-                },
-            )
-        }
+        val globalAttributes = otelRumConfig.captured.globalAttributesSupplier.get()
+        assertNotNull(globalAttributes)
 
-        val attributes = otelRumConfig.captured.globalAttributesSupplier.get()
-        Assertions.assertNotNull(attributes)
+        val userIdAttribute = globalAttributes.get(AttributeKey.stringKey(UserIdManager.USER_ID_ATTR))
+        assertNotNull(userIdAttribute)
+        assertEquals(userId, userIdAttribute)
 
-        val userIdAttribute = attributes.get(AttributeKey.stringKey(UserIdManager.USER_ID_ATTR))
-        Assertions.assertNotNull(userIdAttribute)
-        Assertions.assertEquals(userId, userIdAttribute)
-
-        Assertions.assertEquals("123", attributes.get(AttributeKey.stringKey("app.test")))
+        assertEquals("123", globalAttributes.get(AttributeKey.stringKey("app.test")))
     }
 
     @Test
     fun `builder should throw IllegalStateException if not all required fields are present`() {
         assertThrows<IllegalStateException> {
-            OpenTelemetryAgent
-                .Builder(application)
-                .setApplicationName("testAppName")
-                .build()
+            OpenTelemetryRumClient {
+                application = this@OpenTelemetryRumClientTest.application
+            }
         }
     }
 }

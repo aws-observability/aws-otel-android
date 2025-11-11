@@ -37,14 +37,17 @@ object ResourceProvider {
         application: Application,
         config: AwsRumAppMonitorConfig,
         appName: String? = null,
+        appVersion: String? = null,
     ): Resource {
         val customApplicationName = appName ?: readAppName(application)
+        val serviceVersion = appVersion ?: "-"
 
         val resourceBuilder =
             Resource
                 .getDefault()
                 .toBuilder()
                 .put(ServiceAttributes.SERVICE_NAME, customApplicationName)
+                .put(ServiceAttributes.SERVICE_VERSION, serviceVersion)
                 .put(RumConstants.RUM_SDK_VERSION, BuildConfig.RUM_SDK_VERSION)
                 .put(DeviceIncubatingAttributes.DEVICE_MODEL_NAME, Build.MODEL)
                 .put(DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER, Build.MODEL)

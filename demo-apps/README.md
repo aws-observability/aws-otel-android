@@ -36,8 +36,8 @@ For more detailed instructions on setting up an emulator, refer to the [Android 
 
 1. **Select the Demo App Module**
     - In the Project panel, expand "demo-apps"
-    - Right-click on any demo app (ie "simple-aws-demo") and select "Run 'simple-aws-demo'"
-    - Alternatively, select the demo app (ie "simple-aws-demo") from the configuration dropdown in the toolbar and click the Run button
+    - Right-click on any demo app and select "Run"
+    - Alternatively, select the demo app from the configuration dropdown in the toolbar and click the Run button
 
 2. **Select Deployment Target**
     - Choose the emulator you created earlier

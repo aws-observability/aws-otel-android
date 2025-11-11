@@ -50,9 +50,12 @@ Create `res/raw/aws_config.json`:
     "rumAppMonitorId": "<your-app-monitor-id>",
   },
 
+  // optionally configure your application's version, allowing you to filter telemetry on the RUM console based on your running app's version
+  "serviceVersion": "1.0",
+
   // optional attributes that will be appended to all OpenTelemetry application spans and events
   "applicationAttributes": {
-    "application.version": "1.0.0" // specifying application.version will allow you to filter telemetry on the RUM console based on your running app's version
+    "custom.attribute": "123"
   }
 }
 ```
@@ -71,20 +74,21 @@ dependencies {
 
 ```kotlin
 class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
+   override fun onCreate() {
+      super.onCreate()
 
-        val config = AwsRumAppMonitorConfig(
-            region = "us-east-1",
-            appMonitorId = "your-app-monitor-id",
-            alias = "your-app-alias"
-        )
-
-        OpenTelemetryAgent.Builder(this)
-            .setAppMonitorConfig(config)
-            .setApplicationVersion("1.0.0")
-            .build()
-    }
+      OpenTelemetryRumClient {
+         androidApplication = this@MyApplication
+         awsRum {
+            region = "us-east-1"
+            appMonitorId = "<your-app-monitor-id>"
+            alias = "<your-resource-based-policy-alias>"
+         }
+         sessionInactivityTimeout = Duration.ofMinutes(1)
+         applicationAttributes = mapOf("app.test" to "123")
+         serviceVersion = "1.0"
+      }
+   }
 }
 ```
 
@@ -146,7 +150,6 @@ The library consists of several modules designed for flexibility and modularity:
 
 Explore our comprehensive [demo applications](demo-apps/):
 
-- **[Simple AWS Demo](demo-apps/simple-aws-demo/)** - Basic CloudWatch RUM integration
 - **[Agent Demo](demo-apps/agent-demo/)** - Zero-configuration auto-instrumentation
 - **[Crash Demo](demo-apps/crash-demo/)** - Crash reporting demonstration
 - **[ANR Demo](demo-apps/anr-demo/)** - ANR detection example

@@ -14,6 +14,7 @@
  */
 package software.amazon.opentelemetry.android.agent
 
+import android.app.Application
 import android.os.Looper
 import android.util.Log
 import io.mockk.every
@@ -22,55 +23,49 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import io.mockk.slot
-import io.mockk.unmockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporterBuilder
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporterBuilder
-import io.opentelemetry.sdk.logs.export.LogRecordExporter
-import io.opentelemetry.sdk.trace.export.SpanExporter
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
-import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
+import software.amazon.opentelemetry.android.OpenTelemetryRumClientConfig
 import software.amazon.opentelemetry.android.TelemetryConfig
 import java.time.Duration
 
 @ExtendWith(MockKExtension::class)
 class RumAgentProviderTest {
     @MockK
-    private lateinit var mockBuilder: OpenTelemetryAgent.Builder
+    private lateinit var mockApplication: Application
 
     @MockK
-    private lateinit var mockOpenTelemetryAgent: OpenTelemetryAgent
+    private lateinit var mockSpanExporterBuilder: OtlpHttpSpanExporterBuilder
 
     @MockK
-    private lateinit var mockDefaultSpanExporterBuilder: OtlpHttpSpanExporterBuilder
+    private lateinit var mockLogRecordExporterBuilder: OtlpHttpLogRecordExporterBuilder
 
     @MockK
-    private lateinit var mockDefaultLogRecordExporterBuilder: OtlpHttpLogRecordExporterBuilder
+    private lateinit var mockSpanExporter: OtlpHttpSpanExporter
+
+    @MockK
+    private lateinit var mockLogRecordExporter: OtlpHttpLogRecordExporter
 
     private lateinit var rumAgentProvider: RumAgentProvider
+    private lateinit var capturedConfig: OpenTelemetryRumClientConfig
 
     @BeforeEach
     fun setUp() {
         rumAgentProvider = RumAgentProvider()
-        every { mockBuilder.build() } returns mockOpenTelemetryAgent
-        every { mockBuilder.setAppMonitorConfig(any()) } returns mockBuilder
-        every { mockBuilder.setSessionInactivityTimeout(any()) } returns mockBuilder
-        every { mockBuilder.setEnabledTelemetry(any()) } returns mockBuilder
-        every { mockBuilder.addSpanExporterCustomizer(any()) } returns mockBuilder
-        every { mockBuilder.addLogRecordExporterCustomizer(any()) } returns mockBuilder
-        every { mockBuilder.setSessionSampleRate(any()) } returns mockBuilder
 
         mockkObject(AwsConfigReader)
-
         mockkStatic(Log::class)
         every { Log.e(any(), any(), any()) } returns 1
         every { Log.w(any(), any<String>()) } returns 1
@@ -81,89 +76,73 @@ class RumAgentProviderTest {
         every { Looper.getMainLooper() } returns mockk()
 
         mockkStatic(OtlpHttpSpanExporter::class)
-        every { OtlpHttpSpanExporter.builder() } returns mockDefaultSpanExporterBuilder
+        every { OtlpHttpSpanExporter.builder() } returns mockSpanExporterBuilder
+        every { mockSpanExporterBuilder.setEndpoint(any()) } returns mockSpanExporterBuilder
+        every { mockSpanExporterBuilder.setCompression(any()) } returns mockSpanExporterBuilder
+        every { mockSpanExporterBuilder.build() } returns mockSpanExporter
+
         mockkStatic(OtlpHttpLogRecordExporter::class)
-        every { OtlpHttpLogRecordExporter.builder() } returns mockDefaultLogRecordExporterBuilder
-        every { mockDefaultSpanExporterBuilder.setEndpoint(any()) } returns mockDefaultSpanExporterBuilder
-        every { mockDefaultSpanExporterBuilder.setCompression(any()) } returns mockDefaultSpanExporterBuilder
-        every { mockDefaultSpanExporterBuilder.build() } returns mockk()
-        every { mockDefaultLogRecordExporterBuilder.setEndpoint(any()) } returns mockDefaultLogRecordExporterBuilder
-        every { mockDefaultLogRecordExporterBuilder.setCompression(any()) } returns mockDefaultLogRecordExporterBuilder
-        every { mockDefaultLogRecordExporterBuilder.build() } returns mockk()
+        every { OtlpHttpLogRecordExporter.builder() } returns mockLogRecordExporterBuilder
+        every { mockLogRecordExporterBuilder.setEndpoint(any()) } returns mockLogRecordExporterBuilder
+        every { mockLogRecordExporterBuilder.setCompression(any()) } returns mockLogRecordExporterBuilder
+        every { mockLogRecordExporterBuilder.build() } returns mockLogRecordExporter
+
+        mockkObject(OpenTelemetryRumClient)
+        every { OpenTelemetryRumClient.invoke(any()) } answers {
+            val block = firstArg<OpenTelemetryRumClientConfig.() -> Unit>()
+            capturedConfig = OpenTelemetryRumClientConfig().apply(block)
+            mockk(relaxed = true)
+        }
     }
 
     @AfterEach
     fun tearDown() {
-        unmockkObject(AwsConfigReader)
+        unmockkAll()
     }
 
     @Test
-    fun `initialize should configure basic AwsRumAppMonitorConfig`() {
-        // Given
+    fun `initialize should configure basic AWS RUM settings`() {
         val config = createBasicConfig()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
-        verify { mockBuilder.setAppMonitorConfig(capture(appMonitorConfigSlot)) }
-        val capturedConfig = appMonitorConfigSlot.captured
-        assert(capturedConfig.region == "us-east-1")
-        assert(capturedConfig.appMonitorId == "test-app-monitor-id")
-        assert(capturedConfig.alias == "test-alias")
-
-        val sessionInactivityTimeout = slot<Duration>()
-        verify { mockBuilder.setSessionInactivityTimeout(capture(sessionInactivityTimeout)) }
-        assert(sessionInactivityTimeout.captured == Duration.ofSeconds(config.sessionTimeout.toLong()))
-
-        verify { mockBuilder.setSessionSampleRate(config.sessionSampleRate) }
+        assertEquals("us-east-1", capturedConfig.awsRumConfig?.region)
+        assertEquals("test-app-monitor-id", capturedConfig.awsRumConfig?.appMonitorId)
+        assertEquals("test-alias", capturedConfig.awsRumConfig?.alias)
+        assertEquals(mockApplication, capturedConfig.androidApplication)
     }
 
     @Test
     fun `initialize should set session timeout from config`() {
-        // Given
         val config = createBasicConfig(sessionTimeout = 600)
-        val timeoutSlot = slot<Duration>()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setSessionInactivityTimeout(capture(timeoutSlot)) }
-        assert(timeoutSlot.captured == Duration.ofSeconds(600))
+        assertEquals(Duration.ofSeconds(600), capturedConfig.sessionInactivityTimeout)
     }
 
     @Test
-    fun `initialize should configure default exporters when no special auth configured`() {
-        // Given
+    fun `initialize should configure exporters with correct endpoints`() {
         val config = createBasicConfig()
         val tracesEndpoint = "https://traces.endpoint.com"
         val logsEndpoint = "https://logs.endpoint.com"
         every { AwsConfigReader.getTracesEndpoint(config) } returns tracesEndpoint
         every { AwsConfigReader.getLogsEndpoint(config) } returns logsEndpoint
 
-        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
-        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
-
-        // Then
-        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
-        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
-
-        // Validate that the customizers create the correct exporter types
-        val spanExporter = spanCustomizerSlot.captured.invoke(mockk())
-        val logExporter = logCustomizerSlot.captured.invoke(mockk())
-
-        Assertions.assertTrue(spanExporter is OtlpHttpSpanExporter)
-        Assertions.assertTrue(logExporter is OtlpHttpLogRecordExporter)
+        verify { mockSpanExporterBuilder.setEndpoint(tracesEndpoint) }
+        verify { mockLogRecordExporterBuilder.setEndpoint(logsEndpoint) }
+        assertEquals(mockSpanExporter, capturedConfig.spanExporter)
+        assertEquals(mockLogRecordExporter, capturedConfig.logRecordExporter)
     }
 
     @Test
     fun `initialize should enable all telemetry when all are configured as enabled`() {
-        // Given
         val telemetryConfigs =
             TelemetryConfigs(
                 activity = TelemetryOption(enabled = true),
@@ -177,30 +156,27 @@ class RumAgentProviderTest {
                 uiLoad = TelemetryOption(enabled = true),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
-        val telemetrySlot = slot<List<TelemetryConfig>>()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
-        val enabledTelemetries = telemetrySlot.captured
-        assert(enabledTelemetries.size == 10)
-        assert(enabledTelemetries.contains(TelemetryConfig.ACTIVITY))
-        assert(enabledTelemetries.contains(TelemetryConfig.ANR))
-        assert(enabledTelemetries.contains(TelemetryConfig.CRASH))
-        assert(enabledTelemetries.contains(TelemetryConfig.FRAGMENT))
-        assert(enabledTelemetries.contains(TelemetryConfig.NETWORK))
-        assert(enabledTelemetries.contains(TelemetryConfig.SLOW_RENDERING))
-        assert(enabledTelemetries.contains(TelemetryConfig.STARTUP))
-        assert(enabledTelemetries.contains(TelemetryConfig.HTTP_URLCONNECTION))
-        assert(enabledTelemetries.contains(TelemetryConfig.OKHTTP_3))
-        assert(enabledTelemetries.contains(TelemetryConfig.UI_LOADING))
+        val enabledTelemetries = capturedConfig.telemetry!!
+        assertEquals(10, enabledTelemetries.size)
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.ACTIVITY))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.ANR))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.CRASH))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.FRAGMENT))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.NETWORK))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.SLOW_RENDERING))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.STARTUP))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.HTTP_URLCONNECTION))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.OKHTTP_3))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.UI_LOADING))
     }
 
     @Test
     fun `initialize should enable only selected telemetry when partially configured`() {
-        // Given
         val telemetryConfigs =
             TelemetryConfigs(
                 activity = TelemetryOption(enabled = true),
@@ -208,45 +184,37 @@ class RumAgentProviderTest {
                 crash = TelemetryOption(enabled = true),
                 fragment = TelemetryOption(enabled = false),
                 network = TelemetryOption(enabled = true),
-                slowRendering = null, // not configured
-                startup = null, // not configured
+                slowRendering = null,
+                startup = null,
                 http = HttpTelemetryOption(enabled = false),
                 uiLoad = TelemetryOption(enabled = false),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
-        val telemetrySlot = slot<List<TelemetryConfig>>()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
-        val enabledTelemetries = telemetrySlot.captured
-        assert(enabledTelemetries.size == 3)
-        assert(enabledTelemetries.contains(TelemetryConfig.ACTIVITY))
-        assert(enabledTelemetries.contains(TelemetryConfig.CRASH))
-        assert(enabledTelemetries.contains(TelemetryConfig.NETWORK))
-        assert(!enabledTelemetries.contains(TelemetryConfig.ANR))
-        assert(!enabledTelemetries.contains(TelemetryConfig.FRAGMENT))
-        assert(!enabledTelemetries.contains(TelemetryConfig.HTTP_URLCONNECTION))
-        assert(!enabledTelemetries.contains(TelemetryConfig.UI_LOADING))
+        val enabledTelemetries = capturedConfig.telemetry!!
+        assertEquals(3, enabledTelemetries.size)
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.ACTIVITY))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.CRASH))
+        assertTrue(enabledTelemetries.contains(TelemetryConfig.NETWORK))
     }
 
     @Test
-    fun `initialize should not set enabled telemetry when telemetry config is null`() {
-        // Given
+    fun `initialize should not set telemetry when config is null`() {
         val config = createBasicConfig(telemetryConfigs = null)
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify(exactly = 0) { mockBuilder.setEnabledTelemetry(any()) }
+        assertEquals(null, capturedConfig.telemetry)
     }
 
     @Test
     fun `initialize should enable no telemetry when all are disabled`() {
-        // Given
         val telemetryConfigs =
             TelemetryConfigs(
                 activity = TelemetryOption(enabled = false),
@@ -260,32 +228,16 @@ class RumAgentProviderTest {
                 uiLoad = TelemetryOption(enabled = false),
             )
         val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
-        val telemetrySlot = slot<List<TelemetryConfig>>()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setEnabledTelemetry(capture(telemetrySlot)) }
-        val enabledTelemetries = telemetrySlot.captured
-        assert(enabledTelemetries.isEmpty())
-    }
-
-    @Test
-    fun `initialize should call build on builder`() {
-        // Given
-        val config = createBasicConfig()
-
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
-
-        // Then
-        verify { mockBuilder.build() }
+        assertTrue(capturedConfig.telemetry!!.isEmpty())
     }
 
     @Test
     fun `initialize should handle null rumAlias in config`() {
-        // Given
         val awsConfig =
             AwsConfig(
                 region = "us-east-1",
@@ -293,78 +245,95 @@ class RumAgentProviderTest {
                 rumAlias = null,
             )
         val config = AgentConfig(aws = awsConfig)
-        val appMonitorConfigSlot = slot<AwsRumAppMonitorConfig>()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setAppMonitorConfig(capture(appMonitorConfigSlot)) }
-        val capturedConfig = appMonitorConfigSlot.captured
-        assert(capturedConfig.alias == null)
+        assertEquals(null, capturedConfig.awsRumConfig?.alias)
     }
 
     @Test
     fun `initialize should use default session timeout when not specified`() {
-        // Given
-        val config = createBasicConfig() // Uses default sessionTimeout = 300
-        val timeoutSlot = slot<Duration>()
+        val config = createBasicConfig()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // Then
-        verify { mockBuilder.setSessionInactivityTimeout(capture(timeoutSlot)) }
-        assert(timeoutSlot.captured == Duration.ofSeconds(300))
+        assertEquals(Duration.ofSeconds(300), capturedConfig.sessionInactivityTimeout)
     }
 
     @Test
     fun `initialize should use configured compression for exporters`() {
-        // Given
         val exportOverride = ExportOverrideConfig(compression = "gzip")
         val config = createBasicConfig(exportOverride = exportOverride)
         every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
         every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
-        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
-
-        // Then
-        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
-        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
-
-        spanCustomizerSlot.captured.invoke(mockk())
-        logCustomizerSlot.captured.invoke(mockk())
-
-        verify { mockDefaultSpanExporterBuilder.setCompression("gzip") }
-        verify { mockDefaultLogRecordExporterBuilder.setCompression("gzip") }
+        verify { mockSpanExporterBuilder.setCompression("gzip") }
+        verify { mockLogRecordExporterBuilder.setCompression("gzip") }
     }
 
     @Test
     fun `initialize should use default compression when not configured`() {
-        // Given
         val config = createBasicConfig()
         every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
         every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        val spanCustomizerSlot = slot<(SpanExporter) -> SpanExporter>()
-        val logCustomizerSlot = slot<(LogRecordExporter) -> LogRecordExporter>()
+        rumAgentProvider.initialize(config, mockApplication)
 
-        // When
-        rumAgentProvider.initialize(config, mockBuilder)
+        verify { mockSpanExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
+        verify { mockLogRecordExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
+    }
 
-        // Then
-        verify { mockBuilder.addSpanExporterCustomizer(capture(spanCustomizerSlot)) }
-        verify { mockBuilder.addLogRecordExporterCustomizer(capture(logCustomizerSlot)) }
+    @Test
+    fun `initialize should set session sample rate`() {
+        val config = createBasicConfig()
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
 
-        spanCustomizerSlot.captured.invoke(mockk())
-        logCustomizerSlot.captured.invoke(mockk())
+        rumAgentProvider.initialize(config, mockApplication)
 
-        verify { mockDefaultSpanExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
-        verify { mockDefaultLogRecordExporterBuilder.setCompression(RumAgentProvider.DEFAULT_COMPRESSION) }
+        assertEquals(config.sessionSampleRate, capturedConfig.sessionSampleRate)
+    }
+
+    @Test
+    fun `initialize should set application attributes when provided`() {
+        val attributes =
+            mapOf(
+                "custom.attribute" to JsonPrimitive("value"),
+            )
+        val config = createBasicConfig(applicationAttributes = attributes)
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
+
+        rumAgentProvider.initialize(config, mockApplication)
+
+        assertEquals(mapOf("custom.attribute" to "value"), capturedConfig.applicationAttributes)
+    }
+
+    @Test
+    fun `initialize should set captured request and response headers when http telemetry enabled`() {
+        val telemetryConfigs =
+            TelemetryConfigs(
+                http =
+                    HttpTelemetryOption(
+                        enabled = true,
+                        capturedRequestHeaders = listOf("Authorization", "Content-Type"),
+                        capturedResponseHeaders = listOf("X-Custom-Header"),
+                    ),
+            )
+        val config = createBasicConfig(telemetryConfigs = telemetryConfigs)
+        every { AwsConfigReader.getTracesEndpoint(config) } returns "https://traces.endpoint.com"
+        every { AwsConfigReader.getLogsEndpoint(config) } returns "https://logs.endpoint.com"
+
+        rumAgentProvider.initialize(config, mockApplication)
+
+        assertEquals(listOf("Authorization", "Content-Type"), capturedConfig.capturedRequestHeaders)
+        assertEquals(listOf("X-Custom-Header"), capturedConfig.capturedResponseHeaders)
     }
 
     private fun createBasicConfig(

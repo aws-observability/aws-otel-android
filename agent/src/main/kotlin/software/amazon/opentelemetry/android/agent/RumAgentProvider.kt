@@ -22,14 +22,13 @@ import android.net.Uri
 import android.util.Log
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
-import software.amazon.opentelemetry.android.AwsRumAppMonitorConfig
-import software.amazon.opentelemetry.android.OpenTelemetryAgent
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
 import software.amazon.opentelemetry.android.TelemetryConfig
 import java.time.Duration
 
 internal class RumAgentProvider : ContentProvider() {
     companion object {
-        const val DEFAULT_COMPRESSION = "none"
+        const val DEFAULT_COMPRESSION = "gzip"
     }
 
     /**
@@ -41,7 +40,7 @@ internal class RumAgentProvider : ContentProvider() {
                 val application = context!!.applicationContext as Application
                 val config = AwsConfigReader.readConfig(context!!)
                 if (config != null) {
-                    initialize(config, OpenTelemetryAgent.Builder(application))
+                    initialize(config, application)
                     return true
                 }
                 Log.e(AwsConfigReader.TAG, "No config file found; cannot initialize AgentProvider")
@@ -56,87 +55,68 @@ internal class RumAgentProvider : ContentProvider() {
     }
 
     /**
-     * Initialize the ADOT Android Agent (OpenTelemetryAgent)
+     * Initialize the ADOT Android Client (OpenTelemetryRumClient)
      */
     fun initialize(
         config: AgentConfig,
-        builder: OpenTelemetryAgent.Builder,
+        application: Application,
     ) {
-        // Default configuration - sends data to AWS RUM
-        val awsRumAppMonitorConfig =
-            AwsRumAppMonitorConfig(
-                config.aws.region,
-                config.aws.rumAppMonitorId,
-                config.aws.rumAlias,
-            )
-
-        builder
-            .setAppMonitorConfig(awsRumAppMonitorConfig)
-            .setSessionInactivityTimeout(Duration.ofSeconds(config.sessionTimeout.toLong()))
-            .setSessionSampleRate(config.sessionSampleRate)
-
-        // Use default OTLP exporters without authentication
-        configureDefaultExporters(builder, config)
-
-        val telemetry = config.telemetry
-
-        if (telemetry != null) {
-            val enabledTelemetries =
-                listOfNotNull(
-                    TelemetryConfig.ACTIVITY.takeIf { telemetry.activity?.enabled == true },
-                    TelemetryConfig.ANR.takeIf { telemetry.anr?.enabled == true },
-                    TelemetryConfig.CRASH.takeIf { telemetry.crash?.enabled == true },
-                    TelemetryConfig.FRAGMENT.takeIf { telemetry.fragment?.enabled == true },
-                    TelemetryConfig.NETWORK.takeIf { telemetry.network?.enabled == true },
-                    TelemetryConfig.SLOW_RENDERING.takeIf { telemetry.slowRendering?.enabled == true },
-                    TelemetryConfig.STARTUP.takeIf { telemetry.startup?.enabled == true },
-                    TelemetryConfig.HTTP_URLCONNECTION.takeIf { telemetry.http?.enabled == true },
-                    TelemetryConfig.OKHTTP_3.takeIf { telemetry.http?.enabled == true },
-                    TelemetryConfig.UI_LOADING.takeIf { telemetry.uiLoad?.enabled == true },
-                )
-            builder.setEnabledTelemetry(enabledTelemetries)
-            if (telemetry.http?.enabled == true) {
-                if (telemetry.http.capturedResponseHeaders != null) {
-                    builder.setCapturedResponseHeaders(telemetry.http.capturedResponseHeaders)
-                }
-                if (telemetry.http.capturedRequestHeaders != null) {
-                    builder.setCapturedRequestHeaders(telemetry.http.capturedRequestHeaders)
-                }
+        OpenTelemetryRumClient {
+            awsRum {
+                region = config.aws.region
+                appMonitorId = config.aws.rumAppMonitorId
+                alias = config.aws.rumAlias
             }
-        }
-
-        config.applicationAttributes?.let { attributes ->
-            builder.setCustomApplicationAttributes(
-                attributes.entries.associate {
-                    it.key to it.value.content
-                },
-            )
-        }
-
-        builder.build()
-    }
-
-    /**
-     * Configure the builder to use default OTLP exporters without authentication
-     */
-    private fun configureDefaultExporters(
-        builder: OpenTelemetryAgent.Builder,
-        config: AgentConfig,
-    ) {
-        builder
-            .addSpanExporterCustomizer { _ ->
+            androidApplication = application
+            sessionInactivityTimeout = Duration.ofSeconds(config.sessionTimeout.toLong())
+            sessionSampleRate = config.sessionSampleRate
+            spanExporter =
                 OtlpHttpSpanExporter
                     .builder()
                     .setEndpoint(AwsConfigReader.getTracesEndpoint(config))
                     .setCompression(config.exportOverride?.compression ?: DEFAULT_COMPRESSION)
                     .build()
-            }.addLogRecordExporterCustomizer { _ ->
+            logRecordExporter =
                 OtlpHttpLogRecordExporter
                     .builder()
                     .setEndpoint(AwsConfigReader.getLogsEndpoint(config))
                     .setCompression(config.exportOverride?.compression ?: DEFAULT_COMPRESSION)
                     .build()
+
+            val configTelemetry = config.telemetry
+            if (configTelemetry != null) {
+                val enabledTelemetries =
+                    listOfNotNull(
+                        TelemetryConfig.ACTIVITY.takeIf { configTelemetry.activity?.enabled == true },
+                        TelemetryConfig.ANR.takeIf { configTelemetry.anr?.enabled == true },
+                        TelemetryConfig.CRASH.takeIf { configTelemetry.crash?.enabled == true },
+                        TelemetryConfig.FRAGMENT.takeIf { configTelemetry.fragment?.enabled == true },
+                        TelemetryConfig.NETWORK.takeIf { configTelemetry.network?.enabled == true },
+                        TelemetryConfig.SLOW_RENDERING.takeIf { configTelemetry.slowRendering?.enabled == true },
+                        TelemetryConfig.STARTUP.takeIf { configTelemetry.startup?.enabled == true },
+                        TelemetryConfig.HTTP_URLCONNECTION.takeIf { configTelemetry.http?.enabled == true },
+                        TelemetryConfig.OKHTTP_3.takeIf { configTelemetry.http?.enabled == true },
+                        TelemetryConfig.UI_LOADING.takeIf { configTelemetry.uiLoad?.enabled == true },
+                    )
+                telemetry = enabledTelemetries
+                if (configTelemetry.http?.enabled == true) {
+                    if (configTelemetry.http.capturedResponseHeaders != null) {
+                        capturedResponseHeaders = configTelemetry.http.capturedResponseHeaders
+                    }
+                    if (configTelemetry.http.capturedRequestHeaders != null) {
+                        capturedRequestHeaders = configTelemetry.http.capturedRequestHeaders
+                    }
+                }
             }
+            if (config.applicationAttributes != null) {
+                applicationAttributes =
+                    config.applicationAttributes.entries.associate {
+                        it.key to it.value.content
+                    }
+            }
+            serviceVersion = config.serviceVersion
+            serviceName = config.serviceName
+        }
     }
 
     override fun query(
