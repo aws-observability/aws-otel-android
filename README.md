@@ -75,6 +75,9 @@ dependencies {
 ```
 
 ```kotlin
+import io.opentelemetry.sdk.resources.Resource
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
+
 class MyApplication : Application() {
    override fun onCreate() {
       super.onCreate()
@@ -85,10 +88,10 @@ class MyApplication : Application() {
             region = "us-east-1"
             appMonitorId = "<your-app-monitor-id>"
          }
-         otelResourceAttributes = mapOf(
-            "deployment.environment" to "staging",
-            "service.version" to "1.0"
-         )
+         otelResource = Resource.builder()
+            .put("service.name", "testAppName")
+            .put("service.version", "1.0")
+            .build()
       }
    }
 }

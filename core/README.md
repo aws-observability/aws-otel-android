@@ -15,6 +15,9 @@ dependencies {
 ### 2. Initialize in Application Class
 
 ```kotlin
+import io.opentelemetry.sdk.resources.Resource
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
+
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -26,9 +29,10 @@ class MyApplication : Application() {
                 appMonitorId = "<your-app-monitor-id>"
                 alias = "<your-resource-based-policy-alias>"
             }
-            sessionInactivityTimeout = Duration.ofMinutes(1)
-            applicationAttributes = mapOf("app.test" to "123")
-            serviceVersion = "1.0"
+            otelResource = Resource.builder()
+                .put("service.name", "testAppName")
+                .put("service.version", "1.0")
+                .build()
         }
     }
 }
