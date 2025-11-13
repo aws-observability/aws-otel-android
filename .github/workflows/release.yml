@@ -95,7 +95,8 @@ jobs:
              --title "Release v${VERSION}" \
              --notes-file release_notes.md \
              --draft \
-             "v${VERSION}"
+             "v${VERSION}" \
+             .
 
       - name: Clean up signing key
         if: always()
