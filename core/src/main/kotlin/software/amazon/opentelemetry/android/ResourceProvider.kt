@@ -58,7 +58,7 @@ object ResourceProvider {
                 .put(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID, config.appMonitorId)
 
         // Auto-discover application name if it hasn't been provided
-        if (customResource?.getAttribute(ServiceAttributes.SERVICE_NAME) != null) {
+        if (customResource?.getAttribute(ServiceAttributes.SERVICE_NAME) == null) {
             val appName = readAppName(application)
             resourceBuilder.put(ServiceAttributes.SERVICE_NAME, appName)
         }

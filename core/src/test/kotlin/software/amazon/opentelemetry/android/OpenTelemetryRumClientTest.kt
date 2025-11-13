@@ -201,6 +201,7 @@ class OpenTelemetryRumClientTest {
                 withArg {
                     assertEquals("testAppName", it.getAttribute(ServiceAttributes.SERVICE_NAME))
                     assertEquals("1.0", it.getAttribute(ServiceAttributes.SERVICE_VERSION))
+                    assertEquals("123", it.getAttribute(AttributeKey.stringKey("app.test")))
                     assertEquals(
                         "us-east-1",
                         it.getAttribute(AttributeKey.stringKey(CloudIncubatingAttributes.CLOUD_REGION.key)),
@@ -228,8 +229,6 @@ class OpenTelemetryRumClientTest {
         val userIdAttribute = globalAttributes.get(AttributeKey.stringKey(UserIdManager.USER_ID_ATTR))
         assertNotNull(userIdAttribute)
         assertEquals(userId, userIdAttribute)
-
-        assertEquals("123", globalAttributes.get(AttributeKey.stringKey("app.test")))
     }
 
     @Test
