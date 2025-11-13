@@ -46,11 +46,7 @@ jobs:
 
       - name: Set Maven Central credentials as environment variables
         run: |
-          echo "ORG_GRADLE_PROJECT_sonatypeUsername=${{ env.MAVEN_CENTRAL_USERNAME }}" >> $GITHUB_ENV
-          echo "ORG_GRADLE_PROJECT_sonatypePassword=${{ env.MAVEN_CENTRAL_PASSWORD }}" >> $GITHUB_ENV
-          echo "ORG_GRADLE_PROJECT_signing.keyId=${{ env.SIGNING_KEY_ID }}" >> $GITHUB_ENV
-          echo "ORG_GRADLE_PROJECT_signing.password=${{ env.SIGNING_PASSWORD }}" >> $GITHUB_ENV
-          echo "ORG_GRADLE_PROJECT_signing.secretKeyRingFile=secring.gpg" >> $GITHUB_ENV
+          echo "CI=true" >> $GITHUB_ENV
 
       - name: Decode and save signing key
         run: |
@@ -61,19 +57,43 @@ jobs:
           VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build and publish to Maven Central
-        run: |
-          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+      - name: Build and Publish release with Gradle
+        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 #v3.5.0
+        with:
+          arguments: build final closeSonatypeStagingRepository -Prelease.version=${{ env.VERSION }} --stacktrace # TODO: Test and replace with closeAndReleaseSonatypeStagingRepository
+        env:
+          PUBLISH_TOKEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          PUBLISH_TOKEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
+          GPG_PRIVATE_KEY: ${{ secrets.SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSWORD }}
 
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Extract CHANGELOG entries for this version
+          CHANGELOG_ENTRIES=$(python3 -c "
+          import re, os
+          version = os.environ['VERSION']
+          with open('CHANGELOG.md', 'r') as f:
+              content = f.read()
+          version_pattern = rf'## v{re.escape(version)}.*?\n(.*?)(?=\n## |\Z)'
+          version_match = re.search(version_pattern, content, re.DOTALL)
+          if version_match:
+              entries = version_match.group(1).strip()
+              if entries:
+                  print(entries)
+          ")
+
+          # Create release notes
+          cat > release_notes.md << EOF
+          $(if [ -n "$CHANGELOG_ENTRIES" ]; then echo "## What's Changed"; echo "$CHANGELOG_ENTRIES"; echo ""; fi)
+          EOF
+
           gh release create --target "$GITHUB_REF_NAME" \
              --title "Release v${VERSION}" \
+             --notes-file release_notes.md \
              --draft \
              "v${VERSION}"
 

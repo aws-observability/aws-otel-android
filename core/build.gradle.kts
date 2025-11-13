@@ -31,46 +31,6 @@ dependencies {
     implementation(project(":ui-loading"))
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            pom {
-                name.set("aws-otel-android")
-                description.set("AWS Distro for OpenTelemetry (ADOT) on Android")
-                url.set("https://github.com/aws-observability/aws-otel-android")
-                inceptionYear.set("2025")
-                scm {
-                    url.set("https://github.com/aws-observability/aws-otel-android/tree/main")
-                    connection.set("scm:git:ssh://git@github.com/aws-observability/aws-otel-android.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/aws-observability/aws-otel-android.git")
-                }
-
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        distribution.set("repo")
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        maven{
-            url = uri("https://aws.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = project.findProperty("sonatypeUsername") as String?
-                password = project.findProperty("sonatypePassword") as String?
-            }
-        }
-    }
-}
-
-signing {
-    sign(publishing.publications)
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
