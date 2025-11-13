@@ -36,18 +36,13 @@ object ResourceProvider {
     fun createDefault(
         application: Application,
         config: AwsRumAppMonitorConfig,
-        appName: String? = null,
-        appVersion: String? = null,
+        customResource: Resource? = null,
     ): Resource {
-        val customApplicationName = appName ?: readAppName(application)
-        val serviceVersion = appVersion ?: "-"
-
         val resourceBuilder =
             Resource
                 .getDefault()
+                .merge(customResource)
                 .toBuilder()
-                .put(ServiceAttributes.SERVICE_NAME, customApplicationName)
-                .put(ServiceAttributes.SERVICE_VERSION, serviceVersion)
                 .put(RumConstants.RUM_SDK_VERSION, BuildConfig.RUM_SDK_VERSION)
                 .put(DeviceIncubatingAttributes.DEVICE_MODEL_NAME, Build.MODEL)
                 .put(DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER, Build.MODEL)
@@ -61,6 +56,12 @@ object ResourceProvider {
                 .put(CloudIncubatingAttributes.CLOUD_PROVIDER, AWS_CLOUD_PROVIDER)
                 .put(CloudIncubatingAttributes.CLOUD_REGION, config.region)
                 .put(AwsRumAttributes.AWS_RUM_APP_MONITOR_ID, config.appMonitorId)
+
+        // Auto-discover application name if it hasn't been provided
+        if (customResource?.getAttribute(ServiceAttributes.SERVICE_NAME) != null) {
+            val appName = readAppName(application)
+            resourceBuilder.put(ServiceAttributes.SERVICE_NAME, appName)
+        }
 
         if (!config.alias.isNullOrEmpty()) {
             resourceBuilder.put(AwsRumAttributes.AWS_RUM_APP_MONITOR_ALIAS, config.alias)

@@ -22,6 +22,13 @@ import android.net.Uri
 import android.util.Log
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
+import io.opentelemetry.sdk.resources.Resource
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.long
+import kotlinx.serialization.json.longOrNull
 import software.amazon.opentelemetry.android.OpenTelemetryRumClient
 import software.amazon.opentelemetry.android.TelemetryConfig
 import java.time.Duration
@@ -108,14 +115,21 @@ internal class RumAgentProvider : ContentProvider() {
                     }
                 }
             }
-            if (config.applicationAttributes != null) {
-                applicationAttributes =
-                    config.applicationAttributes.entries.associate {
-                        it.key to it.value.content
-                    }
+            if (config.otelResourceAttributes != null) {
+                otelResource =
+                    Resource
+                        .builder()
+                        .apply {
+                            config.otelResourceAttributes.entries.forEach { (key, value) ->
+                                when {
+                                    value.longOrNull != null -> put(key, value.long)
+                                    value.booleanOrNull != null -> put(key, value.boolean)
+                                    value.doubleOrNull != null -> put(key, value.double)
+                                    else -> put(key, value.content)
+                                }
+                            }
+                        }.build()
             }
-            serviceVersion = config.serviceVersion
-            serviceName = config.serviceName
         }
     }
 

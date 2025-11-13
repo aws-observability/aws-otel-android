@@ -145,9 +145,9 @@
       "type": "string",
       "description": "Allows you to specify a customized service.name resource attribute for your telemetry. If not provided, the SDK will auto-discover the best value for it"
     },
-    "applicationAttributes": {
+    "otelResourceAttributes": {
       "type": "object",
-      "description": "Custom OpenTelemetry attributes injected into every Span and LogRecorded vended by your app. You can use this to include custom metadata with your telemetry.",
+      "description": "A map of key-value pairs to be used as custom resource attributes",
       "additionalProperties": {
         "oneOf": [
           { "type": "string" },

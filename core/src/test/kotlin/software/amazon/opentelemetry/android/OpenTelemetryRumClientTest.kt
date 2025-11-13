@@ -33,6 +33,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.semconv.ServiceAttributes
 import io.opentelemetry.semconv.incubating.CloudIncubatingAttributes
@@ -185,9 +186,13 @@ class OpenTelemetryRumClientTest {
             sessionInactivityTimeout = Duration.ofMinutes(1)
             telemetry = listOf(TelemetryConfig.ACTIVITY, TelemetryConfig.ANR)
             features = listOf(FeatureConfig.USER_ID)
-            applicationAttributes = mapOf("app.test" to "123")
-            serviceVersion = "1.0"
-            serviceName = "testAppName"
+            otelResource =
+                Resource
+                    .builder()
+                    .put("app.test", "123")
+                    .put("service.name", "testAppName")
+                    .put("service.version", "1.0")
+                    .build()
         }
 
         // Validate the expected delegate builder

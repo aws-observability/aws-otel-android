@@ -46,16 +46,18 @@ Create `res/raw/aws_config.json`:
 ```jsonc
 {
   "aws": {
+    // REQUIRED fields:
     "region": "us-east-1", // specify the AWS region your app monitor has been created in
     "rumAppMonitorId": "<your-app-monitor-id>",
   },
 
-  // optionally configure your application's version, allowing you to filter telemetry on the RUM console based on your running app's version
-  "serviceVersion": "1.0",
-
-  // optional attributes that will be appended to all OpenTelemetry application spans and events
-  "applicationAttributes": {
-    "custom.attribute": "123"
+  // optional attributes that will be appended to your OpenTelemetry Resource
+  "otelResourceAttributes": {
+    "deployment.environment": "staging",
+    "service.name": "MyApplication",
+    
+    // Add this field to your application for additional filtering in AWS RUM dashboards
+    "service.version": "1.0"
   }
 }
 ```
@@ -82,11 +84,11 @@ class MyApplication : Application() {
          awsRum {
             region = "us-east-1"
             appMonitorId = "<your-app-monitor-id>"
-            alias = "<your-resource-based-policy-alias>"
          }
-         sessionInactivityTimeout = Duration.ofMinutes(1)
-         applicationAttributes = mapOf("app.test" to "123")
-         serviceVersion = "1.0"
+         otelResourceAttributes = mapOf(
+            "deployment.environment" to "staging",
+            "service.version" to "1.0"
+         )
       }
    }
 }
