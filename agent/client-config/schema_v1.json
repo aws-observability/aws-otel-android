@@ -136,15 +136,6 @@
       "maximum": 1,
       "default": 1
     },
-    "serviceVersion": {
-      "type": "string",
-      "description": "If specified, will annotate your telemetry with this value as a service.version resource attribute. You can use this to partition telemetry across your app version types",
-      "default": "-"
-    },
-    "serviceName": {
-      "type": "string",
-      "description": "Allows you to specify a customized service.name resource attribute for your telemetry. If not provided, the SDK will auto-discover the best value for it"
-    },
     "otelResourceAttributes": {
       "type": "object",
       "description": "A map of key-value pairs to be used as custom resource attributes",
