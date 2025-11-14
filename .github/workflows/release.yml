@@ -1,9 +1,6 @@
 name: Release Build and Publish to Maven Central
 
 on:
-  push:
-    branches:
-      - chore/release-workflows-v3
   workflow_dispatch:
 
 env:
@@ -63,7 +60,7 @@ jobs:
       - name: Build and Publish release with Gradle
         uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 #v3.5.0
         with:
-          arguments: build publishToSonatype -Pfinal=true --stacktrace # TODO: Test and replace with closeAndReleaseSonatypeStagingRepository
+          arguments: build publishToSonatype closeSonatypeStagingRepository -Pfinal=true --stacktrace # TODO: Test and replace with closeAndReleaseSonatypeStagingRepository
         env:
           PUBLISH_TOKEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           PUBLISH_TOKEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
