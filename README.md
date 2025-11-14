@@ -29,7 +29,7 @@ Add to your app's `build.gradle`. For a Kotlin DSL example:
 ```kotlin
 dependencies {
     // For automatic instrumentation (recommended; see below for programmatic configuration)
-    implementation("software.amazon.opentelemetry.android:agent:${LATEST_VERSION}")
+    implementation("software.amazon.opentelemetry.android:agent:0.0.0")
 
     // For HTTP instrumentation with ByteBuddy
     byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.12.0-alpha")           // if you are using OkHttp-3.0
@@ -153,6 +153,45 @@ Explore our comprehensive [demo applications](demo-apps/):
 - **[Agent Demo](demo-apps/agent-demo/)** - Zero-configuration auto-instrumentation
 - **[Crash Demo](demo-apps/crash-demo/)** - Crash reporting demonstration
 - **[ANR Demo](demo-apps/anr-demo/)** - ANR detection example
+
+## Version Management
+
+### Version Bumping
+
+The repository includes a script to manage version bumping across relevant files. The script updates versions in:
+- `gradle.properties` (project version)
+- `README.md` (documentation references, if any)
+
+#### Manual Version Bumping
+
+Use the `scripts/bump-version.sh` script for version control:
+
+**Patch Version** (x.y.z → x.y.z+1):
+```bash
+./scripts/bump-version.sh patch
+```
+
+**Minor Version** (x.y.z → x.y+1.0):
+```bash
+./scripts/bump-version.sh minor
+```
+
+**Major Version** (x.y.z → x+1.0.0):
+```bash
+./scripts/bump-version.sh major
+```
+
+**Specific Version**:
+```bash
+./scripts/bump-version.sh 2.1.3
+```
+
+**With Automatic Commit and Tag**:
+```bash
+./scripts/bump-version.sh patch --commit-tag
+```
+
+The script will prompt for confirmation before making changes and creates backups of modified files.
 
 ## Contributing
 

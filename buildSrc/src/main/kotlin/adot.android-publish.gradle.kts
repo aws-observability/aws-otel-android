@@ -65,8 +65,8 @@ afterEvaluate {
                 }
                 developers {
                     developer {
-                        id.set("awsobserability")
-                        name.set("aws-observability")
+                        id.set("aws-opentelemetry")
+                        name.set("aws-opentelemetry")
                         url.set("https://github.com/aws-observability")
                     }
                 }
@@ -76,7 +76,7 @@ afterEvaluate {
         // Signing only during a release.
         if (isARelease) {
             signing {
-                useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSWORD"))
+                useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
                 sign(maven)
             }
         }

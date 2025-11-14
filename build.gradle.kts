@@ -15,6 +15,7 @@ buildscript {
 
 plugins {
     id("adot.spotless")
+    alias(libs.plugins.publishPlugin)
 }
 
 extra["java_version"] = JavaVersion.VERSION_1_8
@@ -40,6 +41,17 @@ subprojects {
             tasks.named("preBuild") {
                 dependsOn("spotlessApply")
             }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username.set(System.getenv("PUBLISH_TOKEN_USERNAME"))
+            password.set(System.getenv("PUBLISH_TOKEN_PASSWORD"))
         }
     }
 }

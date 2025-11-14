@@ -31,11 +31,13 @@ android {
         targetCompatibility(javaVersion)
     }
 
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-        apiVersion = minKotlinVersion.version
-        languageVersion = minKotlinVersion.version
-        freeCompilerArgs = listOf("-Xjvm-default=all")
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(javaVersion.toString()))
+            apiVersion.set(minKotlinVersion)
+            languageVersion.set(minKotlinVersion)
+            freeCompilerArgs.add("-Xjvm-default=all")
+        }
     }
 
     sourceSets {

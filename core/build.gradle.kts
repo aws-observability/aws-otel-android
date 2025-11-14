@@ -1,6 +1,8 @@
 plugins {
     id("adot.android-library")
     id("adot.android-publish")
+    id("signing")
+    id("maven-publish")
 }
 
 android {
