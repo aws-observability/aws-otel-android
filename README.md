@@ -55,7 +55,7 @@ Create `res/raw/aws_config.json`:
   "otelResourceAttributes": {
     "deployment.environment": "staging",
     "service.name": "MyApplication",
-    
+
     // Add this field to your application for additional filtering in AWS RUM dashboards
     "service.version": "1.0"
   }
