@@ -41,4 +41,8 @@ jobs:
 
       - name: Test maven access
         run: |
-          curl --verbose --user "$MAVEN_CENTRAL_USERNAME:$MAVEN_CENTRAL_PASSWORD" https://ossrh-staging-api.central.sonatype.com/service/local/staging/profiles
+          curl --verbose \
+            --user "$MAVEN_CENTRAL_USERNAME:$MAVEN_CENTRAL_PASSWORD" \                                                                                                                     
+            --header "Content-Type: application/xml" \                                                                                                                                     
+            --header "Accept: application/xml" \                                                                                                                                           
+            https://ossrh-staging-api.central.sonatype.com/service/local/staging/profiles   
