@@ -50,11 +50,10 @@ jobs:
       - name: Set env var for signing the release
         run: |
           echo "CI=true" >> $GITHUB_ENV
-          echo "GPG_PRIVATE_KEY_DECODED=$(echo "${{ env.SIGNING_KEY }}" | base64 -d)" >> $GITHUB_ENV
-
-      - name: Decode and save signing key
-        run: |
           echo "${{ env.SIGNING_KEY }}" | base64 -d > secring.gpg
+          DECODED_KEY=$(echo "${{ env.SIGNING_KEY }}" | base64 -d)                                                                                                                     
+          ENCODED_FOR_ENV=$(echo "$DECODED_KEY" | base64 -w 0)                                                                                                                         
+          echo "GPG_PRIVATE_KEY_CLEAN=$ENCODED_FOR_ENV" >> $GITHUB_ENV 
 
       - name: Extract version from gradle.properties
         run: |
@@ -69,7 +68,7 @@ jobs:
           PUBLISH_TOKEN_USERNAME: ${{ env.MAVEN_CENTRAL_USERNAME }}                                                                                                                    
           PUBLISH_TOKEN_PASSWORD: ${{ env.MAVEN_CENTRAL_PASSWORD }}                                                                                                                    
           GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}                                                                                                                                      
-          GPG_PRIVATE_KEY: ${{ env.GPG_PRIVATE_KEY_DECODED }}                                                                                                                                     
+          GPG_PRIVATE_KEY: ${{ env.GPG_PRIVATE_KEY_CLEAN }}                                                                                                                                     
           GPG_PASSPHRASE: ${{ env.SIGNING_PASSWORD }}
 
       - name: Create GitHub release
