@@ -29,7 +29,7 @@ Add to your app's `build.gradle`. For a Kotlin DSL example:
 ```kotlin
 dependencies {
     // For automatic instrumentation (recommended; see below for programmatic configuration)
-    implementation("software.amazon.opentelemetry.android:agent:${LATEST_VERSION}")
+    implementation("software.amazon.opentelemetry.android:agent:0.0.0")
 
     // For HTTP instrumentation with ByteBuddy
     byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.12.0-alpha")           // if you are using OkHttp-3.0
