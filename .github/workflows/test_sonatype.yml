@@ -41,6 +41,4 @@ jobs:
 
       - name: Test maven access
         run: |
-          curl --verbose \
-            --header "Authorization: Bearer $(echo -n "$MAVEN_CENTRAL_USERNAME:$MAVEN_CENTRAL_PASSWORD" | base64)" \                                                                       
-            https://central.sonatype.com/api/v1/manual/search/repositories      
+          curl --verbose --user "$MAVEN_CENTRAL_USERNAME:$MAVEN_CENTRAL_PASSWORD" https://central.sonatype.com/api/v1/manual/search/repositories
