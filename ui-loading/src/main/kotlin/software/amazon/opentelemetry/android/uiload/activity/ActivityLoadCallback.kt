@@ -17,7 +17,7 @@ package software.amazon.opentelemetry.android.uiload.activity
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import software.amazon.opentelemetry.android.uiload.utils.CommonUtils
+import software.amazon.opentelemetry.android.common.Constants
 import software.amazon.opentelemetry.android.uiload.utils.FirstDrawListener
 
 class ActivityLoadCallback(
@@ -28,7 +28,7 @@ class ActivityLoadCallback(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
-        tracers.startSpan(activity, CommonUtils.FIRST_DRAW_SPAN)
+        tracers.startSpan(activity, Constants.TTFD_SPAN_NAME)
         firstDrawListener.registerFirstDraw(
             activity,
         ) { view -> tracers.endSpan(activity, view) }

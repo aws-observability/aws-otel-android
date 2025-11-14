@@ -18,4 +18,4 @@ include(":tests:contract-tests")
 
 include(":agent")
 include(":ui-loading")
-include(":api")
+include(":common")

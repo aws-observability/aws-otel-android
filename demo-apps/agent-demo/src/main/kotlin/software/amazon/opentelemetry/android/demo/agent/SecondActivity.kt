@@ -28,8 +28,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import software.amazon.opentelemetry.android.api.AwsRum
+import software.amazon.opentelemetry.android.OpenTelemetryRumClient
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivitySecondBinding
+import software.amazon.opentelemetry.android.features.event
+import software.amazon.opentelemetry.android.features.span
 import java.io.IOException
 
 class CustomException(message: String) : Exception(message)
@@ -70,19 +72,13 @@ class SecondActivity : AppCompatActivity() {
         val message = intent.getStringExtra("MESSAGE") ?: "No message received"
         binding.textViewMessage.text = message
 
-        AwsRum.executeSpan(
-            name = "custom-parent-span",
-            screenName = this.javaClass.simpleName
-        ) {
-            parent ->
-                AwsRum.executeSpan(
-                    name = "custom-child-span",
-                    screenName = this.javaClass.simpleName,
-                    parent
-                ) {
-                    setupButtons()
-                }
+        OpenTelemetryRumClient.span("custom-parent-span") {
+            OpenTelemetryRumClient.span("custom-child-span") {
+                setupButtons()
+            }
         }
+
+        OpenTelemetryRumClient.event("my.custom.event", "my event body")
     }
 
     private fun setupButtons() {

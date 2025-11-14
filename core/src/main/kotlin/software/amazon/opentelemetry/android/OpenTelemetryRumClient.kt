@@ -22,6 +22,7 @@ import io.opentelemetry.android.config.OtelRumConfig
 import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.incubator.logs.ExtendedLogger
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
@@ -30,6 +31,7 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
+import software.amazon.opentelemetry.android.common.Constants
 import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
 import software.amazon.opentelemetry.android.features.SessionIdTimeoutHandler
 import software.amazon.opentelemetry.android.features.SessionManager
@@ -64,13 +66,10 @@ class OpenTelemetryRumClient internal constructor(
     val openTelemetry: OpenTelemetry get() = delegate.openTelemetry
     val rumSessionId: String get() = delegate.rumSessionId
 
-    fun emitEvent(
-        eventName: String,
-        body: String = "",
-        attributes: Attributes = Attributes.empty(),
-    ) {
-        delegate.emitEvent(eventName, body, attributes)
-    }
+    val defaultLogger =
+        openTelemetry.logsBridge
+            .loggerBuilder(Constants.CUSTOM_LOGGER_NAME)
+            .build() as ExtendedLogger
 
     fun shutdown() = delegate.shutdown()
 }

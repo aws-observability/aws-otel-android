@@ -9,8 +9,7 @@ android {
 }
 
 dependencies {
-    api(project(":api"))
-    implementation(project(":core"))
+    api(project(":core"))
     implementation(libs.serialization)
     implementation(libs.opentelemetry.android)
     implementation(libs.opentelemetry.exporter.otlp)
