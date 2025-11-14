@@ -1,6 +1,9 @@
 name: Release Build and Publish to Maven Central
 
 on:
+  push:
+    branches:
+      - chore/release-workflows-v3
   workflow_dispatch:
 
 env:
