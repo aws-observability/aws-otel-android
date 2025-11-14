@@ -91,12 +91,11 @@ jobs:
           $(if [ -n "$CHANGELOG_ENTRIES" ]; then echo "## What's Changed"; echo "$CHANGELOG_ENTRIES"; echo ""; fi)
           EOF
 
-          gh release create --target "$GITHUB_REF_NAME" \
-             --title "Release v${VERSION}" \
-             --notes-file release_notes.md \
-             --draft \
-             "v${VERSION}" \
-             .
+          gh release create "v${VERSION}" \
+            --target "$GITHUB_REF_NAME" \
+            --title "Release v${VERSION}" \
+            --notes-file release_notes.md \
+            --draft
 
       - name: Clean up signing key
         if: always()
