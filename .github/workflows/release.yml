@@ -44,7 +44,7 @@ jobs:
             SIGNING_KEY,${{ secrets.SIGNING_KEY_SECRET_ARN }}
             SIGNING_PASSWORD,${{ secrets.SIGNING_PASSWORD_SECRET_ARN }}
 
-      - name: Set Maven Central credentials as environment variables
+      - name: Set CI env var to allow gradle to sign the release
         run: |
           echo "CI=true" >> $GITHUB_ENV
 
