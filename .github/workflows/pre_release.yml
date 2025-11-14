@@ -111,6 +111,10 @@ jobs:
             exit 1
           fi
           
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG for version ${VERSION}"
+          git push origin "v${VERSION}_release"
+          
       - name: Create pull request against the release branch
         env:
           GITHUB_TOKEN: ${{ env.BOT_TOKEN_GITHUB_RW_PATOKEN }}
