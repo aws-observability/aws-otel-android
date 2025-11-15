@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "CI=true" >> $GITHUB_ENV
           echo "${{ env.SIGNING_KEY }}" | base64 -d > secring.gpg
-          DECODED_KEY=$(echo "${{ env.SIGNING_KEY }}" | base64 -d)                                                                                                                     
+          DECODED_KEY=$(echo "${{ secrets.TEST_SECRET_KEY }}" | base64 -d)                                                                                                                     
           ENCODED_FOR_ENV=$(echo "$DECODED_KEY" | base64 -w 0)                                                                                                                         
           echo "GPG_PRIVATE_KEY_CLEAN=$ENCODED_FOR_ENV" >> $GITHUB_ENV 
 
