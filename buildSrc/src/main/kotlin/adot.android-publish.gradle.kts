@@ -75,8 +75,12 @@ afterEvaluate {
 
         // Signing only during a release.
         if (isARelease) {
+            val signingKey = System.getenv("GPG_PRIVATE_KEY")?.let { base64Key ->
+                String(java.util.Base64.getDecoder().decode(base64Key))
+            }
+            val signingPassword = System.getenv("GPG_PASSPHRASE")
             signing {
-                useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+                useInMemoryPgpKeys(signingKey, signingPassword)
                 sign(maven)
             }
         }
