@@ -25,6 +25,7 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporterBuilder
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
@@ -301,7 +302,7 @@ class RumAgentProviderTest {
     }
 
     @Test
-    fun `initialize should set application attributes when provided`() {
+    fun `initialize should set otel resource attributes when provided`() {
         val attributes =
             mapOf(
                 "custom.attribute" to JsonPrimitive("value"),
@@ -312,7 +313,7 @@ class RumAgentProviderTest {
 
         rumAgentProvider.initialize(config, mockApplication)
 
-        assertEquals(mapOf("custom.attribute" to "value"), capturedConfig.applicationAttributes)
+        assertEquals("value", capturedConfig.otelResource!!.getAttribute(AttributeKey.stringKey("custom.attribute")))
     }
 
     @Test
@@ -356,7 +357,7 @@ class RumAgentProviderTest {
             sessionTimeout = sessionTimeout,
             telemetry = telemetryConfigs,
             exportOverride = exportOverride,
-            applicationAttributes = applicationAttributes,
+            otelResourceAttributes = applicationAttributes,
         )
     }
 }

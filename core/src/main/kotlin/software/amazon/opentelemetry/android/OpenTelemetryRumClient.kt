@@ -27,6 +27,7 @@ import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
 import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import io.opentelemetry.sdk.trace.samplers.Sampler
 import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
@@ -118,9 +119,7 @@ class OpenTelemetryRumClientConfig {
         }
     var telemetry: List<TelemetryConfig>? = null
     var features: List<FeatureConfig>? = null
-    var applicationAttributes: Map<String, String> = emptyMap()
-    var serviceVersion: String? = null
-    var serviceName: String? = null
+    var otelResource: Resource? = null
     var capturedRequestHeaders: List<String>? = null
     var capturedResponseHeaders: List<String>? = null
 
@@ -150,7 +149,7 @@ class OpenTelemetryRumClientConfig {
             awsRumConfig?.build()
                 ?: throw IllegalStateException("AWS RUM configuration is required. Use awsRum { } block.")
 
-        val resource = ResourceProvider.createDefault(androidApplication, rumConfig, appVersion = serviceVersion, appName = serviceName)
+        val resource = ResourceProvider.createDefault(androidApplication, rumConfig, otelResource)
 
         val sessionProvider =
             SessionManager(
@@ -198,10 +197,6 @@ class OpenTelemetryRumClientConfig {
                     globalAttributesBuilder.put(key, value)
                 }
             }
-        }
-
-        applicationAttributes.forEach { (key, value) ->
-            globalAttributesBuilder.put(key, value)
         }
 
         val globalAttributes = globalAttributesBuilder.build()

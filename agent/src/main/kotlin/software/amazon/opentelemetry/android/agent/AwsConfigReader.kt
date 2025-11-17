@@ -68,9 +68,7 @@ internal data class AgentConfig(
     val telemetry: TelemetryConfigs? = null,
     val sessionTimeout: Int = 300,
     val sessionSampleRate: Double = 1.0,
-    val applicationAttributes: Map<String, JsonPrimitive>? = null,
-    val serviceVersion: String? = null,
-    val serviceName: String? = null,
+    val otelResourceAttributes: Map<String, JsonPrimitive>? = null,
 )
 
 @Serializable

@@ -62,10 +62,9 @@ class AwsConfigReaderTest {
           },
           "sessionTimeout": 100,
           "sessionSampleRate": 0.5,
-          "serviceVersion": "1.0",
-          "serviceName": "blah",
-          "applicationAttributes": {
-            "demo": true
+          "otelResourceAttributes": {
+            "service.name": "wow",
+            "service.version": "1.0"
           }
         }
         """.trimIndent()
@@ -98,7 +97,7 @@ class AwsConfigReaderTest {
         assertNotNull(result?.aws)
         assertNotNull(result?.exportOverride)
         assertNotNull(result?.telemetry)
-        assertNotNull(result?.applicationAttributes)
+        assertNotNull(result?.otelResourceAttributes)
         assertEquals("testing", result!!.aws.rumAppMonitorId)
         assertEquals("us-east-1", result.aws.region)
         assertEquals("my-alias", result.aws.rumAlias)
@@ -110,7 +109,8 @@ class AwsConfigReaderTest {
         assertEquals("testlogs", result.exportOverride!!.logs)
         assertEquals("testtraces", result.exportOverride!!.traces)
         assertEquals(0.5, result.sessionSampleRate, 0.001)
-        assertEquals("1.0", result.serviceVersion)
+        assertEquals("1.0", result.otelResourceAttributes!!.get("service.version")!!.content)
+        assertEquals("wow", result.otelResourceAttributes!!.get("service.name")!!.content)
     }
 
     @Test
