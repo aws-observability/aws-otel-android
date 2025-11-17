@@ -47,13 +47,14 @@ afterEvaluate {
             }
             pom {
                 val repoUrl = "https://github.com/aws-observability/aws-otel-android"
-                name.set("AWS Distro for OpenTelemetry - Instrumentation for Android")
-                description.set(project.description)
+                name.set("AWS Distro for OpenTelemetry - Instrumentation for Android - ${project.name}")
+                description.set("AWS Distro for OpenTelemetry Android SDK - ${project.name} module")
                 url.set(repoUrl)
                 licenses {
                     license {
-                        name.set("The Apache Software License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        name.set("Apache License, Version 2.0")
+                        url.set("https://aws.amazon.com/apache2.0")
+                        distribution.set("repo")
                     }
                 }
                 scm {
@@ -61,13 +62,13 @@ afterEvaluate {
                     connection.set(scmUrl)
                     developerConnection.set(scmUrl)
                     url.set(repoUrl)
-                    tag.set("HEAD")
                 }
                 developers {
                     developer {
-                        id.set("aws-opentelemetry")
-                        name.set("aws-opentelemetry")
-                        url.set("https://github.com/aws-observability")
+                        id.set("amazonwebservices")
+                        organization.set("Amazon Web Services")
+                        organizationUrl.set("https://aws.amazon.com")
+                        roles.add("developer")
                     }
                 }
             }
@@ -75,8 +76,12 @@ afterEvaluate {
 
         // Signing only during a release.
         if (isARelease) {
+            val signingKey = System.getenv("GPG_PRIVATE_KEY")?.let { base64Key ->
+                String(java.util.Base64.getDecoder().decode(base64Key))
+            }
+            val signingPassword = System.getenv("GPG_PASSPHRASE")
             signing {
-                useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+                useInMemoryPgpKeys(signingKey, signingPassword)
                 sign(maven)
             }
         }

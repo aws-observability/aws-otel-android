@@ -44,13 +44,9 @@ jobs:
             SIGNING_KEY,${{ secrets.SIGNING_KEY_SECRET_ARN }}
             SIGNING_PASSWORD,${{ secrets.SIGNING_PASSWORD_SECRET_ARN }}
 
-      - name: Set CI env var to allow gradle to sign the release
+      - name: Set env var for signing the release
         run: |
           echo "CI=true" >> $GITHUB_ENV
-
-      - name: Decode and save signing key
-        run: |
-          echo "${{ env.SIGNING_KEY }}" | base64 -d > secring.gpg
 
       - name: Extract version from gradle.properties
         run: |
@@ -60,13 +56,13 @@ jobs:
       - name: Build and Publish release with Gradle
         uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 #v3.5.0
         with:
-          arguments: build final closeSonatypeStagingRepository -Prelease.version=${{ env.VERSION }} --stacktrace # TODO: Test and replace with closeAndReleaseSonatypeStagingRepository
+          arguments: build publishToSonatype closeAndReleaseSonatypeStagingRepository -Pfinal=true --stacktrace 
         env:
-          PUBLISH_TOKEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          PUBLISH_TOKEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
-          GPG_PRIVATE_KEY: ${{ secrets.SIGNING_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSWORD }}
+          PUBLISH_TOKEN_USERNAME: ${{ env.MAVEN_CENTRAL_USERNAME }}                                                                                                                    
+          PUBLISH_TOKEN_PASSWORD: ${{ env.MAVEN_CENTRAL_PASSWORD }}                                                                                                                    
+          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}                                                                                                                                      
+          GPG_PRIVATE_KEY: ${{ env.SIGNING_KEY }}                                                                                                                                     
+          GPG_PASSPHRASE: ${{ env.SIGNING_PASSWORD }}
 
       - name: Create GitHub release
         env:
@@ -96,8 +92,3 @@ jobs:
             --title "Release v${VERSION}" \
             --notes-file release_notes.md \
             --draft
-
-      - name: Clean up signing key
-        if: always()
-        run: |
-          rm -f secring.gpg

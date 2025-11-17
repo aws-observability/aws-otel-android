@@ -54,4 +54,6 @@ nexusPublishing {
             password.set(System.getenv("PUBLISH_TOKEN_PASSWORD"))
         }
     }
+
+    useStaging.set(true)
 }

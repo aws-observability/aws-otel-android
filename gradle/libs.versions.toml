@@ -1,10 +1,13 @@
 [versions]
 opentelemetry-instrumentation-alpha = "2.20.0-alpha"
+opentelemetry-instrumentation-api = "2.20.0"
 opentelemetry-semconv = "1.37.0"
 opentelemetry = "1.55.0"
 opentelemetry-semconv-alpha = "1.34.0-alpha"
 opentelemetry-contrib = "1.49.0-alpha"
 opentelemetry-android = "0.15.0-alpha"
+opentelemetry-api = "1.55.0"
+
 mockito = "5.18.0"
 junit = "5.13.3"
 byteBuddy = "1.17.6"
@@ -37,11 +40,11 @@ opentelemetry-android-httpurlconnection-agent = {module = "io.opentelemetry.andr
 opentelemetry-android-okhttp3 = {module = "io.opentelemetry.android.instrumentation:okhttp3-library", version.ref = "opentelemetry-android"}
 opentelemetry-android-okhttp3-agent = {module = "io.opentelemetry.android.instrumentation:okhttp3-agent", version.ref = "opentelemetry-android"}
 opentelemetry-android-sessions-instrumentation = {module = "io.opentelemetry.android.instrumentation:sessions", version.ref = "opentelemetry-android"}
-opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api" }
+opentelemetry-instrumentation-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-instrumentation-api" }
 opentelemetry-instrumentation-apiSemconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-instrumentation-alpha" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
 opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv-alpha" }
-opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-api" }
 opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator" }
 opentelemetry-sdk-extension-incubator = { module = "io.opentelemetry:opentelemetry-sdk-extension-incubator" }
 opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry" }
