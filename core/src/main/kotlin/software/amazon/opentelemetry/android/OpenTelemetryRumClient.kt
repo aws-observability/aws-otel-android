@@ -34,6 +34,8 @@ import software.amazon.opentelemetry.android.features.AttributesProvidingFeature
 import software.amazon.opentelemetry.android.features.SessionIdTimeoutHandler
 import software.amazon.opentelemetry.android.features.SessionManager
 import software.amazon.opentelemetry.android.processor.CpuAttributesSpanProcessor
+import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerLogRecordProcessor
+import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerSpanProcessor
 import java.time.Duration
 
 /**
@@ -239,6 +241,11 @@ class OpenTelemetryRumClientConfig {
         delegateBuilder.addTracerProviderCustomizer { tracerProviderBuilder, _ ->
             tracerSampler?.let { tracerProviderBuilder.setSampler(it) }
             tracerProviderBuilder.addSpanProcessor(CpuAttributesSpanProcessor())
+            tracerProviderBuilder.addSpanProcessor(ExceptionMessageFillerSpanProcessor())
+        }
+
+        delegateBuilder.addLoggerProviderCustomizer { loggerProviderBuilder, _ ->
+            loggerProviderBuilder.addLogRecordProcessor(ExceptionMessageFillerLogRecordProcessor())
         }
 
         // Add session-based sampling if needed
