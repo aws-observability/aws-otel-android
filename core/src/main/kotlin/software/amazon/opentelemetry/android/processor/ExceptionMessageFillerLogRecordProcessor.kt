@@ -20,22 +20,24 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 import io.opentelemetry.semconv.ExceptionAttributes
 
 /**
- * A simple LogRecordProcessor that will fill exception.message with exception.type if there is no
- * exception.message in the span.
+ * A LogRecordProcessor that transforms exception.message to combine exception.type and exception.message.
+ * The format is "ExceptionType: message" when both exist, or just "ExceptionType" when message is missing.
  */
 class ExceptionMessageFillerLogRecordProcessor : LogRecordProcessor {
-    // Fill exception.message only when not present
     override fun onEmit(
         context: Context,
         logRecord: ReadWriteLogRecord,
     ) {
-        val exceptionMessage = logRecord.getAttribute(ExceptionAttributes.EXCEPTION_MESSAGE)
-        if (exceptionMessage != null) {
-            return
-        }
-
-        // Only fill if we have an exception.type
         val exceptionType = logRecord.getAttribute(ExceptionAttributes.EXCEPTION_TYPE) ?: return
-        logRecord.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, exceptionType)
+        val exceptionMessage = logRecord.getAttribute(ExceptionAttributes.EXCEPTION_MESSAGE)
+
+        val combinedMessage =
+            if (exceptionMessage != null) {
+                "$exceptionType: $exceptionMessage"
+            } else {
+                exceptionType
+            }
+
+        logRecord.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, combinedMessage)
     }
 }

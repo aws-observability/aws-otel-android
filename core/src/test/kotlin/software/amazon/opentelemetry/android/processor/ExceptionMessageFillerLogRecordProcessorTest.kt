@@ -42,7 +42,7 @@ class ExceptionMessageFillerLogRecordProcessorTest {
     }
 
     @Test
-    fun `onEmit should set exception message when missing but type exists`() {
+    fun `onEmit should set exception message to type only when message is missing`() {
         every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns null
         every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns "IllegalStateException"
 
@@ -54,19 +54,21 @@ class ExceptionMessageFillerLogRecordProcessorTest {
     }
 
     @Test
-    fun `onEmit should not set exception message when already present`() {
-        every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns "Existing message"
+    fun `onEmit should combine type and message when both are present`() {
+        every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns
+            "Something went wrong"
+        every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns "IllegalStateException"
 
         processor.onEmit(context, mockLogRecord)
 
-        verify(exactly = 0) {
-            mockLogRecord.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, any<String>())
+        verify {
+            mockLogRecord.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, "IllegalStateException: Something went wrong")
         }
     }
 
     @Test
     fun `onEmit should not set exception message when type is missing`() {
-        every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns null
+        every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns "Some message"
         every { mockLogRecord.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns null
 
         processor.onEmit(context, mockLogRecord)

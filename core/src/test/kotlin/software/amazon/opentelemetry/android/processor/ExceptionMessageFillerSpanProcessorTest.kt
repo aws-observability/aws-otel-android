@@ -38,7 +38,7 @@ class ExceptionMessageFillerSpanProcessorTest {
     }
 
     @Test
-    fun `onEnding should set exception message when missing but type exists`() {
+    fun `onEnding should set exception message to type only when message is missing`() {
         every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns null
         every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns "NullPointerException"
 
@@ -50,19 +50,20 @@ class ExceptionMessageFillerSpanProcessorTest {
     }
 
     @Test
-    fun `onEnding should not set exception message when already present`() {
-        every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns "Existing message"
+    fun `onEnding should combine type and message when both are present`() {
+        every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns "Object was null"
+        every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns "NullPointerException"
 
         processor.onEnding(mockSpan)
 
-        verify(exactly = 0) {
-            mockSpan.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, any<String>())
+        verify {
+            mockSpan.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, "NullPointerException: Object was null")
         }
     }
 
     @Test
     fun `onEnding should not set exception message when type is missing`() {
-        every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns null
+        every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_MESSAGE.key)) } returns "Some message"
         every { mockSpan.getAttribute(AttributeKey.stringKey(ExceptionAttributes.EXCEPTION_TYPE.key)) } returns null
 
         processor.onEnding(mockSpan)

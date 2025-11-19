@@ -21,8 +21,8 @@ import io.opentelemetry.sdk.trace.internal.ExtendedSpanProcessor
 import io.opentelemetry.semconv.ExceptionAttributes
 
 /**
- * A simple SpanProcessor that will fill exception.message with exception.type if there is no
- * exception.message in the span.
+ * A SpanProcessor that transforms exception.message to combine exception.type and exception.message.
+ * The format is "ExceptionType: message" when both exist, or just "ExceptionType" when message is missing.
  */
 class ExceptionMessageFillerSpanProcessor : ExtendedSpanProcessor {
     override fun isOnEndingRequired(): Boolean = true
@@ -38,15 +38,17 @@ class ExceptionMessageFillerSpanProcessor : ExtendedSpanProcessor {
 
     override fun isEndRequired(): Boolean = false
 
-    // Fill exception.message only when not present
     override fun onEnding(span: ReadWriteSpan) {
-        val exceptionMessage = span.getAttribute(ExceptionAttributes.EXCEPTION_MESSAGE)
-        if (exceptionMessage != null) {
-            return
-        }
-
-        // Only fill if we have an exception.type
         val exceptionType = span.getAttribute(ExceptionAttributes.EXCEPTION_TYPE) ?: return
-        span.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, exceptionType)
+        val exceptionMessage = span.getAttribute(ExceptionAttributes.EXCEPTION_MESSAGE)
+
+        val combinedMessage =
+            if (exceptionMessage != null) {
+                "$exceptionType: $exceptionMessage"
+            } else {
+                exceptionType
+            }
+
+        span.setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, combinedMessage)
     }
 }
