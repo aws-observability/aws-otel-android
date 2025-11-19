@@ -30,7 +30,7 @@ inline fun OpenTelemetryRumClient.Companion.span(
     scopeName: String = Constants.CUSTOM_TRACER_NAME,
     attributes: Attributes? = null,
     screenName: String? = null,
-    spanKind: SpanKind? = SpanKind.CLIENT,
+    spanKind: SpanKind? = SpanKind.INTERNAL,
     block: (Span) -> Unit,
 ) {
     // If there is no instance, just run the code block without creating a span
@@ -74,8 +74,8 @@ fun OpenTelemetryRumClient.Companion.fragmentTTFDSpan(fragmentName: String): Spa
     }
 
     val tracer = instance.openTelemetry.getTracer(Constants.CUSTOM_TRACER_NAME)
-    val builder = tracer.spanBuilder(Constants.TTFD_SPAN_NAME)
-    builder.setSpanKind(SpanKind.CLIENT)
+    val builder = tracer.spanBuilder(Constants.TIME_TO_FIRST_DRAW_SPAN_NAME)
+    builder.setSpanKind(SpanKind.INTERNAL)
 
     val span = builder.startSpan()
     span.setAttribute(Constants.FRAGMENT_NAME_KEY, fragmentName)

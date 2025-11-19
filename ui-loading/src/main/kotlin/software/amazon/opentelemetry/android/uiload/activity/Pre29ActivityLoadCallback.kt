@@ -28,7 +28,7 @@ class Pre29ActivityLoadCallback(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
-        tracers.startSpan(activity, Constants.TTFD_SPAN_NAME)
+        tracers.startSpan(activity, Constants.TIME_TO_FIRST_DRAW_SPAN_NAME)
         firstDrawListener.registerFirstDraw(
             activity,
         ) { view -> tracers.endSpan(activity, view) }

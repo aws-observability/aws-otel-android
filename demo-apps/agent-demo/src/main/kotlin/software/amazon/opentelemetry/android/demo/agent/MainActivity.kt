@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupUI()
-//        addInstrumentationTestFragment()
     }
 
     private fun setupUI() {
@@ -96,17 +95,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private fun addInstrumentationTestFragment() {
-//        val fragmentManager = supportFragmentManager
-//        fakeTtfdFragmentSpan = AwsRum.startFragmentTTFDSpan("InstrumentationTestFragment")
-//        val fragmentTransaction = fragmentManager.beginTransaction()
-//
-//        val fragment = InstrumentationTestFragment.newInstance()
-//        fragmentTransaction.add(R.id.fragmentContainer, fragment)
-//        fragmentTransaction.commit()
-//        fakeTtfdFragmentSpan.end()
-//    }
 
     private fun navigateToSecondActivity() {
         Log.d(TAG, "Navigating to SecondActivity")

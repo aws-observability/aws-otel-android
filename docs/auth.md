@@ -2,22 +2,22 @@
 
 This guide covers authentication options for AWS Distro for OpenTelemetry Android.
 
-## Resource-Based Policy with Alias (Recommended)
+## Resource-Based Policy (Recommended)
 
-The simplest approach uses a resource-based policy with an alias. This works with both **agent** and **core** modules and requires no credential management in your app.
+The simplest approach uses a resource-based policy. This works with both **agent** and **core** modules and requires no credential management in your app.
 
 ### Setup
 
 1. Create a resource-based policy in your RUM app monitor with an alias
-2. Configure your app with the alias:
+2. (OPTIONAL) Configure your app with the alias, if your policy has that:
 
 **Agent (zero-code)** - `res/raw/aws_config.json`:
-```json
+```jsonc
 {
   "aws": {
     "region": "us-east-1",
     "rumAppMonitorId": "your-app-monitor-id",
-    "rumAlias": "your-rum-alias"
+    "rumAlias": "your-rum-alias" // optional, if your policy has defined it
   },
   "otelResourceAttributes": {
     "service.name": "MyApplication",
@@ -84,20 +84,24 @@ class MyApplication : Application() {
             )
         }
 
+        val region = "us-east-1"
+        val serviceName = "rum"
+        val endpoint = "https://dataplane.rum.$region.amazonaws.com/v1/rum"
+
         OpenTelemetryRumClient {
             androidApplication = this@MyApplication
 
             spanExporter = AwsSigV4SpanExporter.builder()
-                .setEndpoint("https://dataplane.rum.us-east-1.amazonaws.com/v1/rum")
-                .setRegion("us-east-1")
-                .setServiceName("rum")
+                .setEndpoint(endpoint)
+                .setRegion(region)
+                .setServiceName(serviceName)
                 .setCredentialsProvider(credentialsProvider)
                 .build()
 
             logRecordExporter = AwsSigV4LogRecordExporter.builder()
-                .setEndpoint("https://dataplane.rum.us-east-1.amazonaws.com/v1/rum")
-                .setRegion("us-east-1")
-                .setServiceName("rum")
+                .setEndpoint(endpoint)
+                .setRegion(region)
+                .setServiceName(serviceName)
                 .setCredentialsProvider(credentialsProvider)
                 .build()
 

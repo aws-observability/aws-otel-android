@@ -59,7 +59,7 @@ Create `res/raw/aws_config.json`:
     "service.namespace": "MyTeam",
     "service.version": "1.0.0",
     "deployment.environment": "production"
-    // ... plus any additional custom resource attributes you care to define
+    // ... plus any additional custom resource attributes you want to define
   }
 }
 ```
@@ -98,6 +98,9 @@ class MyApplication : Application() {
    }
 }
 ```
+
+- [Read more about custom instrumentation you can manually enable](docs/custom_instrumentation.md)
+- [Read more about configuring the SDK with authentication](docs/auth.md)
 
 ## Feature modules
 
