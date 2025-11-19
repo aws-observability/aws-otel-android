@@ -59,7 +59,7 @@ For advanced use cases requiring custom credential management, use SigV4-signed 
 ```kotlin
 dependencies {
     implementation("software.amazon.opentelemetry.android:core:1.0.0")
-    implementation("software.amazon.opentelemetry.android:aws-kotlin-sdk:1.0.0")
+    implementation("software.amazon.opentelemetry.android:kotlin-sdk-auth:1.0.0")
 }
 ```
 
