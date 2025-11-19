@@ -39,6 +39,7 @@ import software.amazon.opentelemetry.android.processor.CpuAttributesSpanProcesso
 import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerLogRecordProcessor
 import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerSpanProcessor
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 /**
  * The main entrypoint for RUM OpenTelemetry on AWS with Kotlin DSL configuration.
@@ -92,13 +93,42 @@ class AwsRumConfig {
 }
 
 /**
- * Configuration DSL for disk buffering
+ * Configuration DSL for disk buffering.
+ *
+ * By default, it is ENABLED and set to target approximately 5-second export intervals for
+ * all signal types.
  */
 class DiskBufferingConfigDsl {
+    /** Enable / disable disk buffering */
     var enabled: Boolean = true
+
+    /** The maximum volume (in bytes) of cached signals */
     var maxCacheSize: Int = 10_000_000
 
-    internal fun build(): DiskBufferingConfig = DiskBufferingConfig(enabled, maxCacheSize)
+    /** The max amount of time a cache file can receive new data. */
+    var maxFileAgeForWriteMillis: Long = TimeUnit.SECONDS.toMillis(4)
+
+    /**
+     * The min amount of time needed to pass before reading from a file. This value MUST be greater
+     * than maxFileAgeForWriteMillis to make sure the selected file to read is not being written
+     * to.
+     */
+    var minFileAgeForReadMillis: Long = TimeUnit.SECONDS.toMillis(5)
+
+    /**
+     * The max amount of time a file can be read from, which is also the amount of time a file is not
+     * considered to be deleted as stale.
+     */
+    var maxFileAgeForReadMillis: Long = TimeUnit.SECONDS.toMillis(30)
+
+    internal fun build(): DiskBufferingConfig =
+        DiskBufferingConfig(
+            enabled,
+            maxCacheSize,
+            maxFileAgeForWriteMillis,
+            minFileAgeForReadMillis,
+            maxFileAgeForReadMillis,
+        )
 }
 
 /**
