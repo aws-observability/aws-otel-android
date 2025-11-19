@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.opentelemetry.sdk)
     implementation(libs.opentelemetry.semconv)
     implementation(libs.opentelemetry.semconv.incubating)
+    implementation(project(":common"))
 }
 
 tasks.withType<Test> {

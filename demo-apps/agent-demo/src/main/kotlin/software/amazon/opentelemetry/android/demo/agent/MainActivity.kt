@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import software.amazon.opentelemetry.android.api.AwsRum
 import software.amazon.opentelemetry.android.demo.agent.SecondActivity.Companion.HTTP_200_URL
 import software.amazon.opentelemetry.android.demo.agent.databinding.ActivityMainBinding
 import java.io.BufferedInputStream
@@ -57,11 +56,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val startTime = System.currentTimeMillis()
-        val customSpan = AwsRum.startSpan("custom-span-1", startTime, this.javaClass.simpleName)
         setupUI()
-        customSpan.end()
-        addInstrumentationTestFragment()
     }
 
     private fun setupUI() {
@@ -99,17 +94,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun addInstrumentationTestFragment() {
-        val fragmentManager = supportFragmentManager
-        fakeTtfdFragmentSpan = AwsRum.startFragmentTTFDSpan("InstrumentationTestFragment")
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        
-        val fragment = InstrumentationTestFragment.newInstance()
-        fragmentTransaction.add(R.id.fragmentContainer, fragment)
-        fragmentTransaction.commit()
-        fakeTtfdFragmentSpan.end()
     }
 
     private fun navigateToSecondActivity() {

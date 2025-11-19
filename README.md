@@ -46,18 +46,20 @@ Create `res/raw/aws_config.json`:
 ```jsonc
 {
   "aws": {
-    // REQUIRED fields:
-    "region": "us-east-1", // specify the AWS region your app monitor has been created in
-    "rumAppMonitorId": "<your-app-monitor-id>",
+    "region": "<your region>",
+    "rumAppMonitorId": "<your app monitor id>",
+
+    // optional, if you have a resource-based policy with an alias
+    "rumAlias": "<your rum alias"
   },
 
-  // optional attributes that will be appended to your OpenTelemetry Resource
+  // optional resource attributes, but recommended
   "otelResourceAttributes": {
-    "deployment.environment": "staging",
     "service.name": "MyApplication",
-
-    // Add this field to your application for additional filtering in AWS RUM dashboards
-    "service.version": "1.0"
+    "service.namespace": "MyTeam",
+    "service.version": "1.0.0",
+    "deployment.environment": "production"
+    // ... plus any additional custom resource attributes you want to define
   }
 }
 ```
@@ -97,26 +99,8 @@ class MyApplication : Application() {
 }
 ```
 
-### 3. Custom Instrumentation (Optional)
-
-```kotlin
-import software.amazon.opentelemetry.android.api.AwsRum
-
-// Create custom spans
-val span = AwsRum.startSpan(
-    name = "user_action",
-    screenName = "MainActivity",
-    attributes = mapOf("action" to "button_click")
-)
-// ... perform work
-span.end()
-
-// Or use executeSpan for automatic lifecycle management
-AwsRum.executeSpan("database_query") { span ->
-    // Your code here - span is automatically ended
-    performDatabaseQuery()
-}
-```
+- [Read more about custom instrumentation you can manually enable](docs/custom_instrumentation.md)
+- [Read more about configuring the SDK with authentication](docs/auth.md)
 
 ## Feature modules
 
