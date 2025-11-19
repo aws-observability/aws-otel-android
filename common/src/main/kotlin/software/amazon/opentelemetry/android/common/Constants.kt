@@ -17,7 +17,7 @@ package software.amazon.opentelemetry.android.common
 import io.opentelemetry.api.common.AttributeKey
 
 object Constants {
-    val FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("app.fragment.name")
+    val FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("fragment.name")
 
     const val CUSTOM_TRACER_NAME = "tracer.custom"
 
