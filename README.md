@@ -48,11 +48,11 @@ Create `res/raw/aws_config.json`:
   "aws": {
     "region": "<your region>",
     "rumAppMonitorId": "<your app monitor id>",
-    
+
     // optional, if you have a resource-based policy with an alias
     "rumAlias": "<your rum alias"
   },
-  
+
   // optional resource attributes, but recommended
   "otelResourceAttributes": {
     "service.name": "MyApplication",

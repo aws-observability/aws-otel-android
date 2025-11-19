@@ -86,21 +86,21 @@ class MyApplication : Application() {
 
         OpenTelemetryRumClient {
             androidApplication = this@MyApplication
-            
+
             spanExporter = AwsSigV4SpanExporter.builder()
                 .setEndpoint("https://dataplane.rum.us-east-1.amazonaws.com/v1/rum")
                 .setRegion("us-east-1")
                 .setServiceName("rum")
                 .setCredentialsProvider(credentialsProvider)
                 .build()
-                
+
             logRecordExporter = AwsSigV4LogRecordExporter.builder()
                 .setEndpoint("https://dataplane.rum.us-east-1.amazonaws.com/v1/rum")
                 .setRegion("us-east-1")
                 .setServiceName("rum")
                 .setCredentialsProvider(credentialsProvider)
                 .build()
-            
+
             otelResource = Resource.builder()
                 .put("service.name", "MyApplication")
                 .put("service.version", "1.0.0")

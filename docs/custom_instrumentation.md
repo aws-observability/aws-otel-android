@@ -45,11 +45,11 @@ Track sub-operations within a larger operation:
 ```kotlin
 OpenTelemetryRumClient.span("load_dashboard") { parentSpan ->
     loadUserData()
-    
+
     OpenTelemetryRumClient.span("load_notifications") { childSpan ->
         fetchNotifications()
     }
-    
+
     OpenTelemetryRumClient.span("load_feed") { childSpan ->
         fetchFeed()
     }
@@ -108,7 +108,7 @@ import software.amazon.opentelemetry.android.features.fragmentTTFDSpan
 
 class MyFragment : Fragment() {
     private var ttfdSpan: Span? = null
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -117,10 +117,10 @@ class MyFragment : Fragment() {
         ttfdSpan = OpenTelemetryRumClient.fragmentTTFDSpan("MyFragment")
         return inflater.inflate(R.layout.fragment_my, container, false)
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 view.viewTreeObserver.removeOnPreDrawListener(this)
