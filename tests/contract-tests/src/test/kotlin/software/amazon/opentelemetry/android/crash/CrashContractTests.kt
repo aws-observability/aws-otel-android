@@ -46,7 +46,7 @@ class CrashContractTests {
 
         Assertions.assertEquals(
             logRecords.attributes(EXCEPTION_MESSAGE_ATTR).value.stringValue,
-            "java.lang.reflect.InvocationTargetException",
+            "java.lang.RuntimeException: java.lang.reflect.InvocationTargetException",
         )
         Assertions.assertEquals(
             logRecords.attributes(EXCEPTION_TYPE_ATTR).value.stringValue,

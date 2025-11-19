@@ -56,6 +56,12 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, InstrumentationTestFragment.newInstance())
+                .commit()
+        }
+
         setupUI()
     }
 

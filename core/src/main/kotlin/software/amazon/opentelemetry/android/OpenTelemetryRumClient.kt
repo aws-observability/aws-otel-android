@@ -39,6 +39,7 @@ import software.amazon.opentelemetry.android.processor.CpuAttributesSpanProcesso
 import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerLogRecordProcessor
 import software.amazon.opentelemetry.android.processor.ExceptionMessageFillerSpanProcessor
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 /**
  * The main entrypoint for RUM OpenTelemetry on AWS with Kotlin DSL configuration.
@@ -97,8 +98,18 @@ class AwsRumConfig {
 class DiskBufferingConfigDsl {
     var enabled: Boolean = true
     var maxCacheSize: Int = 10_000_000
+    var maxFileAgeForWriteMillis: Long = TimeUnit.SECONDS.toMillis(4)
+    var minFileAgeForReadMillis: Long = TimeUnit.SECONDS.toMillis(5)
+    var maxFileAgeForReadMillis: Long = TimeUnit.SECONDS.toMillis(30)
 
-    internal fun build(): DiskBufferingConfig = DiskBufferingConfig(enabled, maxCacheSize)
+    internal fun build(): DiskBufferingConfig =
+        DiskBufferingConfig(
+            enabled,
+            maxCacheSize,
+            maxFileAgeForWriteMillis,
+            minFileAgeForReadMillis,
+            maxFileAgeForReadMillis,
+        )
 }
 
 /**
