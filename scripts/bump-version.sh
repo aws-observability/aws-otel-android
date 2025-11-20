@@ -152,22 +152,50 @@ update_version_in_gradle_properties() {
     update_version_in_file "$GRADLE_PROPERTIES" "$old_pattern" "$new_pattern"
 }
 
-# Function to update version in README file
-update_version_in_readme_file() {
+# Function to update version in all markdown files
+update_version_in_markdown_files() {
     local old_version=$1
     local new_version=$2
     
-    # Update version references in README if they exist
-    local old_pattern="\${LATEST_VERSION}"
-    local new_pattern="$new_version"
+    # Find all markdown files
+    local md_files=$(find . -name "*.md" -type f ! -path "*/node_modules/*" ! -path "*/.git/*")
+    local updated_count=0
     
-    # Check if README contains version references and update them
-    if grep -q "LATEST_VERSION" "$README_FILE" 2>/dev/null; then
-        update_version_in_file "$README_FILE" "$old_pattern" "$new_pattern"
+    for file in $md_files; do
+        local file_updated=false
+        
+        # Create backup
+        cp "$file" "${file}.backup"
+        
+        # Update agent:version, core:version, and kotlin-sdk-auth:version patterns
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' -E "s/(agent:)${old_version}/\1${new_version}/g" "$file"
+            sed -i '' -E "s/(core:)${old_version}/\1${new_version}/g" "$file"
+            sed -i '' -E "s/(kotlin-sdk-auth:)${old_version}/\1${new_version}/g" "$file"
+        else
+            sed -i -E "s/(agent:)${old_version}/\1${new_version}/g" "$file"
+            sed -i -E "s/(core:)${old_version}/\1${new_version}/g" "$file"
+            sed -i -E "s/(kotlin-sdk-auth:)${old_version}/\1${new_version}/g" "$file"
+        fi
+        
+        # Check if file was actually modified
+        if ! diff -q "$file" "${file}.backup" > /dev/null 2>&1; then
+            print_color $GREEN "✓ Updated $file"
+            file_updated=true
+            updated_count=$((updated_count + 1))
+        fi
+        
+        # Remove backup
+        rm -f "${file}.backup"
+    done
+    
+    if [[ $updated_count -eq 0 ]]; then
+        print_color $YELLOW "No version references found in markdown files to update"
     else
-        print_color $YELLOW "No version references found in README.md to update"
-        return 0
+        print_color $GREEN "✓ Updated $updated_count markdown file(s)"
     fi
+    
+    return 0
 }
 
 # Function to commit and tag the version bump
@@ -178,7 +206,7 @@ commit_and_tag_version() {
     
     if [[ "$do_commit" == true ]]; then
         print_color $BLUE "Committing version bump..."
-        git add "$GRADLE_PROPERTIES" "$README_FILE"
+        git add "$GRADLE_PROPERTIES" "*.md"
         git commit -m "chore(release): v$version"
         print_color $GREEN "✓ Committed version bump with message: 'chore(release): v$version'"
     fi
@@ -261,30 +289,24 @@ main() {
     
     # Update the versions in all files
     local gradle_success=false
-    local readme_success=false
     
     # Update gradle.properties
     if update_version_in_gradle_properties "$current_version" "$new_version"; then
         gradle_success=true
     fi
     
-    # Update README file  
-    if update_version_in_readme_file "$current_version" "$new_version"; then
-        readme_success=true
-    fi
+    # Update all markdown files
+    update_version_in_markdown_files "$current_version" "$new_version"
     
     # Check if at least gradle.properties update was successful
     if [[ "$gradle_success" == true ]]; then
         # Clean up backups if successful
         rm -f "${GRADLE_PROPERTIES}.backup"
-        rm -f "${README_FILE}.backup"
         
         print_color $GREEN "Version bump completed successfully!"
         print_color $BLUE "Files updated:"
         print_color $BLUE "  - $GRADLE_PROPERTIES (project version)"
-        if [[ "$readme_success" == true ]]; then
-            print_color $BLUE "  - $README_FILE (documentation)"
-        fi
+        print_color $BLUE "  - All markdown files with version references"
         
         # Commit and tag if requested
         if [[ "$do_commit" == true || "$do_tag" == true ]]; then
