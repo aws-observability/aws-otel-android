@@ -87,7 +87,7 @@ owasp = {module = "org.owasp:dependency-check-gradle", version.ref = "owasp"}
 desugarJdkLibs = "com.android.tools:desugar_jdk_libs:2.1.5"
 nullaway = "com.uber.nullaway:nullaway:0.12.7"
 errorprone-core = "com.google.errorprone:error_prone_core:2.37.0"
-errorprone-javac = "com.google.errorprone:javac:9+181-r4173-1"
+errorprone-javac = "com.google.errorprone:javac:1+"
 spotless-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 errorprone-plugin = "net.ltgt.gradle:gradle-errorprone-plugin:4.3.0"
 nullaway-plugin = "net.ltgt.gradle:gradle-nullaway-plugin:2.2.0"
