@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize
         uses: ./.github/actions/initialization
@@ -24,7 +24,7 @@ jobs:
   static-code-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd #5.0.1
+      - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 #5.0.1
         with:
           fetch-depth: 0
           
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize
         uses: ./.github/actions/initialization
