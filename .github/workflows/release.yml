@@ -28,7 +28,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Configure AWS credentials for secrets
-        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 #v5.0.0
+        uses: aws-actions/configure-aws-credentials@f487a3d99423b03b33cbe8a0944867cb0f4223f9 #v5.0.0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_SECRETS_MANAGER }}
           role-session-name: GitHubActions-Release
