@@ -3,7 +3,7 @@ name: Soak Test
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, test/e2e ]
 
 jobs:
   run-soak-test:
@@ -17,10 +17,10 @@ jobs:
         with:
           ref: main
 
-      - name: Checkout folder demo-apps/petclinic-demo from test/PetClinic
+      - name: Checkout folder demo-apps/PetClinic-Android from test/e2e
         run: |
-          git fetch origin test/PetClinic
-          git checkout origin/test/PetClinic -- demo-apps/petclinic-demo
+          git fetch origin test/e2e
+          git checkout origin/test/e2e -- demo-apps/PetClinic-Android
 
       - name: Build Android SDK
         run: |
