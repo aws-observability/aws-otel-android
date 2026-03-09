@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme for dark mode. -->
+    <style name="Base.Theme.PetClinic" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">#8BC34A</item>
+        <item name="colorPrimaryDark">#6DA52F</item>
+        <item name="colorAccent">#8BC34A</item>
+        <item name="android:colorBackground">#1C1C1C</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+    </style>
+</resources>
