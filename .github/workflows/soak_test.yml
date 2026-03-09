@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Android App
         run: |
-          cd demo-apps/petclinic-demo
+          cd demo-apps/PetClinic-Android
           ./gradlew assembleDebug assembleDebugAndroidTest
 
       - name: Build Artifacts - App APK
