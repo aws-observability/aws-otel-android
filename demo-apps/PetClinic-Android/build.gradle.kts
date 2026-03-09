@@ -52,6 +52,8 @@ android {
 dependencies {
     // Instrument the app w/ ADOT Android
     implementation("software.amazon.opentelemetry.android:core:1.0.0-beta")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.47.0")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.47.0")
     // Automated HTTP client instrumentation with ByteBuddy (optional but recommended)
     byteBuddy("io.opentelemetry.android.instrumentation:okhttp3-agent:0.15.0-alpha")
     byteBuddy("io.opentelemetry.android.instrumentation:httpurlconnection-agent:0.15.0-alpha")
