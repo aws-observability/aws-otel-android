@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish SDK to Maven Local
         run: |
-          ./gradlew publishToMavenLocal
+          ./gradlew publishToMavenLocal -x signMavenPublication
 
       - name: Build Android App
         run: |
