@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish SDK to Maven Local (not a release)
         run: |
-          ./gradlew publishToMavenLocal
+          ./gradlew publishToMavenLocal --exclude-task signMavenPublication
         env:
           CI: ""
 
