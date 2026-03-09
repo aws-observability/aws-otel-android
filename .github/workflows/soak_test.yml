@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Android SDK
         run: |
-          ./gradlew build -x :demo-apps:agent-demo:build -x :demo-apps:anr-demo:build -x :demo-apps:crash-demo:build -x :demo-apps:simple-aws-demo:build
+          ./gradlew build -x :demo-apps:agent-demo:build -x :demo-apps:anr-demo:build -x :demo-apps:crash-demo:build
 
       - name: Publish SDK to Maven Local (not a release)
         run: |
