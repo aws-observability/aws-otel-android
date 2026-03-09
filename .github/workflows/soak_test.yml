@@ -26,9 +26,11 @@ jobs:
         run: |
           ./gradlew build
 
-      - name: Publish SDK to Maven Local
+      - name: Publish SDK to Maven Local (not a release)
         run: |
-          ./gradlew publishToMavenLocal -x signMavenPublication
+          ./gradlew publishToMavenLocal
+        env:
+          CI: ""
 
       - name: Build Android App
         run: |
