@@ -75,4 +75,4 @@ jobs:
       - name: Upload App to S3
         run: |
           # Upload app
-          set -o pipefail && aws s3 cp ${{ github.workspace }}demo-apps/PetClinic-Android/build/outputs/apk/debug/PetClinic-debug.apk s3://${{ secrets.AWS_RUM_GAMMA_BUCKET_NAME }}/app/PetClinic_$(date +%Y%m%d_%H%M%S).apk --region ${{ secrets.AWS_RUM_GAMMA_REGION }} --metadata "commitHash=${{ github.sha }}"
+          set -o pipefail && aws s3 cp ${{ github.workspace }}/demo-apps/PetClinic-Android/build/outputs/apk/debug/PetClinic-debug.apk s3://${{ secrets.AWS_RUM_GAMMA_BUCKET_NAME }}/app/PetClinic_$(date +%Y%m%d_%H%M%S).apk --region ${{ secrets.AWS_RUM_GAMMA_REGION }} --metadata "commitHash=${{ github.sha }}"
