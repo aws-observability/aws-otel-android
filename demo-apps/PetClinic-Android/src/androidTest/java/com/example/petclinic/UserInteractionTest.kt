@@ -58,9 +58,9 @@ class UserInteractionTest {
     private fun testUIJankFeature() {
         scrollToBottom()
         try {
-            composeTestRule.onNodeWithText("🟡 Start UI Jank").performClick()
+            composeTestRule.onNodeWithText("🐌 Start UI Jank").performClick()
             Thread.sleep(2000)
-            composeTestRule.onNodeWithText("🟢 Stop UI Jank").performClick()
+            composeTestRule.onNodeWithText("✅ Stop UI Jank").performClick()
             Thread.sleep(500)
         } catch (e: Exception) {
             // Continue if buttons not found
