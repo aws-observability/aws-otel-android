@@ -59,9 +59,12 @@ class UserInteractionTest {
         scrollToBottom()
         try {
             composeTestRule.onNodeWithText("🐌 Start UI Jank").performClick()
-            Thread.sleep(2000)
+            composeTestRule.waitForIdle()
+            composeTestRule.waitUntil(3000) {
+                composeTestRule.onAllNodesWithText("✅ Stop UI Jank").fetchSemanticsNodes().isNotEmpty()
+            }
             composeTestRule.onNodeWithText("✅ Stop UI Jank").performClick()
-            Thread.sleep(500)
+            composeTestRule.waitForIdle()
         } catch (e: Exception) {
             // Continue if buttons not found
         }
