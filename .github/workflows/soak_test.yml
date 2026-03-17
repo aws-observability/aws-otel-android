@@ -1,0 +1,78 @@
+name: Soak Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-soak-test:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Checkout folder demo-apps/PetClinic-Android from test/e2e
+        run: |
+          git fetch origin test/e2e
+          git checkout origin/test/e2e -- demo-apps/PetClinic-Android
+
+      - name: Build Android SDK
+        run: |
+          ./gradlew build -x :demo-apps:agent-demo:build -x :demo-apps:anr-demo:build -x :demo-apps:crash-demo:build
+
+      - name: Publish SDK to Maven Local (not a release)
+        run: |
+          unset CI && ./gradlew publishToMavenLocal
+
+      - name: Build Android App
+        run: |
+          cd demo-apps/PetClinic-Android
+          ./gradlew assembleDebug assembleDebugAndroidTest
+
+      - name: Build Artifacts - App APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: petclinic-android-app
+          path: demo-apps/PetClinic-Android/build/outputs/apk/debug/PetClinic-debug.apk
+          retention-days: 7
+
+      - name: Build Artifacts - Test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: petclinic-android-test
+          path: demo-apps/PetClinic-Android/build/outputs/apk/androidTest/debug/PetClinic-debug-androidTest.apk
+          retention-days: 7
+
+      - name: Build Artifacts - TestSpec
+        uses: actions/upload-artifact@v4
+        with:
+          name: petclinic-android-test-spec
+          path: demo-apps/PetClinic-Android/deviceFarmTestSpec.yml
+          retention-days: 7
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.SOAKTEST_OIDC_ROLE }}
+          aws-region: ${{ secrets.SOAKTEST_AWS_REGION }}
+          role-session-name: GitHubActions-SoakTest
+          audience: sts.amazonaws.com
+
+      - name: Upload TestSpec to S3
+        run: |
+          # Upload test specification
+          set -o pipefail && aws s3 cp ${{ github.workspace }}/demo-apps/PetClinic-Android/deviceFarmTestSpec.yml s3://${{ secrets.SOAKTEST_BUCKET_NAME }}/testSpec/testSpec_$(date +%Y%m%d_%H%M%S).yaml --region ${{ secrets.SOAKTEST_AWS_REGION }} --metadata "commitHash=${{ github.sha }}"
+      - name: Upload TestPackage to S3
+        run: |
+          # Upload test package
+          set -o pipefail && aws s3 cp ${{ github.workspace }}/demo-apps/PetClinic-Android/build/outputs/apk/androidTest/debug/PetClinic-debug-androidTest.apk s3://${{ secrets.SOAKTEST_BUCKET_NAME }}/tests/tests_$(date +%Y%m%d_%H%M%S).apk --region ${{ secrets.SOAKTEST_AWS_REGION }} --metadata "commitHash=${{ github.sha }}"
+      - name: Upload App to S3
+        run: |
+          # Upload app
+          set -o pipefail && aws s3 cp ${{ github.workspace }}/demo-apps/PetClinic-Android/build/outputs/apk/debug/PetClinic-debug.apk s3://${{ secrets.SOAKTEST_BUCKET_NAME }}/app/PetClinic_$(date +%Y%m%d_%H%M%S).apk --region ${{ secrets.SOAKTEST_AWS_REGION }} --metadata "commitHash=${{ github.sha }}"

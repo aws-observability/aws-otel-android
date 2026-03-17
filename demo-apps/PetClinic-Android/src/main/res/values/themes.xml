@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PetClinic" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">#6DB33F</item>
+        <item name="colorPrimaryDark">#5A9A35</item>
+        <item name="colorAccent">#6DB33F</item>
+        <item name="android:colorBackground">#F1F1F1</item>
+        <item name="android:textColorPrimary">#34302D</item>
+    </style>
+
+    <style name="Theme.PetClinic" parent="Base.Theme.PetClinic" />
+</resources>

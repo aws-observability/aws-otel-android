@@ -1,0 +1,84 @@
+version: 0.1
+
+android_test_host: amazon_linux_2
+
+phases:
+
+  install:
+    commands:
+
+  pre_test:
+    commands:
+      - echo "setting Device Farm Job ID"
+
+  test:
+    commands:
+      - echo "Starting the Instrumentation test"
+      - |
+        adb -s $DEVICEFARM_DEVICE_UDID shell "am instrument -r -w \
+        -e deviceFarmJobId "<PASTE_JOB_ID>" \ 
+        -e appMonitorId "0d99d210-2a2c-44c5-b47d-6e7330bd3349" \
+        -e appMonitorRegion "us-west-2" \
+        -e environmentSuffix "-gamma" \
+        --no-window-animation \
+        com.example.petclinic.test/com.example.petclinic.PetClinicTestRunner 2>&1 || echo \": -1\"" |
+        tee $DEVICEFARM_LOG_DIR/instrument.log
+
+      - |-
+        DID_ANY_TESTS_START=$(grep "INSTRUMENTATION_STATUS_CODE: 1" $DEVICEFARM_LOG_DIR/instrument.log |
+          wc -l);
+        TESTS_PASSED=$(grep "INSTRUMENTATION_STATUS_CODE: 0" $DEVICEFARM_LOG_DIR/instrument.log | wc -l);
+        TESTS_ERRORED=$(grep "INSTRUMENTATION_STATUS_CODE: -1" $DEVICEFARM_LOG_DIR/instrument.log | wc -l);
+        TESTS_FAILED=$(grep "INSTRUMENTATION_STATUS_CODE: -2" $DEVICEFARM_LOG_DIR/instrument.log | wc -l);
+        TESTS_IGNORED=$(grep "INSTRUMENTATION_STATUS_CODE: -3" $DEVICEFARM_LOG_DIR/instrument.log | wc -l);
+        TESTS_ASSUMPTION_FAILED=$(grep "INSTRUMENTATION_STATUS_CODE: -4" $DEVICEFARM_LOG_DIR/instrument.log |
+          wc -l);
+        TESTS_PROCESSES_CRASHED=$(grep "INSTRUMENTATION_RESULT: shortMsg=Process crashed." \
+          $DEVICEFARM_LOG_DIR/instrument.log | wc -l);
+
+      - >-
+        echo "From your instrumentation output, it appears that $TESTS_PASSED tests passed,
+        $TESTS_FAILED failed, $TESTS_IGNORED were ignored, $TESTS_ERRORED errored,
+        and $TESTS_ASSUMPTION_FAILED experienced an assumption failure.";
+        
+        echo "These counts are calculated directly from the raw instrumentation output, thus any 
+        redundant lines of output (e.g. a test case that was retried multiple times) could cause 
+        the numbers to not align exactly with your expected number of test cases.";
+
+      - |
+        if [ $TESTS_PROCESSES_CRASHED -ne 0 ] || [ $TESTS_FAILED -ne 0 ];
+        then
+          echo "App crash or test failure detected! Reopening app to allow crash report to publish...";
+          PACKAGE_NAME=$(echo $DEVICEFARM_TEST_PACKAGE_NAME | sed 's/\.test$//')
+          adb -s $DEVICEFARM_DEVICE_UDID shell monkey -p $PACKAGE_NAME -c android.intent.category.LAUNCHER 1
+          echo "Waiting 20 seconds for crash report to publish..."
+          sleep 20
+          echo "Crash report publishing window complete"
+        fi;
+
+      - |
+        if [ $DID_ANY_TESTS_START -eq 0 ];
+        then
+          echo "Marking the test suite as failed because no tests started!";
+          false;
+        elif [ $TESTS_FAILED -ne 0 ];
+        then
+          echo "Marking the test suite as failed because $TESTS_FAILED tests failed!";
+          false;
+        elif [ $TESTS_ERRORED -ne 0 ];
+        then
+          echo "Marking the test suite as failed because $TESTS_ERRORED tests errored!";
+          false;
+        elif [ $TESTS_PROCESSES_CRASHED -ne 0 ];
+        then
+          echo "Marking the test suite as failed because the application-under-test crashed during the test!";
+          false;
+        else
+          echo "Tests passed!";
+        fi;
+
+  post_test:
+    commands:
+
+artifacts:
+  - $DEVICEFARM_LOG_DIR

@@ -1,0 +1,10 @@
+{
+  "aws": {
+    "region": "<your region>",
+    "rumAppMonitorId": "<your app monitor id>"
+  },
+  "otelResourceAttributes": {
+    "service.name": "PetClinic-AndroidApp-Prod",
+    "service.version": "1.0.0"
+  }
+}
