@@ -17,7 +17,7 @@ phases:
       - |
         adb -s $DEVICEFARM_DEVICE_UDID shell "am instrument -r -w \
         -e deviceFarmJobId "<PASTE_JOB_ID>" \ 
-        -e appMonitorId "e00aab52-f520-4fcd-8ba7-aae113878057" \
+        -e appMonitorId "0d99d210-2a2c-44c5-b47d-6e7330bd3349" \
         -e appMonitorRegion "us-west-2" \
         -e environmentSuffix "-gamma" \
         --no-window-animation \
